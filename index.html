@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>TITAN NETWORK PRO</title>
+    <title>TITAN NETWORK</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root { --blue: #007aff; --bg: #f8f9fa; --card: #ffffff; --green: #2ecc71; --gold: #f1c40f; }
@@ -11,25 +11,23 @@
         .page { display: none; height: 100vh; overflow-y: auto; padding-bottom: 100px; box-sizing: border-box; }
         .page.active { display: block; }
         
-        /* Cüzdan ve Header */
-        .header-card { background: var(--card); margin: 15px; padding: 15px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; }
-        .wallet-display { background: #eef6ff; padding: 10px 15px; border-radius: 15px; border: 1px solid #d0e7ff; }
+        /* Cüzdan Kartı Tasarımı */
+        .wallet-card { background: var(--card); margin: 15px; padding: 20px; border-radius: 25px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); text-align: center; }
+        .wallet-icon { width: 60px; height: 60px; background: #eef6ff; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; font-size: 30px; }
 
-        /* Reaktör Bölümü */
-        .mining-area { text-align: center; margin-top: 10px; }
+        /* Reaktör Alanı */
+        .mining-area { text-align: center; margin-top: 20px; }
         .reactor { width: 180px; height: 180px; margin: 0 auto; border: 8px solid #eef6ff; border-radius: 50%; position: relative; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px rgba(0,122,255,0.2); }
         .blades { width: 140px; height: 140px; background: conic-gradient(from 0deg, transparent 0%, var(--blue) 30%, transparent 40%, var(--blue) 70%, transparent 80%); border-radius: 50%; animation: spin 2s linear infinite; filter: blur(2px); opacity: 0.8; }
-        .reactor-core { position: absolute; width: 40px; height: 40px; background: var(--blue); border-radius: 50%; box-shadow: 0 0 30px var(--blue); color: white; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+        .reactor-core { position: absolute; width: 40px; height: 40px; background: var(--blue); border-radius: 50%; color: white; display: flex; align-items: center; justify-content: center; }
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
-        .balance-main { font-size: 36px; font-weight: 800; margin: 15px 0 5px 0; font-variant-numeric: tabular-nums; }
-        .btn-action { background: var(--blue); color: white; border: none; width: 90%; padding: 16px; border-radius: 18px; font-size: 17px; font-weight: bold; box-shadow: 0 5px 15px rgba(0,122,255,0.3); cursor: pointer; }
+        .balance-main { font-size: 38px; font-weight: 800; margin: 15px 0 5px 0; }
+        .btn-action { background: var(--blue); color: white; border: none; width: 90%; padding: 16px; border-radius: 18px; font-size: 17px; font-weight: bold; box-shadow: 0 5px 15px rgba(0,122,255,0.3); }
 
-        /* Satış Paketleri Tasarımı */
+        /* Paketler */
         .boost-card { background: white; margin: 10px 15px; padding: 18px; border-radius: 20px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 10px rgba(0,0,0,0.05); border: 1px solid #eee; }
-        .package-title { font-weight: bold; font-size: 16px; display: block; }
-        .package-desc { font-size: 12px; color: #2ecc71; font-weight: bold; }
-        .btn-buy { background: var(--blue); color: white; border: none; padding: 12px 18px; border-radius: 12px; font-weight: bold; min-width: 80px; }
+        .btn-buy { background: var(--blue); color: white; border: none; padding: 12px 18px; border-radius: 12px; font-weight: bold; }
 
         /* Alt Navbar */
         .nav-bar { position: fixed; bottom: 0; width: 100%; background: white; display: flex; padding: 10px 0; border-top: 1px solid #eee; z-index: 1000; }
@@ -41,104 +39,91 @@
 <body>
 
     <div id="homePage" class="page active">
-        <div class="header-card">
-            <div class="wallet-display">
-                <small style="color:#888; display:block;">My Wallet Balance</small>
-                <b id="walletBal">0.0000</b> <small>TON</small>
-            </div>
-            <div style="text-align:right;">
-                <button onclick="saveToWallet()" style="background:var(--green); color:white; border:none; padding:8px 12px; border-radius:10px; font-size:12px; font-weight:bold;">📥 Save to Wallet</button>
-            </div>
+        <div style="display:flex; justify-content:space-between; padding:15px; align-items:center;">
+            <div style="background:white; padding:8px 15px; border-radius:15px; font-weight:bold; font-size:14px; box-shadow:0 2px 5px rgba(0,0,0,0.05);">💎 <span id="topWallet">0.0000</span> TON</div>
+            <button onclick="saveToWallet()" style="background:var(--green); color:white; border:none; padding:10px 15px; border-radius:15px; font-weight:bold; font-size:12px;">📥 Save to Wallet</button>
         </div>
-
         <div class="mining-area">
             <div class="reactor"><div class="blades"></div><div class="reactor-core">⚡</div></div>
             <div class="balance-main" id="balanceDisplay">0.00000000</div>
-            <div style="color:var(--blue); font-weight:bold; margin-bottom:15px;" id="speedDisplay">⚡ 0.012 PPH</div>
+            <div style="color:var(--blue); font-weight:bold; margin-bottom:20px;" id="speedDisplay">⚡ 0.012 PPH</div>
             <button class="btn-action" id="mineBtn" onclick="startMining()">🚀 Start Mining</button>
+        </div>
+    </div>
+
+    <div id="walletPage" class="page">
+        <h2 style="text-align:center; margin-top:30px;">Your Wallet</h2>
+        <div class="wallet-card">
+            <div class="wallet-icon">👛</div>
+            <small style="color:#888;">Total Balance</small>
+            <div style="font-size:32px; font-weight:800; margin:10px 0;"><span id="mainWallet">0.0000</span> TON</div>
+            <button onclick="Telegram.WebApp.showAlert('Çekim talebi yakında aktif edilecek!')" style="background:#eef6ff; color:var(--blue); border:none; width:100%; padding:15px; border-radius:15px; font-weight:bold;">Withdraw Funds</button>
         </div>
     </div>
 
     <div id="boostPage" class="page">
         <h2 style="text-align:center; margin-top:25px;">Upgrade Shop</h2>
-        <p style="text-align:center; color:#666; font-size:14px;">Use your Wallet TON to buy speed!</p>
-        
         <div class="boost-card">
-            <div><span class="package-title">Starter Pack</span><span class="package-desc">+0.50 PPH Speed</span></div>
+            <div><b>Starter Pack</b><br><small style="color:var(--green);">+0.50 PPH</small></div>
             <button class="btn-buy" onclick="buyPackage(0.50, 2.0)">2 TON</button>
         </div>
         <div class="boost-card">
-            <div><span class="package-title">Pro Miner</span><span class="package-desc">+1.50 PPH Speed</span></div>
+            <div><b>Pro Miner</b><br><small style="color:var(--green);">+1.50 PPH</small></div>
             <button class="btn-buy" onclick="buyPackage(1.50, 5.0)">5 TON</button>
         </div>
         <div class="boost-card">
-            <div><span class="package-title">Industrial Core</span><span class="package-desc">+4.00 PPH Speed</span></div>
+            <div><b>Industrial Core</b><br><small style="color:var(--green);">+4.00 PPH</small></div>
             <button class="btn-buy" onclick="buyPackage(4.00, 10.0)">10 TON</button>
         </div>
-        <div class="boost-card" style="border: 1px solid var(--gold);">
-            <div><span class="package-title" style="color:var(--gold);">Titan Reactor</span><span class="package-desc">+10.00 PPH Speed</span></div>
+        <div class="boost-card" style="border:1px solid var(--gold);">
+            <div><b style="color:var(--gold);">Titan Reactor</b><br><small style="color:var(--green);">+10.00 PPH</small></div>
             <button class="btn-buy" style="background:var(--gold);" onclick="buyPackage(10.00, 20.0)">20 TON</button>
         </div>
     </div>
 
     <div class="nav-bar">
-        <div class="nav-item" onclick="showPage('homePage')" id="nav-home"><b>🏠</b>Home</div>
+        <div class="nav-item active" onclick="showPage('homePage')" id="nav-home"><b>🏠</b>Home</div>
+        <div class="nav-item" onclick="showPage('walletPage')" id="nav-wallet"><b>👛</b>Wallet</div>
         <div class="nav-item" onclick="showPage('boostPage')" id="nav-boosts"><b>🚀</b>Packages</div>
-        <div class="nav-item" onclick="Telegram.WebApp.showAlert('Referans Sistemi Aktif!')"><b>👥</b>Friends</div>
+        <div class="nav-item" onclick="Telegram.WebApp.showAlert('Referanslar Yakında!')"><b>👥</b>Friends</div>
     </div>
 
     <script>
-        let miningBalance = 0.00000000;
-        let walletBalance = 0.0000;
-        let currentSpeed = 0.012; 
-        let isMining = false;
+        let miningBalance = 0; let walletBalance = 0; let currentSpeed = 0.012; let isMining = false;
 
         function showPage(pageId) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             document.getElementById(pageId).classList.add('active');
-            if(pageId === 'homePage') document.getElementById('nav-home').classList.add('active');
-            if(pageId === 'boostPage') document.getElementById('nav-boosts').classList.add('active');
+            document.getElementById('nav-' + pageId.replace('Page', '')).classList.add('active');
         }
 
         function startMining() {
-            if(isMining) return;
-            isMining = true;
-            Telegram.WebApp.HapticFeedback.impactOccurred('medium');
+            if(isMining) return; isMining = true;
             document.getElementById('mineBtn').innerText = "⛏️ Mining...";
             document.getElementById('mineBtn').style.background = "#2ecc71";
-            
             setInterval(() => {
                 miningBalance += (currentSpeed / 3600);
                 document.getElementById('balanceDisplay').innerText = miningBalance.toFixed(8);
             }, 1000);
         }
 
-        // Kazılanları Cüzdana Aktar
         function saveToWallet() {
-            if(miningBalance <= 0) return;
-            walletBalance += miningBalance;
-            miningBalance = 0;
+            walletBalance += miningBalance; miningBalance = 0;
             document.getElementById('balanceDisplay').innerText = "0.00000000";
-            document.getElementById('walletBal').innerText = walletBalance.toFixed(4);
+            document.getElementById('topWallet').innerText = walletBalance.toFixed(4);
+            document.getElementById('mainWallet').innerText = walletBalance.toFixed(4);
             Telegram.WebApp.HapticFeedback.notificationOccurred('success');
-            Telegram.WebApp.showAlert("Bakiyeniz başarıyla cüzdanınıza aktarıldı!");
         }
 
-        // Paket Satın Alma (Cüzdandaki TON ile)
         function buyPackage(speedAdd, cost) {
-            if(walletBalance < cost) {
-                Telegram.WebApp.showAlert("Cüzdan bakiyesi yetersiz! Önce madencilikten cüzdana aktarma yapmalısın.");
-                return;
-            }
-            walletBalance -= cost;
-            currentSpeed += speedAdd;
-            document.getElementById('walletBal').innerText = walletBalance.toFixed(4);
+            if(walletBalance < cost) { Telegram.WebApp.showAlert("Cüzdan bakiyesi yetersiz!"); return; }
+            walletBalance -= cost; currentSpeed += speedAdd;
+            document.getElementById('topWallet').innerText = walletBalance.toFixed(4);
+            document.getElementById('mainWallet').innerText = walletBalance.toFixed(4);
             document.getElementById('speedDisplay').innerText = "⚡ " + currentSpeed.toFixed(3) + " PPH";
-            Telegram.WebApp.HapticFeedback.notificationOccurred('success');
-            Telegram.WebApp.showAlert("Paket Aktif! Hızınız " + currentSpeed.toFixed(3) + " PPH oldu.");
+            Telegram.WebApp.showAlert("Paket Satın Alındı!");
         }
-
         Telegram.WebApp.ready();
     </script>
 </body>
