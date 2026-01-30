@@ -14,23 +14,36 @@
         .token-info { display: flex; align-items: center; gap: 10px; }
         .token-logo { width: 40px; height: 40px; background: #eef6ff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; }
         
-        /* Ana Alan ve Mavi Fan */
+        /* KODLA ÇİZİLEN NEON REAKTÖR (Resim Gerektirmez) */
         .mining-area { text-align: center; margin-top: 30px; }
-        .fan-container { width: 240px; height: 240px; margin: 0 auto; position: relative; }
-        .fan-img { 
-            width: 100%; height: 100%; 
-            animation: spin 3s linear infinite; 
-            filter: hue-rotate(180deg) drop-shadow(0 0 20px rgba(0,122,255,0.4)); 
+        .reactor {
+            width: 220px; height: 220px; margin: 0 auto;
+            border: 8px solid #eef6ff; border-radius: 50%;
+            position: relative; display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 0 20px rgba(0,122,255,0.2);
+        }
+        .blades {
+            width: 180px; height: 180px;
+            background: conic-gradient(from 0deg, transparent 0%, var(--blue) 30%, transparent 40%, var(--blue) 70%, transparent 80%);
+            border-radius: 50%;
+            animation: spin 2s linear infinite;
+            filter: blur(2px);
+            opacity: 0.8;
+        }
+        .reactor-core {
+            position: absolute; width: 60px; height: 60px;
+            background: var(--blue); border-radius: 50%;
+            box-shadow: 0 0 30px var(--blue);
+            color: white; display: flex; align-items: center; justify-content: center; font-size: 24px;
         }
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
         /* Bakiye Yazısı */
-        .balance-main { font-size: 40px; font-weight: 800; margin: 20px 0 5px 0; font-variant-numeric: tabular-nums; }
-        .speed-tag { font-size: 14px; color: #007aff; font-weight: bold; margin-bottom: 25px; }
+        .balance-main { font-size: 42px; font-weight: 800; margin: 25px 0 5px 0; font-variant-numeric: tabular-nums; }
+        .speed-tag { font-size: 15px; color: var(--blue); font-weight: bold; margin-bottom: 25px; }
 
-        /* Profesyonel Buton */
-        .btn-action { background: var(--blue); color: white; border: none; width: 90%; padding: 18px; border-radius: 18px; font-size: 18px; font-weight: bold; box-shadow: 0 5px 15px rgba(0,122,255,0.3); transition: 0.3s; }
-        .btn-action:active { transform: scale(0.95); }
+        /* Buton */
+        .btn-action { background: var(--blue); color: white; border: none; width: 90%; padding: 18px; border-radius: 18px; font-size: 18px; font-weight: bold; box-shadow: 0 5px 15px rgba(0,122,255,0.3); }
 
         /* Alt Navbar */
         .nav-bar { position: fixed; bottom: 0; width: 100%; background: white; display: flex; padding: 10px 0; border-top: 1px solid #eee; }
@@ -45,16 +58,17 @@
             <div class="token-logo">💎</div>
             <div style="text-align:left;"><small style="color:#888;">Balance</small><br><b>0 TON</b></div>
         </div>
-        <button onclick="Telegram.WebApp.showAlert('Cüzdan Sistemi Yakında!')" style="border:none; background:#eef6ff; color:var(--blue); border-radius:10px; padding:8px 12px;">👛</button>
+        <button onclick="Telegram.WebApp.showAlert('Cüzdan Yakında!')" style="border:none; background:#eef6ff; color:var(--blue); border-radius:10px; padding:8px 12px;">👛</button>
     </div>
 
     <div class="mining-area">
-        <div class="fan-container">
-            <img src="https://www.svgrepo.com/show/448500/fan.svg" class="fan-img">
+        <div class="reactor">
+            <div class="blades"></div>
+            <div class="reactor-core">⚡</div>
         </div>
 
         <div class="balance-main" id="balance">0.00000000</div>
-        <div class="speed-tag">⚡ 0.012 PPH (Hızlandırıldı)</div>
+        <div class="speed-tag">⚡ 0.012 PPH (Aktif)</div>
 
         <button class="btn-action" id="mineBtn" onclick="startMining()">🚀 Start Mining</button>
     </div>
@@ -69,15 +83,22 @@
 
     <script>
         let balance = 0.00000000;
-        let speed = 0.012; // Sayıların daha hızlı akması için artırdım!
+        let speed = 0.012; 
         let isMining = false;
 
         function startMining() {
             if(isMining) return;
             isMining = true;
-            
-            // Telegram titreşim efekti
             Telegram.WebApp.HapticFeedback.impactOccurred('heavy');
-            
-            document.getElementById('mineBtn').
-                
+            document.getElementById('mineBtn').innerText = "⛏️ Mining...";
+            document.getElementById('mineBtn').style.background = "#2ecc71";
+            setInterval(() => {
+                balance += (speed / 3600);
+                document.getElementById('balance').innerText = balance.toFixed(8);
+            }, 1000);
+        }
+        Telegram.WebApp.ready();
+        Telegram.WebApp.expand();
+    </script>
+</body>
+</html>
