@@ -3,121 +3,128 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>TITAN NETWORK</title>
+    <title>TITAN</title>
     <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        :root { --blue: #007aff; --bg: #f8f9fa; --green: #2ecc71; }
-        body { background: var(--bg); font-family: sans-serif; margin: 0; padding: 0; overflow: hidden; }
+        body { font-family: sans-serif; margin: 0; background: #f0f2f5; color: #333; }
+        .page { display: none; padding: 20px; height: 100vh; box-sizing: border-box; }
+        .active { display: block !important; }
+        .card { background: white; padding: 15px; border-radius: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 15px; text-align: center; }
         
-        /* Sayfalar */
-        .page { display: none; height: 100vh; padding: 20px; box-sizing: border-box; }
-        .page.active { display: block !important; }
-
-        /* Üst Panel */
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .stat { background: white; padding: 10px; border-radius: 12px; border: 1px solid #ddd; font-weight: bold; }
-        .claim { background: var(--green); color: white; border: none; padding: 10px; border-radius: 10px; font-weight: bold; }
-
-        /* Ana Alan */
-        .main { text-align: center; }
-        .circle { width: 140px; height: 140px; margin: 0 auto; border: 8px solid #eef6ff; border-radius: 50%; position: relative; display: flex; align-items: center; justify-content: center; }
-        .spin { width: 110px; height: 110px; background: conic-gradient(from 0deg, #007aff, transparent); border-radius: 50%; animation: rot 2s linear infinite; }
-        @keyframes rot { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        /* Navbar */
+        .nav { position: fixed; bottom: 0; width: 100%; height: 70px; background: white; display: flex; border-top: 1px solid #ddd; }
+        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 12px; color: #777; cursor: pointer; }
+        .nav-item.selected { color: #007aff; font-weight: bold; }
         
-        /* Alt Menü */
-        .nav { position: fixed; bottom: 0; width: 100%; height: 75px; background: white; display: flex; border-top: 1px solid #eee; }
-        .nav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 12px; color: #888; cursor: pointer; }
-        .nav-btn.selected { color: var(--blue); font-weight: bold; }
-        .nav-btn span { font-size: 24px; }
-
-        #ton-connect-button { display: flex; justify-content: center; margin: 15px 0; }
+        .btn { background: #007aff; color: white; border: none; padding: 12px 20px; border-radius: 10px; font-weight: bold; width: 100%; cursor: pointer; }
+        .mining-anim { width: 100px; height: 100px; border: 5px solid #007aff; border-radius: 50%; border-top-color: transparent; margin: 20px auto; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
-    <div id="pg-home" class="page active">
-        <div class="header">
-            <div class="stat">💎 <span id="top-w">0.0000</span></div>
-            <button class="claim" onclick="doClaim()">📥 Save</button>
+    <div id="p-home" class="page active">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <div class="card" style="margin:0; padding: 10px;">💎 <span id="top-bal">0.0000</span></div>
+            <button onclick="saveBal()" style="background:#2ecc71; color:white; border:none; padding:10px; border-radius:8px; font-weight:bold;">📥 Save</button>
         </div>
-        <div id="ton-connect-button"></div>
-        <div class="main">
-            <div class="circle"><div class="spin"></div><div style="position:absolute;">⚡</div></div>
-            <div style="font-size:32px; font-weight:800; margin:15px 0;" id="m-bal">0.00000000</div>
-            <p style="color:var(--blue); font-weight:bold;">⚡ 0.012 PPH</p>
-            <button onclick="doStart()" id="s-btn" style="background:var(--blue); color:white; border:none; width:90%; padding:15px; border-radius:15px; font-weight:bold; font-size:18px;">🚀 Start Mining</button>
+        
+        <div id="ton-connect-btn" style="display:flex; justify-content:center; margin-bottom: 20px;"></div>
+
+        <div class="card">
+            <div id="anim" style="display:none;" class="mining-anim"></div>
+            <div style="font-size: 32px; font-weight: bold; margin: 10px 0;" id="m-display">0.00000000</div>
+            <p style="color:#007aff;">⚡ 0.012 PPH</p>
+            <button class="btn" id="start-btn" onclick="startMining()">🚀 Start Mining</button>
         </div>
     </div>
 
-    <div id="pg-wallet" class="page">
-        <h2 style="text-align:center;">Cüzdanın</h2>
-        <div class="stat" style="text-align:center; padding:30px; font-size:24px;">
-            <span id="w-bal">0.0000</span> TON
+    <div id="p-wallet" class="page">
+        <h2 style="text-align:center;">Cüzdan Bilgisi</h2>
+        <div class="card">
+            <p style="font-size: 24px; font-weight: bold;"><span id="w-display">0.0000</span> TON</p>
         </div>
     </div>
 
-    <div id="pg-shop" class="page">
+    <div id="p-shop" class="page">
         <h2 style="text-align:center;">Market</h2>
-        <div class="stat">Hız Paketi: 2 TON</div>
-    </div>
-
-    <div id="pg-leaders" class="page">
-        <h2 style="text-align:center;">Liderler</h2>
-        <div class="stat">1. @titan_king</div>
+        <div class="card">
+            <p>Hız Paketi (+0.50 PPH)</p>
+            <button class="btn" onclick="buySpeed()">2 TON Satın Al</button>
+        </div>
     </div>
 
     <div class="nav">
-        <div class="nav-btn selected" onclick="go('home')" id="b-home"><span>🏠</span>Home</div>
-        <div class="nav-btn" onclick="go('wallet')" id="b-wallet"><span>👛</span>Wallet</div>
-        <div class="nav-btn" onclick="go('shop')" id="b-shop"><span>🚀</span>Shop</div>
-        <div class="nav-btn" onclick="go('leaders')" id="b-leaders"><span>🏆</span>Leaders</div>
+        <div class="nav-item selected" id="n-home" onclick="go('home')"><span style="font-size:20px;">🏠</span>Home</div>
+        <div class="nav-item" id="n-wallet" onclick="go('wallet')"><span style="font-size:20px;">👛</span>Wallet</div>
+        <div class="nav-item" id="n-shop" onclick="go('shop')"><span style="font-size:20px;">🚀</span>Shop</div>
     </div>
 
     <script>
-        // Manifest URL'sini kontrol et!
+        // MANIFEST KONTROLÜ
         const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
             manifestUrl: 'https://hakk2793.github.io/titan-uygulamasi/tonconnect-manifest.json',
-            buttonRootId: 'ton-connect-button'
+            buttonRootId: 'ton-connect-btn'
         });
 
-        let mb = parseFloat(localStorage.getItem('mb')) || 0;
-        let wb = parseFloat(localStorage.getItem('wb')) || 0;
-        let isM = localStorage.getItem('isM') === 'true';
+        let miningBal = parseFloat(localStorage.getItem('miningBal')) || 0;
+        let walletBal = parseFloat(localStorage.getItem('walletBal')) || 0;
+        let isMining = localStorage.getItem('isMining') === 'true';
 
-        // Sayfa Değiştirme (Kesin Çözüm)
-        function go(p) {
-            document.querySelectorAll('.page').forEach(x => x.classList.remove('active'));
-            document.querySelectorAll('.nav-btn').forEach(x => x.classList.remove('selected'));
-            document.getElementById('pg-' + p).classList.add('active');
-            document.getElementById('b-' + p).classList.add('selected');
+        // Sayfa Değiştirme Fonksiyonu (Basitleştirildi)
+        function go(page) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('selected'));
+            document.getElementById('p-' + page).classList.add('active');
+            document.getElementById('n-' + page).classList.add('selected');
         }
 
-        function doStart() {
-            if(isM) return;
-            isM = true; localStorage.setItem('isM', 'true');
-            document.getElementById('s-btn').innerText = "Mining...";
+        function startMining() {
+            if(isMining) return;
+            isMining = true;
+            localStorage.setItem('isMining', 'true');
+            document.getElementById('anim').style.display = 'block';
+            document.getElementById('start-btn').innerText = "Madencilik Yapılıyor...";
+            document.getElementById('start-btn').style.opacity = "0.5";
+            
             setInterval(() => {
-                mb += (0.012 / 3600);
-                document.getElementById('m-bal').innerText = mb.toFixed(8);
-                localStorage.setItem('mb', mb);
+                miningBal += (0.012 / 3600);
+                document.getElementById('m-display').innerText = miningBal.toFixed(8);
+                localStorage.setItem('miningBal', miningBal);
             }, 1000);
         }
 
-        function doClaim() {
-            wb += mb; mb = 0;
-            localStorage.setItem('wb', wb); localStorage.setItem('mb', 0);
-            update();
-            Telegram.WebApp.showAlert("Kaydedildi!");
+        function saveBal() {
+            walletBal += miningBal;
+            miningBal = 0;
+            localStorage.setItem('walletBal', walletBal);
+            localStorage.setItem('miningBal', 0);
+            updateUI();
+            Telegram.WebApp.showAlert("Bakiyeniz Wallet'a aktarıldı!");
         }
 
-        function update() {
-            document.getElementById('m-bal').innerText = mb.toFixed(8);
-            document.getElementById('top-w').innerText = wb.toFixed(4);
-            document.getElementById('w-bal').innerText = wb.toFixed(4);
+        function updateUI() {
+            document.getElementById('m-display').innerText = miningBal.toFixed(8);
+            document.getElementById('top-bal').innerText = walletBal.toFixed(4);
+            document.getElementById('w-display').innerText = walletBal.toFixed(4);
         }
 
-        window.onload = () => { if(isM) doStart(); update(); };
+        async function buySpeed() {
+            if(!tonConnectUI.connected) {
+                Telegram.WebApp.showAlert("Lütfen önce cüzdanı bağlayın!");
+                return;
+            }
+            // Satın alma işlemi kodları buraya gelecek
+        }
+
+        window.onload = () => {
+            if(isMining) {
+                isMining = false; // Döngüyü tekrar başlatmak için
+                startMining();
+            }
+            updateUI();
+        };
         Telegram.WebApp.ready();
     </script>
 </body>
