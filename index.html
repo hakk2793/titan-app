@@ -3,63 +3,172 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Gogircin Titan</title>
+    <title>Gogircin Titan Network</title>
     <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        :root { --bg: #0f172a; --card: #1e293b; --blue: #3b82f6; --text: #f8fafc; --green: #22c55e; }
-        body { background: var(--bg); color: var(--text); font-family: sans-serif; margin: 0; padding: 0; display: block; }
+        :root { --bg: #0f172a; --card: #1e293b; --blue: #3b82f6; --text: #f8fafc; --green: #22c55e; --gold: #fbbf24; }
+        body { background: var(--bg); color: var(--text); font-family: sans-serif; margin: 0; padding: 0; overflow: hidden; }
         .page { display: none; height: 100vh; padding: 20px; box-sizing: border-box; overflow-y: auto; text-align: center; padding-bottom: 100px; }
         .active { display: block; }
-        .card { background: var(--card); padding: 20px; border-radius: 15px; margin-bottom: 15px; border: 1px solid #334155; }
-        .btn { background: var(--blue); color: white; border: none; padding: 14px; border-radius: 12px; cursor: pointer; width: 100%; font-weight: bold; margin-top: 10px; }
-        .nav { position: fixed; bottom: 0; width: 100%; background: #111827; display: flex; justify-content: space-around; padding: 12px 0; border-top: 1px solid #374151; }
-        .nav-item { font-size: 11px; color: #94a3b8; cursor: pointer; text-align: center; flex: 1; }
-        .nav-item.active { color: var(--blue); font-weight: bold; }
+        .card { background: var(--card); padding: 20px; border-radius: 20px; margin-bottom: 15px; border: 1px solid #334155; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        .btn { background: var(--blue); color: white; border: none; padding: 14px; border-radius: 12px; cursor: pointer; width: 100%; font-weight: bold; margin-top: 10px; font-size: 16px; transition: 0.2s; }
+        .btn:active { transform: scale(0.98); }
+        .nav { position: fixed; bottom: 0; width: 100%; background: #111827; display: flex; justify-content: space-around; padding: 12px 0; border-top: 1px solid #374151; z-index: 100; }
+        .nav-item { font-size: 11px; color: #94a3b8; cursor: pointer; text-align: center; flex: 1; transition: 0.3s; }
+        .nav-item.active { color: var(--blue); transform: translateY(-3px); font-weight: bold; }
+        #mining-anim { font-size: 70px; margin: 20px 0; animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+        .stat-badge { background: rgba(59, 130, 246, 0.1); color: var(--blue); padding: 5px 15px; border-radius: 20px; font-weight: bold; font-size: 14px; }
     </style>
 </head>
 <body>
+
     <div id="p-home" class="page active">
         <div id="ton-connect" style="display: flex; justify-content: center; margin-bottom: 15px;"></div>
         <div class="card">
-            <p>Toplam Bakiyen</p>
-            <h1 id="top-bal">0.0000</h1>
-            <p style="color: var(--blue);">⚡ <span id="pph-display">0.512</span> PPH</p>
-            <button class="btn" style="background: var(--green);" id="daily-btn" onclick="claimDaily()">🎁 Günlük Bonus Al</button>
+            <p style="color: #94a3b8; margin: 0;">Toplam Madencilik Bakiyen</p>
+            <h1 id="top-bal" style="font-size: 40px; margin: 10px 0; color: #fff;">0.0000</h1>
+            <div id="mining-anim">⛏️</div>
+            <div class="stat-badge">⚡ <span id="pph-display">0.512</span> PPH</div>
+            <button class="btn" style="background: var(--green); margin-top: 25px;" id="daily-btn" onclick="claimDaily()">🎁 Günlük Bonus Al</button>
         </div>
     </div>
+
     <div id="p-market" class="page">
-        <h2>🚀 Market</h2>
-        <div class="card"><h3>Hız Paketi</h3><p>1.9 TON</p><button class="btn" onclick="buySpeed(1.9, 0.50)">Satın Al</button></div>
+        <h2 style="color: var(--blue);">🚀 Titan Market</h2>
+        <div class="card">
+            <h3>Hız Paketi V1</h3>
+            <p style="color: #94a3b8;">Kazım hızını kalıcı olarak +0.50 PPH artırır.</p>
+            <p style="font-size: 24px; font-weight: bold; color: var(--green);">1.9 TON</p>
+            <button class="btn" onclick="buySpeed(1.9, 0.50)">Hemen Yükselt</button>
+        </div>
+        <div class="card" style="opacity: 0.6;">
+            <h3>Mega Boost (Yakında)</h3>
+            <p>+2.00 PPH | 5.0 TON</p>
+            <button class="btn" disabled style="background: #475569;">Kilitli</button>
+        </div>
     </div>
+
+    <div id="p-ref" class="page">
+        <h2 style="color: var(--gold);">👥 Referans Sistemi</h2>
+        <div class="card">
+            <p>Arkadaşlarını davet et, çekim kilitlerini aç!</p>
+            <input type="text" id="ref-link" readonly style="width: 100%; padding: 12px; border-radius: 10px; background: #0f172a; color: white; border: 1px solid #334155; text-align: center; margin-bottom: 10px;">
+            <button class="btn" onclick="copyRef()">Davet Linkini Kopyala</button>
+        </div>
+        <div class="card">
+            <p style="font-size: 18px;">Toplam Referansın: <b id="ref-count" style="color: var(--blue);">0</b></p>
+        </div>
+    </div>
+
     <div id="p-wallet" class="page">
-        <h2>💰 Cüzdan</h2>
-        <div class="card"><h1 id="wallet-ton">0.0000</h1><button class="btn" onclick="handleWithdraw()">📤 Para Çek</button></div>
+        <h2 style="color: var(--green);">💰 Cüzdan & Çekim</h2>
+        <div class="card">
+            <p style="color: #94a3b8; margin: 0;">Çekilebilir Miktar</p>
+            <h1 id="wallet-ton" style="color: var(--blue); font-size: 36px; margin: 10px 0;">0.0000</h1>
+            <button class="btn" onclick="handleWithdraw()">📤 Çekim Talebi Gönder</button>
+        </div>
+        <div class="card" style="text-align: left; font-size: 12px; line-height: 1.8;">
+            <h4 style="margin: 0 0 10px 0; color: var(--gold);">⚠️ Çekim Şartları:</h4>
+            <div id="s1">❌ 1. Çekim: 1.9 TON Yatırım & Min. 1.9 TON</div>
+            <div id="s2">❌ 2. Çekim: 10 Referans & Min. 50 TON</div>
+            <div id="s3">❌ 3. Çekim: 50 Referans & Min. 500 TON</div>
+        </div>
     </div>
+
     <nav class="nav">
         <div class="nav-item active" onclick="showPage('p-home', this)">🏠<br>Home</div>
         <div class="nav-item" onclick="showPage('p-market', this)">🚀<br>Shop</div>
+        <div class="nav-item" onclick="showPage('p-ref', this)">👥<br>Ref</div>
         <div class="nav-item" onclick="showPage('p-wallet', this)">💰<br>Wallet</div>
     </nav>
+
 <script>
     const MY_WALLET = "UQC8qx530ORsKhEMwVVd_3UtPfjnAxKyA0DgTB1yR513oBOd";
-    const tonConnectUI = new TONConnectUI.TonConnectUI({ manifestUrl: 'https://hakk2793.github.io/titan-app/tonconnect-manifest.json', buttonRootId: 'ton-connect' });
+    const tonConnectUI = new TONConnectUI.TonConnectUI({ 
+        manifestUrl: 'https://hakk2793.github.io/titan-app/tonconnect-manifest.json', 
+        buttonRootId: 'ton-connect' 
+    });
+
     let bal = parseFloat(localStorage.getItem('bal')) || 0;
     let pph = parseFloat(localStorage.getItem('pph')) || 0.512;
     let hasInv = localStorage.getItem('hasInv') === 'true';
+    let wCount = parseInt(localStorage.getItem('wCount')) || 0;
+    let rCount = parseInt(localStorage.getItem('rCount')) || 0;
     let lDaily = localStorage.getItem('lDaily') || 0;
-    setInterval(() => { bal += pph / 3600; update(); localStorage.setItem('bal', bal); }, 1000);
-    function update() {
+
+    // Madencilik Motoru
+    setInterval(() => {
+        bal += pph / 3600;
+        updateUI();
+        localStorage.setItem('bal', bal);
+    }, 1000);
+
+    function updateUI() {
         document.getElementById('top-bal').innerText = bal.toFixed(4);
         document.getElementById('wallet-ton').innerText = bal.toFixed(4);
         document.getElementById('pph-display').innerText = pph.toFixed(3);
-        document.getElementById('daily-btn').disabled = (Date.now() - lDaily < 86400000);
+        document.getElementById('ref-count').innerText = rCount;
+        
+        let uid = Telegram.WebApp.initDataUnsafe.user ? Telegram.WebApp.initDataUnsafe.user.id : "GogircinUser";
+        document.getElementById('ref-link').value = "https://t.me/Gogircin_bot?start=" + uid;
+
+        // Şartları Kontrol Et
+        if(hasInv) document.getElementById('s1').innerHTML = "✅ 1. Çekim: Yatırım Yapıldı";
+        if(wCount >= 1) document.getElementById('s2').innerHTML = "✅ 2. Çekim: Hazır (10 Ref & 50 TON)";
+        if(wCount >= 2) document.getElementById('s3').innerHTML = "✅ 3. Çekim: Hazır (50 Ref & 500 TON)";
+
+        // Günlük Bonus Butonu
+        let isReady = (Date.now() - lDaily >= 86400000);
+        document.getElementById('daily-btn').disabled = !isReady;
+        document.getElementById('daily-btn').style.opacity = isReady ? "1" : "0.5";
+        document.getElementById('daily-btn').innerText = isReady ? "🎁 Günlük Bonus Al" : "Yarın Tekrar Gel";
     }
-    function claimDaily() { if(Date.now() - lDaily >= 86400000) { bal += 0.025; lDaily = Date.now(); localStorage.setItem('lDaily', lDaily); update(); Telegram.WebApp.showAlert("Bonus eklendi!"); } }
-    async function buySpeed(p, b) { const tx = { validUntil: Math.floor(Date.now()/1000)+60, messages:[{address: MY_WALLET, amount:(p*1000000000).toString()}] }; try { await tonConnectUI.sendTransaction(tx); pph += b; hasInv = true; localStorage.setItem('pph', pph); localStorage.setItem('hasInv', 'true'); update(); } catch(e){} }
-    function handleWithdraw() { if(!hasInv) return Telegram.WebApp.showAlert("Önce 1.9 TON yatırım yapmalısın!"); Telegram.WebApp.showAlert("Çekim talebi alındı."); }
-    function showPage(id, el) { document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active')); document.getElementById(id).classList.add('active'); el.classList.add('active'); }
-    window.onload = () => { Telegram.WebApp.ready(); update(); };
+
+    function claimDaily() {
+        if(Date.now() - lDaily >= 86400000) {
+            bal += 0.025; lDaily = Date.now();
+            localStorage.setItem('lDaily', lDaily);
+            updateUI(); Telegram.WebApp.showAlert("🎁 0.025 TON Bonus Hesabına Eklendi!");
+        }
+    }
+
+    async function buySpeed(price, boost) {
+        if (!tonConnectUI.connected) return Telegram.WebApp.showAlert("Lütfen önce cüzdanınızı bağlayın!");
+        const tx = { validUntil: Math.floor(Date.now()/1000)+60, messages:[{address: MY_WALLET, amount:(price*1000000000).toString()}] };
+        try {
+            await tonConnectUI.sendTransaction(tx);
+            pph += boost; hasInv = true;
+            localStorage.setItem('pph', pph); localStorage.setItem('hasInv', 'true');
+            updateUI(); Telegram.WebApp.showAlert("✅ İşlem Başarılı! Hızın Arttı.");
+        } catch(e) { Telegram.WebApp.showAlert("❌ İşlem iptal edildi veya hata oluştu."); }
+    }
+
+    function handleWithdraw() {
+        if(!hasInv) return Telegram.WebApp.showAlert("❌ Kilitli! İlk çekim için 1.9 TON yatırım yapmalısınız.");
+        if(wCount == 0 && bal < 1.9) return Telegram.WebApp.showAlert("❌ Min. 1.9 TON bakiye gerekli.");
+        if(wCount == 1 && (rCount < 10 || bal < 50)) return Telegram.WebApp.showAlert("❌ 10 Referans ve 50 TON gerekli.");
+        if(wCount >= 2 && (rCount < 50 || bal < 500)) return Telegram.WebApp.showAlert("❌ 50 Referans ve 500 TON gerekli.");
+        
+        Telegram.WebApp.showConfirm("Bakiyenizi çekmek istiyor musunuz?", (c) => {
+            if(c) { bal = 0; wCount++; localStorage.setItem('wCount', wCount); updateUI(); Telegram.WebApp.showAlert("✅ Talebiniz alındı, 24 saat içinde gönderilecektir."); }
+        });
+    }
+
+    function showPage(id, el) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        el.classList.add('active');
+    }
+
+    function copyRef() {
+        let el = document.getElementById('ref-link'); el.select(); document.execCommand('copy');
+        Telegram.WebApp.showAlert("✅ Davet linkin kopyalandı!");
+    }
+
+    window.onload = () => { Telegram.WebApp.ready(); Telegram.WebApp.expand(); updateUI(); };
 </script>
 </body>
 </html>
