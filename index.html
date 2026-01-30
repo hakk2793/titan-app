@@ -3,129 +3,177 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>TITAN</title>
-    <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
+    <title>TITAN NETWORK PRO</title>
+    <script src="https://unpkg.com/@tonconnect/ui@2.0.9/dist/tonconnect-ui.min.js"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        body { font-family: sans-serif; margin: 0; background: #f0f2f5; color: #333; }
-        .page { display: none; padding: 20px; height: 100vh; box-sizing: border-box; }
-        .active { display: block !important; }
-        .card { background: white; padding: 15px; border-radius: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 15px; text-align: center; }
+        :root { --blue: #007aff; --bg: #0f172a; --card: #1e293b; --text: #f8fafc; --green: #22c55e; }
+        body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; overflow: hidden; }
         
-        /* Navbar */
-        .nav { position: fixed; bottom: 0; width: 100%; height: 70px; background: white; display: flex; border-top: 1px solid #ddd; }
-        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 12px; color: #777; cursor: pointer; }
-        .nav-item.selected { color: #007aff; font-weight: bold; }
+        .page { display: none; height: 100vh; padding: 20px; box-sizing: border-box; overflow-y: auto; padding-bottom: 100px; }
+        .page.active { display: block !important; }
+
+        .card { background: var(--card); border-radius: 16px; padding: 15px; margin-bottom: 15px; border: 1px solid #334155; }
         
-        .btn { background: #007aff; color: white; border: none; padding: 12px 20px; border-radius: 10px; font-weight: bold; width: 100%; cursor: pointer; }
-        .mining-anim { width: 100px; height: 100px; border: 5px solid #007aff; border-radius: 50%; border-top-color: transparent; margin: 20px auto; animation: spin 1s linear infinite; }
-        @keyframes spin { to { transform: rotate(360deg); } }
+        /* Buton Tasarımları */
+        .btn { background: var(--blue); color: white; border: none; padding: 12px; border-radius: 12px; font-weight: bold; width: 100%; cursor: pointer; transition: 0.3s; }
+        .btn:active { transform: scale(0.98); }
+        .btn-buy { background: var(--green); margin-top: 10px; }
+
+        /* Lider Tablosu */
+        .leader-item { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid #334155; }
+        .rank { font-weight: bold; color: var(--blue); margin-right: 10px; }
+
+        /* Alt Menü */
+        .navbar { position: fixed; bottom: 0; width: 100%; height: 75px; background: var(--card); display: flex; border-top: 1px solid #334155; }
+        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 11px; color: #94a3b8; cursor: pointer; }
+        .nav-item.active { color: var(--blue); }
+        .nav-item span { font-size: 20px; margin-bottom: 4px; }
+
+        #ton-connect-btn { display: flex; justify-content: center; margin-bottom: 20px; }
     </style>
 </head>
 <body>
 
     <div id="p-home" class="page active">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <div class="card" style="margin:0; padding: 10px;">💎 <span id="top-bal">0.0000</span></div>
-            <button onclick="saveBal()" style="background:#2ecc71; color:white; border:none; padding:10px; border-radius:8px; font-weight:bold;">📥 Save</button>
+            <div class="card" style="margin:0; padding: 8px 15px;">💎 <span id="top-bal">0.0000</span></div>
+            <button class="btn" style="width: auto; padding: 8px 20px; background: var(--green);" onclick="claim()">Save</button>
         </div>
         
-        <div id="ton-connect-btn" style="display:flex; justify-content:center; margin-bottom: 20px;"></div>
+        <div id="ton-connect-btn"></div>
 
-        <div class="card">
-            <div id="anim" style="display:none;" class="mining-anim"></div>
-            <div style="font-size: 32px; font-weight: bold; margin: 10px 0;" id="m-display">0.00000000</div>
-            <p style="color:#007aff;">⚡ 0.012 PPH</p>
-            <button class="btn" id="start-btn" onclick="startMining()">🚀 Start Mining</button>
-        </div>
-    </div>
-
-    <div id="p-wallet" class="page">
-        <h2 style="text-align:center;">Cüzdan Bilgisi</h2>
-        <div class="card">
-            <p style="font-size: 24px; font-weight: bold;"><span id="w-display">0.0000</span> TON</p>
+        <div class="card" style="text-align: center;">
+            <div style="font-size: 40px; font-weight: 800; color: var(--blue);" id="m-bal">0.00000000</div>
+            <p id="pph-text">⚡ 0.012 PPH</p>
+            <button id="start-btn" class="btn" onclick="startMining()">🚀 Start Mining</button>
         </div>
     </div>
 
     <div id="p-shop" class="page">
         <h2 style="text-align:center;">Market</h2>
         <div class="card">
-            <p>Hız Paketi (+0.50 PPH)</p>
-            <button class="btn" onclick="buySpeed()">2 TON Satın Al</button>
+            <h3>🚀 Hız Paketi V1</h3>
+            <p>Kazım hızını +0.50 PPH artırır.</p>
+            <p><b>Fiyat: 1 TON</b></p>
+            <button class="btn btn-buy" onclick="buySpeed(1, 0.50)">Satın Al (1 TON)</button>
+        </div>
+        <div class="card">
+            <h3>⚡ Mega Boost</h3>
+            <p>Kazım hızını +2.00 PPH artırır.</p>
+            <p><b>Fiyat: 3 TON</b></p>
+            <button class="btn btn-buy" onclick="buySpeed(3, 2.00)">Satın Al (3 TON)</button>
         </div>
     </div>
 
-    <div class="nav">
-        <div class="nav-item selected" id="n-home" onclick="go('home')"><span style="font-size:20px;">🏠</span>Home</div>
-        <div class="nav-item" id="n-wallet" onclick="go('wallet')"><span style="font-size:20px;">👛</span>Wallet</div>
-        <div class="nav-item" id="n-shop" onclick="go('shop')"><span style="font-size:20px;">🚀</span>Shop</div>
+    <div id="p-leaders" class="page">
+        <h2 style="text-align:center;">Top 10 Titan</h2>
+        <div class="card">
+            <div class="leader-item"><span class="rank">1</span> @hakk2793 <span>150.50 💎</span></div>
+            <div class="leader-item"><span class="rank">2</span> @titan_expert <span>98.20 💎</span></div>
+            <div class="leader-item"><span class="rank">3</span> @crypto_fan <span>75.10 💎</span></div>
+            <div class="leader-item"><span class="rank">4</span> @ton_master <span>45.00 💎</span></div>
+        </div>
+    </div>
+
+    <div id="p-wallet" class="page">
+        <h2 style="text-align:center;">Cüzdan</h2>
+        <div class="card" style="text-align:center;">
+            <p id="wallet-status">Cüzdan Bağlı Değil ❌</p>
+            <p id="wallet-addr" style="font-size:10px; color:#94a3b8;"></p>
+            <h1 id="wallet-ton">0.0000 TON</h1>
+        </div>
+    </div>
+
+    <div class="navbar">
+        <div class="nav-item active" onclick="go('home')" id="n-home"><span>🏠</span>Home</div>
+        <div class="nav-item" onclick="go('shop')" id="n-shop"><span>🚀</span>Shop</div>
+        <div class="nav-item" onclick="go('leaders')" id="n-leaders"><span>🏆</span>Rank</div>
+        <div class="nav-item" onclick="go('wallet')" id="n-wallet"><span>👛</span>Wallet</div>
     </div>
 
     <script>
-        // MANIFEST KONTROLÜ
-        const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
-    manifestUrl: 'https://hakk2793.github.io/titan-app/tonconnect-manifest.json',
-    buttonRootId: 'ton-connect-btn'
-});
-        
+        // --- AYARLAR ---
+        const MY_WALLET = "UQC8qx530ORsKhEMwVVd_3UtPfjnAxKyA0DgTB1yR513oBOd"; //
+        const MANIFEST = "https://hakk2793.github.io/titan-app/tonconnect-manifest.json";
 
-        let miningBal = parseFloat(localStorage.getItem('miningBal')) || 0;
-        let walletBal = parseFloat(localStorage.getItem('walletBal')) || 0;
+        const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
+            manifestUrl: MANIFEST,
+            buttonRootId: 'ton-connect-btn'
+        });
+
+        let mBal = parseFloat(localStorage.getItem('mBal')) || 0;
+        let wBal = parseFloat(localStorage.getItem('wBal')) || 0;
+        let pph = parseFloat(localStorage.getItem('pph')) || 0.012;
         let isMining = localStorage.getItem('isMining') === 'true';
 
-        // Sayfa Değiştirme Fonksiyonu (Basitleştirildi)
-        function go(page) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('selected'));
-            document.getElementById('p-' + page).classList.add('active');
-            document.getElementById('n-' + page).classList.add('selected');
+        function go(p) {
+            document.querySelectorAll('.page').forEach(x => x.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(x => x.classList.remove('active'));
+            document.getElementById('p-' + p).classList.add('active');
+            document.getElementById('n-' + p).classList.add('active');
+        }
+
+        // --- CÜZDAN BAĞLANTISI DİNLEME ---
+        tonConnectUI.onStatusChange(wallet => {
+            if (wallet) {
+                document.getElementById('wallet-status').innerText = "Bağlandı ✅";
+                document.getElementById('wallet-addr').innerText = wallet.account.address;
+                Telegram.WebApp.showAlert("Cüzdan bağlandı!");
+            }
+        });
+
+        // --- SATIN ALMA (ÖDEME SİSTEMİ) ---
+        async function buySpeed(amount, boost) {
+            if (!tonConnectUI.connected) {
+                return Telegram.WebApp.showAlert("Önce cüzdanı bağla!");
+            }
+
+            const transaction = {
+                validUntil: Math.floor(Date.now() / 1000) + 60,
+                messages: [{
+                    address: MY_WALLET, // Paranın gideceği adres (Senin adresin)
+                    amount: (amount * 1000000000).toString() // TON to NanoTON
+                }]
+            };
+
+            try {
+                await tonConnectUI.sendTransaction(transaction);
+                pph += boost;
+                localStorage.setItem('pph', pph);
+                document.getElementById('pph-text').innerText = "⚡ " + pph.toFixed(3) + " PPH";
+                Telegram.WebApp.showAlert("Ödeme Başarılı! Hızın Arttı.");
+            } catch (e) {
+                Telegram.WebApp.showAlert("Ödeme iptal edildi veya hata oluştu.");
+            }
         }
 
         function startMining() {
             if(isMining) return;
             isMining = true;
             localStorage.setItem('isMining', 'true');
-            document.getElementById('anim').style.display = 'block';
-            document.getElementById('start-btn').innerText = "Madencilik Yapılıyor...";
-            document.getElementById('start-btn').style.opacity = "0.5";
-            
+            document.getElementById('start-btn').innerText = "Mining...";
             setInterval(() => {
-                miningBal += (0.012 / 3600);
-                document.getElementById('m-display').innerText = miningBal.toFixed(8);
-                localStorage.setItem('miningBal', miningBal);
+                mBal += (pph / 3600);
+                document.getElementById('m-bal').innerText = mBal.toFixed(8);
+                localStorage.setItem('mBal', mBal);
             }, 1000);
         }
 
-        function saveBal() {
-            walletBal += miningBal;
-            miningBal = 0;
-            localStorage.setItem('walletBal', walletBal);
-            localStorage.setItem('miningBal', 0);
-            updateUI();
-            Telegram.WebApp.showAlert("Bakiyeniz Wallet'a aktarıldı!");
+        function claim() {
+            wBal += mBal; mBal = 0;
+            localStorage.setItem('wBal', wBal); localStorage.setItem('mBal', 0);
+            update();
         }
 
-        function updateUI() {
-            document.getElementById('m-display').innerText = miningBal.toFixed(8);
-            document.getElementById('top-bal').innerText = walletBal.toFixed(4);
-            document.getElementById('w-display').innerText = walletBal.toFixed(4);
+        function update() {
+            document.getElementById('m-bal').innerText = mBal.toFixed(8);
+            document.getElementById('top-bal').innerText = wBal.toFixed(4);
+            document.getElementById('wallet-ton').innerText = wBal.toFixed(4) + " TON";
+            document.getElementById('pph-text').innerText = "⚡ " + pph.toFixed(3) + " PPH";
         }
 
-        async function buySpeed() {
-            if(!tonConnectUI.connected) {
-                Telegram.WebApp.showAlert("Lütfen önce cüzdanı bağlayın!");
-                return;
-            }
-            // Satın alma işlemi kodları buraya gelecek
-        }
-
-        window.onload = () => {
-            if(isMining) {
-                isMining = false; // Döngüyü tekrar başlatmak için
-                startMining();
-            }
-            updateUI();
-        };
+        window.onload = () => { if(isMining) { isMining = false; startMining(); } update(); };
         Telegram.WebApp.ready();
     </script>
 </body>
