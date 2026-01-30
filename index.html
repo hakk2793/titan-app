@@ -11,36 +11,36 @@
         .page { display: none; height: 100vh; overflow-y: auto; padding-bottom: 100px; box-sizing: border-box; }
         .page.active { display: block; }
         
-        /* Cüzdan Kartı Tasarımı */
-        .wallet-card { background: var(--card); margin: 15px; padding: 20px; border-radius: 25px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); text-align: center; }
-        .wallet-icon { width: 60px; height: 60px; background: #eef6ff; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; font-size: 30px; }
+        /* Cüzdan Kartı */
+        .wallet-card { background: var(--card); margin: 15px; padding: 25px; border-radius: 25px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); text-align: center; border: 1px solid #eee; }
+        .wallet-icon { width: 70px; height: 70px; background: #eef6ff; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 35px; }
 
-        /* Reaktör Alanı */
+        /* Madencilik Alanı */
         .mining-area { text-align: center; margin-top: 20px; }
         .reactor { width: 180px; height: 180px; margin: 0 auto; border: 8px solid #eef6ff; border-radius: 50%; position: relative; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px rgba(0,122,255,0.2); }
         .blades { width: 140px; height: 140px; background: conic-gradient(from 0deg, transparent 0%, var(--blue) 30%, transparent 40%, var(--blue) 70%, transparent 80%); border-radius: 50%; animation: spin 2s linear infinite; filter: blur(2px); opacity: 0.8; }
         .reactor-core { position: absolute; width: 40px; height: 40px; background: var(--blue); border-radius: 50%; color: white; display: flex; align-items: center; justify-content: center; }
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
-        .balance-main { font-size: 38px; font-weight: 800; margin: 15px 0 5px 0; }
+        .balance-main { font-size: 38px; font-weight: 800; margin: 15px 0 5px 0; font-variant-numeric: tabular-nums; }
         .btn-action { background: var(--blue); color: white; border: none; width: 90%; padding: 16px; border-radius: 18px; font-size: 17px; font-weight: bold; box-shadow: 0 5px 15px rgba(0,122,255,0.3); }
 
-        /* Paketler */
+        /* Paket Kartları */
         .boost-card { background: white; margin: 10px 15px; padding: 18px; border-radius: 20px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 10px rgba(0,0,0,0.05); border: 1px solid #eee; }
         .btn-buy { background: var(--blue); color: white; border: none; padding: 12px 18px; border-radius: 12px; font-weight: bold; }
 
         /* Alt Navbar */
-        .nav-bar { position: fixed; bottom: 0; width: 100%; background: white; display: flex; padding: 10px 0; border-top: 1px solid #eee; z-index: 1000; }
-        .nav-item { flex: 1; text-align: center; font-size: 10px; color: #999; cursor: pointer; }
-        .nav-item.active { color: var(--blue); }
-        .nav-item b { display: block; font-size: 22px; margin-bottom: 2px; }
+        .nav-bar { position: fixed; bottom: 0; width: 100%; background: white; display: flex; padding: 12px 0; border-top: 1px solid #eee; z-index: 1000; box-shadow: 0 -5px 15px rgba(0,0,0,0.02); }
+        .nav-item { flex: 1; text-align: center; font-size: 11px; color: #999; cursor: pointer; transition: 0.2s; }
+        .nav-item.active { color: var(--blue); font-weight: bold; }
+        .nav-item b { display: block; font-size: 24px; margin-bottom: 4px; }
     </style>
 </head>
 <body>
 
     <div id="homePage" class="page active">
         <div style="display:flex; justify-content:space-between; padding:15px; align-items:center;">
-            <div style="background:white; padding:8px 15px; border-radius:15px; font-weight:bold; font-size:14px; box-shadow:0 2px 5px rgba(0,0,0,0.05);">💎 <span id="topWallet">0.0000</span> TON</div>
+            <div style="background:white; padding:10px 18px; border-radius:15px; font-weight:bold; box-shadow:0 2px 5px rgba(0,0,0,0.05); border:1px solid #eee;">💎 <span id="topWallet">0.0000</span> <small>TON</small></div>
             <button onclick="saveToWallet()" style="background:var(--green); color:white; border:none; padding:10px 15px; border-radius:15px; font-weight:bold; font-size:12px;">📥 Save to Wallet</button>
         </div>
         <div class="mining-area">
@@ -52,12 +52,15 @@
     </div>
 
     <div id="walletPage" class="page">
-        <h2 style="text-align:center; margin-top:30px;">Your Wallet</h2>
+        <h2 style="text-align:center; margin-top:30px;">Titan Wallet</h2>
         <div class="wallet-card">
             <div class="wallet-icon">👛</div>
-            <small style="color:#888;">Total Balance</small>
-            <div style="font-size:32px; font-weight:800; margin:10px 0;"><span id="mainWallet">0.0000</span> TON</div>
-            <button onclick="Telegram.WebApp.showAlert('Çekim talebi yakında aktif edilecek!')" style="background:#eef6ff; color:var(--blue); border:none; width:100%; padding:15px; border-radius:15px; font-weight:bold;">Withdraw Funds</button>
+            <p style="color:#888; margin-bottom:5px;">Your Secure Balance</p>
+            <div style="font-size:36px; font-weight:800; margin-bottom:25px;"><span id="mainWallet">0.0000</span> TON</div>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                <button onclick="Telegram.WebApp.showAlert('Yakında!')" style="background:var(--blue); color:white; border:none; padding:15px; border-radius:15px; font-weight:bold;">Deposit</button>
+                <button onclick="Telegram.WebApp.showAlert('Minimum çekim: 10 TON')" style="background:#f1f2f6; color:#333; border:none; padding:15px; border-radius:15px; font-weight:bold;">Withdraw</button>
+            </div>
         </div>
     </div>
 
@@ -81,11 +84,20 @@
         </div>
     </div>
 
+    <div id="friendsPage" class="page">
+        <h2 style="text-align:center; margin-top:30px;">Invite Friends</h2>
+        <div style="background:white; margin:15px; padding:30px; border-radius:25px; text-align:center; box-shadow:0 5px 15px rgba(0,0,0,0.05);">
+            <div style="font-size:50px; margin-bottom:15px;">👥</div>
+            <p>Invite friends and get <br><b>+0.05 PPH bonus</b> each!</p>
+            <button class="btn-action" onclick="Telegram.WebApp.showAlert('Link Kopyalandı!')">Invite a Friend</button>
+        </div>
+    </div>
+
     <div class="nav-bar">
         <div class="nav-item active" onclick="showPage('homePage')" id="nav-home"><b>🏠</b>Home</div>
         <div class="nav-item" onclick="showPage('walletPage')" id="nav-wallet"><b>👛</b>Wallet</div>
         <div class="nav-item" onclick="showPage('boostPage')" id="nav-boosts"><b>🚀</b>Packages</div>
-        <div class="nav-item" onclick="Telegram.WebApp.showAlert('Referanslar Yakında!')"><b>👥</b>Friends</div>
+        <div class="nav-item" onclick="showPage('friendsPage')" id="nav-friends"><b>👥</b>Friends</div>
     </div>
 
     <script>
@@ -96,12 +108,15 @@
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             document.getElementById(pageId).classList.add('active');
             document.getElementById('nav-' + pageId.replace('Page', '')).classList.add('active');
+            Telegram.WebApp.HapticFeedback.impactOccurred('light');
         }
 
         function startMining() {
-            if(isMining) return; isMining = true;
+            if(isMining) return; 
+            isMining = true;
             document.getElementById('mineBtn').innerText = "⛏️ Mining...";
             document.getElementById('mineBtn').style.background = "#2ecc71";
+            Telegram.WebApp.HapticFeedback.impactOccurred('medium');
             setInterval(() => {
                 miningBalance += (currentSpeed / 3600);
                 document.getElementById('balanceDisplay').innerText = miningBalance.toFixed(8);
@@ -109,22 +124,26 @@
         }
 
         function saveToWallet() {
+            if(miningBalance <= 0) return;
             walletBalance += miningBalance; miningBalance = 0;
             document.getElementById('balanceDisplay').innerText = "0.00000000";
             document.getElementById('topWallet').innerText = walletBalance.toFixed(4);
             document.getElementById('mainWallet').innerText = walletBalance.toFixed(4);
             Telegram.WebApp.HapticFeedback.notificationOccurred('success');
+            Telegram.WebApp.showAlert("Bakiyen cüzdana aktarıldı!");
         }
 
         function buyPackage(speedAdd, cost) {
-            if(walletBalance < cost) { Telegram.WebApp.showAlert("Cüzdan bakiyesi yetersiz!"); return; }
+            if(walletBalance < cost) { Telegram.WebApp.showAlert("Cüzdan bakiyen yetersiz!"); return; }
             walletBalance -= cost; currentSpeed += speedAdd;
             document.getElementById('topWallet').innerText = walletBalance.toFixed(4);
             document.getElementById('mainWallet').innerText = walletBalance.toFixed(4);
             document.getElementById('speedDisplay').innerText = "⚡ " + currentSpeed.toFixed(3) + " PPH";
-            Telegram.WebApp.showAlert("Paket Satın Alındı!");
+            Telegram.WebApp.HapticFeedback.notificationOccurred('success');
+            Telegram.WebApp.showAlert("Paket Aktif Edildi!");
         }
         Telegram.WebApp.ready();
+        Telegram.WebApp.expand();
     </script>
 </body>
 </html>
