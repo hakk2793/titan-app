@@ -7,123 +7,143 @@
     <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        :root { --blue: #007aff; --bg: #f8f9fa; --card: #ffffff; --green: #2ecc71; --gold: #f1c40f; }
-        body { background: var(--bg); font-family: -apple-system, sans-serif; margin: 0; padding: 0; color: #333; overflow: hidden; }
-        .page { display: none; height: calc(100vh - 75px); overflow-y: auto; padding-bottom: 20px; box-sizing: border-box; }
+        :root { --blue: #007aff; --bg: #f8f9fa; --card: #ffffff; --green: #2ecc71; }
+        body { background: var(--bg); font-family: -apple-system, sans-serif; margin: 0; padding: 0; overflow: hidden; }
+        .page { display: none; height: calc(100vh - 80px); overflow-y: auto; padding: 15px; box-sizing: border-box; }
         .page.active { display: block; }
+        
+        /* Üst Panel */
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .bal-box { background: white; padding: 10px 15px; border-radius: 15px; border: 1px solid #eee; font-weight: bold; }
+        .save-btn { background: var(--green); color: white; border: none; padding: 10px 15px; border-radius: 12px; font-weight: bold; }
 
-        /* Top Bar Tasarımı */
-        .top-stats { display: flex; justify-content: space-between; padding: 15px; align-items: center; }
-        .wallet-box { background: white; padding: 8px 15px; border-radius: 12px; border: 1px solid #eee; font-weight: bold; }
-        .btn-save { background: var(--green); color: white; border: none; padding: 10px 18px; border-radius: 12px; font-weight: bold; }
-
-        /* Mining Alanı */
-        .mining-section { text-align: center; margin-top: 10px; }
-        .reactor { width: 160px; height: 160px; margin: 0 auto; border: 8px solid #eef6ff; border-radius: 50%; position: relative; display: flex; align-items: center; justify-content: center; }
-        .blades { width: 130px; height: 130px; background: conic-gradient(from 0deg, transparent 0%, var(--blue) 30%, transparent 40%, var(--blue) 70%, transparent 80%); border-radius: 50%; animation: spin 2s linear infinite; }
-        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        .balance-text { font-size: 36px; font-weight: 800; margin: 15px 0 5px; }
-
-        /* Navbar */
-        .nav-bar { position: fixed; bottom: 0; width: 100%; height: 75px; background: white; display: flex; border-top: 1px solid #eee; z-index: 1000; }
-        .nav-item { flex: 1; text-align: center; font-size: 10px; color: #999; display: flex; flex-direction: column; align-items: center; justify-content: center; text-decoration: none; }
+        /* Madencilik */
+        .mine-card { text-align: center; margin-top: 20px; }
+        .reactor { width: 160px; height: 160px; margin: 0 auto; border: 8px solid #eef6ff; border-radius: 50%; display: flex; align-items: center; justify-content: center; position: relative; }
+        .blades { width: 130px; height: 130px; background: conic-gradient(from 0deg, transparent 0%, var(--blue) 30%, transparent 40%, var(--blue) 70%, transparent 80%); border-radius: 50%; animation: rotate 2s linear infinite; }
+        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .main-balance { font-size: 38px; font-weight: 800; margin: 20px 0; }
+        
+        /* Menü */
+        .nav { position: fixed; bottom: 0; width: 100%; height: 80px; background: white; display: flex; border-top: 1px solid #eee; }
+        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 11px; color: #999; cursor: pointer; }
         .nav-item.active { color: var(--blue); font-weight: bold; }
-        .nav-item img { width: 24px; height: 24px; margin-bottom: 4px; }
+        .nav-item span { font-size: 24px; margin-bottom: 4px; }
 
-        #ton-connect-btn { display: flex; justify-content: center; margin-bottom: 15px; }
+        #ton-connect-btn { margin: 20px 0; display: flex; justify-content: center; }
     </style>
 </head>
 <body>
 
-    <div id="homePage" class="page active">
-        <div class="top-stats">
-            <div class="wallet-box">💎 <span id="topWallet">0.0000</span></div>
-            <button class="btn-save" onclick="saveToWallet()">📥 Save to Wallet</button>
+    <div id="home" class="page active">
+        <div class="header">
+            <div class="bal-box">💎 <span id="topBal">0.0000</span></div>
+            <button class="save-btn" onclick="claim()">📥 Save to Wallet</button>
         </div>
-        
         <div id="ton-connect-btn"></div>
-
-        <div class="mining-section">
-            <div class="reactor"><div class="blades"></div><div class="reactor-core">⚡</div></div>
-            <div class="balance-text" id="balanceDisplay">0.00000000</div>
-            <div style="color:var(--blue); font-weight:bold; margin-bottom:15px;" id="speedDisplay">⚡ 0.012 PPH</div>
-            <button style="background:var(--blue); color:white; border:none; width:85%; padding:15px; border-radius:15px; font-weight:bold;" id="mineBtn" onclick="startMining()">🚀 Start Mining</button>
+        <div class="mine-card">
+            <div class="reactor"><div class="blades"></div><div style="position:absolute;">⚡</div></div>
+            <div class="main-balance" id="disp">0.00000000</div>
+            <div style="color:var(--blue); font-weight:bold; margin-bottom:20px;">⚡ <span id="speed">0.012</span> PPH</div>
+            <button id="mBtn" onclick="start()" style="background:var(--blue); color:white; border:none; width:100%; padding:18px; border-radius:20px; font-size:18px; font-weight:bold;">🚀 Start Mining</button>
         </div>
     </div>
 
-    <div id="walletPage" class="page">
-        <h2 style="text-align:center; margin-top:20px;">Cüzdanın</h2>
-        <div style="background:white; margin:15px; padding:25px; border-radius:25px; text-align:center; border:1px solid #eee;">
-            <div style="font-size:32px; font-weight:800;"><span id="mainWallet">0.0000</span> TON</div>
-            <p style="color:#888;">Toplam Kazanılan</p>
+    <div id="wallet" class="page">
+        <h2 style="text-align:center;">Wallet</h2>
+        <div style="background:white; padding:30px; border-radius:25px; text-align:center; border:1px solid #eee;">
+            <div style="font-size:40px;">👛</div>
+            <div style="font-size:32px; font-weight:800; margin:10px 0;"><span id="wBal">0.0000</span> TON</div>
         </div>
     </div>
 
-    <div id="shopPage" class="page"><h2 style="text-align:center;">Market</h2></div>
-    <div id="leaderPage" class="page"><h2 style="text-align:center;">Liderler</h2></div>
+    <div id="shop" class="page">
+        <h2 style="text-align:center;">Shop</h2>
+        <div style="background:white; padding:15px; border-radius:20px; display:flex; justify-content:space-between; align-items:center; border:1px solid #eee;">
+            <span><b>Starter Pack</b><br><small>+0.50 PPH</small></span>
+            <button onclick="buy(2, 0.50)" style="background:var(--blue); color:white; border:none; padding:10px 20px; border-radius:10px; font-weight:bold;">2 TON</button>
+        </div>
+    </div>
 
-    <div class="nav-bar">
-        <div class="nav-item active" onclick="showPage('homePage')" id="nav-home">
-            <img src="https://img.icons8.com/fluency/48/home.png" alt="Home">Home
+    <div id="leaders" class="page">
+        <h2 style="text-align:center;">Leaders</h2>
+        <div style="background:white; padding:15px; border-radius:15px; display:flex; justify-content:space-between; border:1px solid #eee;">
+            <span>1. @king_ton</span>
+            <b>150.0 TON</b>
         </div>
-        <div class="nav-item" onclick="showPage('walletPage')" id="nav-wallet">
-            <img src="https://img.icons8.com/fluency/48/wallet.png" alt="Wallet">Wallet
-        </div>
-        <div class="nav-item" onclick="showPage('shopPage')" id="nav-shop">
-            <img src="https://img.icons8.com/fluency/48/rocket.png" alt="Shop">Shop
-        </div>
-        <div class="nav-item" onclick="showPage('leaderPage')" id="nav-leader">
-            <img src="https://img.icons8.com/fluency/48/trophy.png" alt="Leaders">Leaders
-        </div>
+    </div>
+
+    <div class="nav">
+        <div class="nav-item active" onclick="go('home')" id="n-home"><span>🏠</span>Home</div>
+        <div class="nav-item" onclick="go('wallet')" id="n-wallet"><span>👛</span>Wallet</div>
+        <div class="nav-item" onclick="go('shop')" id="n-shop"><span>🚀</span>Shop</div>
+        <div class="nav-item" onclick="go('leaders')" id="n-leaders"><span>🏆</span>Leaders</div>
     </div>
 
     <script>
-        const MY_WALLET = "UQC8qx530ORsKhEMwVVd_3UtPfjnAxKyA0DgTB1yR513oBOd";
+        const ADMIN_WALLET = "UQC8qx530ORsKhEMwVVd_3UtPfjnAxKyA0DgTB1yR513oBOd";
         
-        // MANIFEST HATASI ÇÖZÜMÜ: Güvenilir bir manifest adresi kullanıyoruz
+        // Manifest hatasını aşmak için resmi ve güvenilir manifest linki
         const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
             manifestUrl: 'https://ton-connect.github.io/demo-dapp-with-react/tonconnect-manifest.json',
             buttonRootId: 'ton-connect-btn'
         });
 
-        let miningBalance = parseFloat(localStorage.getItem('miningBalance')) || 0;
-        let walletBalance = parseFloat(localStorage.getItem('walletBalance')) || 0;
-        let currentSpeed = 0.012;
-        let isMining = localStorage.getItem('isMining') === 'true';
+        let mBal = parseFloat(localStorage.getItem('mBal')) || 0;
+        let wBal = parseFloat(localStorage.getItem('wBal')) || 0;
+        let spd = parseFloat(localStorage.getItem('spd')) || 0.012;
+        let isM = localStorage.getItem('isM') === 'true';
 
-        function showPage(id) {
+        function go(id) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             document.getElementById(id).classList.add('active');
-            const navId = 'nav-' + id.replace('Page', '');
-            document.getElementById(navId).classList.add('active');
+            document.getElementById('n-' + id).classList.add('active');
         }
 
-        function startMining() {
-            isMining = true;
-            localStorage.setItem('isMining', 'true');
-            document.getElementById('mineBtn').innerText = "Mining...";
+        function start() {
+            if(isM) return;
+            isM = true; localStorage.setItem('isM', 'true');
+            document.getElementById('mBtn').innerText = "⛏️ Mining...";
+            document.getElementById('mBtn').style.background = "#2ecc71";
             setInterval(() => {
-                miningBalance += (currentSpeed / 3600);
-                document.getElementById('balanceDisplay').innerText = miningBalance.toFixed(8);
-                localStorage.setItem('miningBalance', miningBalance);
+                mBal += (spd / 3600);
+                document.getElementById('disp').innerText = mBal.toFixed(8);
+                localStorage.setItem('mBal', mBal);
             }, 1000);
         }
 
-        function saveToWallet() {
-            walletBalance += miningBalance;
-            miningBalance = 0;
-            localStorage.setItem('walletBalance', walletBalance);
+        function claim() {
+            if(mBal <= 0) return;
+            wBal += mBal; mBal = 0;
+            localStorage.setItem('wBal', wBal); localStorage.setItem('mBal', 0);
             updateUI();
+            Telegram.WebApp.showAlert("Başarıyla Cüzdana Aktarıldı!");
         }
 
         function updateUI() {
-            document.getElementById('balanceDisplay').innerText = miningBalance.toFixed(8);
-            document.getElementById('topWallet').innerText = walletBalance.toFixed(4);
-            document.getElementById('mainWallet').innerText = walletBalance.toFixed(4);
+            document.getElementById('disp').innerText = mBal.toFixed(8);
+            document.getElementById('topBal').innerText = wBal.toFixed(4);
+            document.getElementById('wBal').innerText = wBal.toFixed(4);
+            document.getElementById('speed').innerText = spd.toFixed(3);
         }
 
-        window.onload = () => { if(isMining) startMining(); updateUI(); };
+        async function buy(cost, add) {
+            if(!tonConnectUI.connected) { Telegram.WebApp.showAlert("Önce cüzdanı bağla!"); return; }
+            const tx = {
+                validUntil: Math.floor(Date.now() / 1000) + 60,
+                messages: [{ address: ADMIN_WALLET, amount: (cost * 1000000000).toString() }]
+            };
+            try {
+                await tonConnectUI.sendTransaction(tx);
+                spd += add; localStorage.setItem('spd', spd);
+                updateUI();
+                Telegram.WebApp.showAlert("Hız Artırıldı!");
+            } catch (e) { Telegram.WebApp.showAlert("Hata!"); }
+        }
+
+        window.onload = () => { if(isM) start(); updateUI(); };
+        Telegram.WebApp.ready();
     </script>
 </body>
 </html>
