@@ -7,15 +7,17 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root { --blue: #007aff; --bg: #f8f9fa; --card: #ffffff; --green: #2ecc71; --gold: #f1c40f; }
-        body { background: var(--bg); font-family: -apple-system, sans-serif; margin: 0; color: #333; overflow: hidden; }
-        .page { display: none; padding-bottom: 80px; height: 100vh; overflow-y: auto; }
+        body { background: var(--bg); font-family: -apple-system, sans-serif; margin: 0; padding: 0; color: #333; overflow: hidden; }
+        
+        /* Sayfa Yapısı */
+        .page { display: none; height: 100vh; overflow-y: auto; padding-bottom: 100px; box-sizing: border-box; }
         .page.active { display: block; }
         
-        /* Kartlar ve Tasarım */
+        /* Kart Tasarımları */
         .header-card { background: var(--card); margin: 15px; padding: 15px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; }
         .token-logo { width: 40px; height: 40px; background: #eef6ff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; }
         
-        /* Reaktör Alanı */
+        /* Reaktör Bölümü */
         .mining-area { text-align: center; margin-top: 10px; }
         .reactor { width: 180px; height: 180px; margin: 0 auto; border: 8px solid #eef6ff; border-radius: 50%; position: relative; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px rgba(0,122,255,0.2); }
         .blades { width: 140px; height: 140px; background: conic-gradient(from 0deg, transparent 0%, var(--blue) 30%, transparent 40%, var(--blue) 70%, transparent 80%); border-radius: 50%; animation: spin 2s linear infinite; filter: blur(2px); opacity: 0.8; }
@@ -23,122 +25,4 @@
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
         .balance-main { font-size: 36px; font-weight: 800; margin: 15px 0 5px 0; font-variant-numeric: tabular-nums; }
-        .speed-tag { font-size: 14px; color: var(--blue); font-weight: bold; margin-bottom: 15px; }
-        .btn-action { background: var(--blue); color: white; border: none; width: 90%; padding: 16px; border-radius: 18px; font-size: 17px; font-weight: bold; box-shadow: 0 5px 15px rgba(0,122,255,0.3); cursor: pointer; }
-
-        /* Boost Paketleri Listesi */
-        .boost-card { background: white; margin: 15px; padding: 15px; border-radius: 20px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-        .boost-info { text-align: left; }
-        .boost-info b { display: block; font-size: 16px; }
-        .boost-info span { font-size: 12px; color: #888; }
-        .btn-buy { background: var(--blue); color: white; border: none; padding: 10px 15px; border-radius: 12px; font-weight: bold; cursor: pointer; }
-        .btn-buy:disabled { background: #ccc; }
-
-        /* Navbar */
-        .nav-bar { position: fixed; bottom: 0; width: 100%; background: white; display: flex; padding: 10px 0; border-top: 1px solid #eee; z-index: 1000; }
-        .nav-item { flex: 1; text-align: center; font-size: 10px; color: #999; cursor: pointer; }
-        .nav-item.active { color: var(--blue); }
-        .nav-item b { display: block; font-size: 22px; margin-bottom: 2px; }
-    </style>
-</head>
-<body>
-
-    <div id="homePage" class="page active">
-        <div class="header-card">
-            <div style="display:flex; align-items:center; gap:10px;">
-                <div class="token-logo">💎</div>
-                <div style="text-align:left;"><small style="color:#888;">Total Balance</small><br><b id="headerBal">0.0000</b></div>
-            </div>
-            <div style="font-size: 12px; background: #fff9e6; padding: 5px 10px; border-radius: 10px; color: #f39c12; font-weight: bold;">LVL <span id="userLevel">1</span></div>
-        </div>
-
-        <div class="mining-area">
-            <div class="reactor"><div class="blades"></div><div class="reactor-core">⚡</div></div>
-            <div class="balance-main" id="balanceDisplay">0.00000000</div>
-            <div class="speed-tag" id="speedDisplay">⚡ 0.012 PPH</div>
-            <button class="btn-action" id="mineBtn" onclick="startMining()">🚀 Start Mining</button>
-        </div>
-    </div>
-
-    <div id="boostPage" class="page">
-        <h2 style="text-align:center; margin-top:25px;">Mining Boosts</h2>
-        <p style="text-align:center; color:#666; margin-bottom:20px;">Upgrade your reactor for more TON!</p>
         
-        <div class="boost-card">
-            <div class="boost-info"><b>Bronze Fan</b><span>+0.05 PPH Speed</span></div>
-            <button class="btn-buy" onclick="buyBoost(0.05, 0.01)">0.01 TON</button>
-        </div>
-
-        <div class="boost-card">
-            <div class="boost-info"><b>Silver Core</b><span>+0.25 PPH Speed</span></div>
-            <button class="btn-buy" onclick="buyBoost(0.25, 0.05)">0.05 TON</button>
-        </div>
-
-        <div class="boost-card">
-            <div class="boost-info" style="color:var(--gold);"><b>Golden Reactor</b><span>+1.50 PPH Speed</span></div>
-            <button class="btn-buy" onclick="buyBoost(1.50, 0.20)" style="background:var(--gold);">0.20 TON</button>
-        </div>
-    </div>
-
-    <div id="friendsPage" class="page">
-        <h2 style="text-align:center; margin-top:25px;">Invite Friends</h2>
-        <div style="background:white; margin:15px; padding:20px; border-radius:20px; text-align:center;">
-            <p>Your referral link:</p>
-            <small id="refLink" style="color:var(--blue); font-weight:bold;">t.me/Gogircin_bot?start=user123</small><br><br>
-            <button class="btn-action" onclick="Telegram.WebApp.showAlert('Link Kopyalandı!')">Copy Link</button>
-        </div>
-    </div>
-
-    <div class="nav-bar">
-        <div class="nav-item" onclick="Telegram.WebApp.showAlert('Cüzdan Yakında!')"><b>👛</b>Wallet</div>
-        <div class="nav-item" onclick="showPage('friendsPage')" id="nav-friends"><b>👥</b>Friends</div>
-        <div class="nav-item active" onclick="showPage('homePage')" id="nav-home"><b>🏠</b>Home</div>
-        <div class="nav-item" onclick="showPage('boostPage')" id="nav-boosts"><b>🚀</b>Boosts</div>
-        <div class="nav-item" onclick="Telegram.WebApp.showAlert('Yakında!')"><b>⚙️</b>More</div>
-    </div>
-
-    <script>
-        let balance = 0.00000000;
-        let speed = 0.012; 
-        let isMining = false;
-
-        function showPage(pageId) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            document.getElementById(pageId).classList.add('active');
-            if(pageId === 'homePage') document.getElementById('nav-home').classList.add('active');
-            if(pageId === 'friendsPage') document.getElementById('nav-friends').classList.add('active');
-            if(pageId === 'boostPage') document.getElementById('nav-boosts').classList.add('active');
-        }
-
-        function startMining() {
-            if(isMining) return;
-            isMining = true;
-            Telegram.WebApp.HapticFeedback.impactOccurred('medium');
-            document.getElementById('mineBtn').innerText = "⛏️ Mining...";
-            document.getElementById('mineBtn').style.background = "#2ecc71";
-            
-            setInterval(() => {
-                balance += (speed / 3600);
-                document.getElementById('balanceDisplay').innerText = balance.toFixed(8);
-                document.getElementById('headerBal').innerText = balance.toFixed(4);
-            }, 1000);
-        }
-
-        function buyBoost(addSpeed, cost) {
-            if(balance < cost) {
-                Telegram.WebApp.showAlert("Yetersiz Bakiye! Daha fazla kazman lazım.");
-                return;
-            }
-            balance -= cost;
-            speed += addSpeed;
-            document.getElementById('speedDisplay').innerText = "⚡ " + speed.toFixed(3) + " PPH";
-            document.getElementById('balanceDisplay').innerText = balance.toFixed(8);
-            Telegram.WebApp.HapticFeedback.notificationOccurred('success');
-            Telegram.WebApp.showAlert("Hızınız Artırıldı! Yeni Hız: " + speed.toFixed(3) + " PPH");
-        }
-
-        Telegram.WebApp.ready();
-    </script>
-</body>
-</html>
