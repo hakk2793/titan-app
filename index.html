@@ -146,11 +146,29 @@
         }
 
         function copyRef() {
-            const uid = Telegram.WebApp.initDataUnsafe.user ? Telegram.WebApp.initDataUnsafe.user.id : "user";
-            const link = "https://t.me/Gogircin_bot?start=" + uid;
-            const el = document.createElement('textarea'); el.value = link; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el);
-            Telegram.WebApp.showAlert("Referans linkiniz kopyalandı!");
-        }
+    // 1. Bot kullanıcı adının doğruluğundan emin ol (Senin botun: Gogircin_bot)
+    const botUsername = "Gogircin_bot"; 
+    
+    const user = Telegram.WebApp.initDataUnsafe.user;
+    
+    if (user && user.id) {
+        // 2. Link formatını Telegram'ın en sevdiği şekilde düzenleyelim
+        const link = "https://t.me/" + botUsername + "?start=" + user.id;
+        
+        // 3. Kopyalama işlemi
+        const el = document.createElement('textarea');
+        el.value = link;
+        document.body.appendChild(el);
+        el.select();
+        document.execCommand('copy');
+        document.body.removeChild(el);
+        
+        Telegram.WebApp.showAlert("✅ Referans linkin kopyalandı! \n\nArkadaşına gönderdiğinde artık hata almayacak.");
+    } else {
+        Telegram.WebApp.showAlert("❌ Profil verisi alınamadı. Lütfen botu durdurup tekrar başlatın.");
+    }
+}
+
 
         function startMining() {
             if(isMining) return;
