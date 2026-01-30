@@ -10,147 +10,114 @@
         :root { --blue: #007aff; --bg: #f8f9fa; --green: #2ecc71; }
         body { background: var(--bg); font-family: sans-serif; margin: 0; padding: 0; overflow: hidden; }
         
-        /* Sayfa Yapısı */
+        /* Sayfalar */
         .page { display: none; height: 100vh; padding: 20px; box-sizing: border-box; }
-        .active { display: block !important; }
+        .page.active { display: block !important; }
 
-        /* Üst Bilgi */
-        .top-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .chip { background: white; padding: 8px 12px; border-radius: 10px; border: 1px solid #ddd; font-weight: bold; font-size: 14px; }
-        .save-btn { background: var(--green); color: white; border: none; padding: 10px 15px; border-radius: 10px; font-weight: bold; }
+        /* Üst Panel */
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .stat { background: white; padding: 10px; border-radius: 12px; border: 1px solid #ddd; font-weight: bold; }
+        .claim { background: var(--green); color: white; border: none; padding: 10px; border-radius: 10px; font-weight: bold; }
 
-        /* Madencilik */
-        .main-ui { text-align: center; margin-top: 20px; }
-        .circle { width: 160px; height: 160px; margin: 0 auto; border: 10px solid #eef6ff; border-radius: 50%; display: flex; align-items: center; justify-content: center; position: relative; }
-        .spin { width: 130px; height: 130px; background: conic-gradient(from 0deg, transparent 0%, var(--blue) 40%, transparent 50%); border-radius: 50%; animation: rot 2s linear infinite; }
+        /* Ana Alan */
+        .main { text-align: center; }
+        .circle { width: 140px; height: 140px; margin: 0 auto; border: 8px solid #eef6ff; border-radius: 50%; position: relative; display: flex; align-items: center; justify-content: center; }
+        .spin { width: 110px; height: 110px; background: conic-gradient(from 0deg, #007aff, transparent); border-radius: 50%; animation: rot 2s linear infinite; }
         @keyframes rot { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        .balance { font-size: 38px; font-weight: 800; margin: 20px 0; }
-
+        
         /* Alt Menü */
-        .menu { position: fixed; bottom: 0; width: 100%; height: 75px; background: white; display: flex; border-top: 1px solid #eee; }
-        .menu-btn { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 12px; color: #888; cursor: pointer; }
-        .menu-btn.active { color: var(--blue); font-weight: bold; }
-        .menu-btn span { font-size: 22px; }
+        .nav { position: fixed; bottom: 0; width: 100%; height: 75px; background: white; display: flex; border-top: 1px solid #eee; }
+        .nav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 12px; color: #888; cursor: pointer; }
+        .nav-btn.selected { color: var(--blue); font-weight: bold; }
+        .nav-btn span { font-size: 24px; }
 
-        #ton-connect-button { display: flex; justify-content: center; margin-bottom: 20px; }
+        #ton-connect-button { display: flex; justify-content: center; margin: 15px 0; }
     </style>
 </head>
 <body>
 
-    <div id="home" class="page active">
-        <div class="top-nav">
-            <div class="chip">💎 <span id="tW">0.0000</span></div>
-            <button class="save-btn" onclick="save()">📥 Save to Wallet</button>
+    <div id="pg-home" class="page active">
+        <div class="header">
+            <div class="stat">💎 <span id="top-w">0.0000</span></div>
+            <button class="claim" onclick="doClaim()">📥 Save</button>
         </div>
-        
         <div id="ton-connect-button"></div>
-
-        <div class="main-ui">
-            <div class="circle"><div class="spin"></div><div style="position:absolute; font-size:24px;">⚡</div></div>
-            <div class="balance" id="mB">0.00000000</div>
-            <p style="color:var(--blue); font-weight:bold;">⚡ <span id="sP">0.012</span> PPH</p>
-            <button id="stBtn" onclick="start()" style="background:var(--blue); color:white; border:none; width:90%; padding:18px; border-radius:20px; font-size:18px; font-weight:bold;">🚀 Start Mining</button>
+        <div class="main">
+            <div class="circle"><div class="spin"></div><div style="position:absolute;">⚡</div></div>
+            <div style="font-size:32px; font-weight:800; margin:15px 0;" id="m-bal">0.00000000</div>
+            <p style="color:var(--blue); font-weight:bold;">⚡ 0.012 PPH</p>
+            <button onclick="doStart()" id="s-btn" style="background:var(--blue); color:white; border:none; width:90%; padding:15px; border-radius:15px; font-weight:bold; font-size:18px;">🚀 Start Mining</button>
         </div>
     </div>
 
-    <div id="wallet" class="page">
-        <h2 style="text-align:center;">Cüzdan</h2>
-        <div style="background:white; padding:30px; border-radius:20px; text-align:center; border:1px solid #eee;">
-            <p style="font-size:40px; margin:0;">👛</p>
-            <p style="font-size:30px; font-weight:800; margin:10px 0;"><span id="mW">0.0000</span> TON</p>
+    <div id="pg-wallet" class="page">
+        <h2 style="text-align:center;">Cüzdanın</h2>
+        <div class="stat" style="text-align:center; padding:30px; font-size:24px;">
+            <span id="w-bal">0.0000</span> TON
         </div>
     </div>
 
-    <div id="shop" class="page">
+    <div id="pg-shop" class="page">
         <h2 style="text-align:center;">Market</h2>
-        <div style="background:white; padding:15px; border-radius:15px; border:1px solid #eee; display:flex; justify-content:space-between; align-items:center;">
-            <span><b>Hız Paketi</b><br><small>+0.50 PPH</small></span>
-            <button onclick="buy(2, 0.50)" style="background:var(--blue); color:white; border:none; padding:10px; border-radius:8px;">2 TON</button>
-        </div>
+        <div class="stat">Hız Paketi: 2 TON</div>
     </div>
 
-    <div id="leaders" class="page">
-        <h2 style="text-align:center;">Liderler 🏆</h2>
-        <div style="background:white; padding:15px; border-radius:15px; border:1px solid #eee;">
-            1. @titan_king - 100 TON
-        </div>
+    <div id="pg-leaders" class="page">
+        <h2 style="text-align:center;">Liderler</h2>
+        <div class="stat">1. @titan_king</div>
     </div>
 
-    <div class="menu">
-        <div class="menu-btn active" id="btn-home" onclick="nav('home')"><span>🏠</span>Home</div>
-        <div class="menu-btn" id="btn-wallet" onclick="nav('wallet')"><span>👛</span>Wallet</div>
-        <div class="menu-btn" id="btn-shop" onclick="nav('shop')"><span>🚀</span>Shop</div>
-        <div class="menu-btn" id="btn-leaders" onclick="nav('leaders')"><span>🏆</span>Leaders</div>
+    <div class="nav">
+        <div class="nav-btn selected" onclick="go('home')" id="b-home"><span>🏠</span>Home</div>
+        <div class="nav-btn" onclick="go('wallet')" id="b-wallet"><span>👛</span>Wallet</div>
+        <div class="nav-btn" onclick="go('shop')" id="b-shop"><span>🚀</span>Shop</div>
+        <div class="nav-btn" onclick="go('leaders')" id="b-leaders"><span>🏆</span>Leaders</div>
     </div>
 
     <script>
-        // --- AYARLAR ---
-        const MY_WALLET = "UQC8qx530ORsKhEMwVVd_3UtPfjnAxKyA0DgTB1yR513oBOd";
-        
-        // Manifest hatasını bypass etmek için TON'un resmi manifestsiz bağlantısını deniyoruz
+        // Manifest URL'sini kontrol et!
         const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
-            manifestUrl: 'https://ton-connect.github.io/demo-dapp-with-react/tonconnect-manifest.json',
+            manifestUrl: 'https://hakk2793.github.io/titan-uygulamasi/tonconnect-manifest.json',
             buttonRootId: 'ton-connect-button'
         });
 
         let mb = parseFloat(localStorage.getItem('mb')) || 0;
         let wb = parseFloat(localStorage.getItem('wb')) || 0;
-        let sp = parseFloat(localStorage.getItem('sp')) || 0.012;
         let isM = localStorage.getItem('isM') === 'true';
 
-        // Sayfa Değiştirme (Basitleştirildi)
-        function nav(id) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.querySelectorAll('.menu-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-            document.getElementById('btn-' + id).classList.add('active');
+        // Sayfa Değiştirme (Kesin Çözüm)
+        function go(p) {
+            document.querySelectorAll('.page').forEach(x => x.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(x => x.classList.remove('selected'));
+            document.getElementById('pg-' + p).classList.add('active');
+            document.getElementById('b-' + p).classList.add('selected');
         }
 
-        function start() {
+        function doStart() {
             if(isM) return;
             isM = true; localStorage.setItem('isM', 'true');
-            document.getElementById('stBtn').innerText = "Mining...";
-            document.getElementById('stBtn').style.background = "#2ecc71";
+            document.getElementById('s-btn').innerText = "Mining...";
             setInterval(() => {
-                mb += (sp / 3600);
-                document.getElementById('mB').innerText = mb.toFixed(8);
+                mb += (0.012 / 3600);
+                document.getElementById('m-bal').innerText = mb.toFixed(8);
                 localStorage.setItem('mb', mb);
             }, 1000);
         }
 
-        function save() {
-            if(mb <= 0) return;
+        function doClaim() {
             wb += mb; mb = 0;
             localStorage.setItem('wb', wb); localStorage.setItem('mb', 0);
-            ui();
+            update();
             Telegram.WebApp.showAlert("Kaydedildi!");
         }
 
-        function ui() {
-            document.getElementById('mB').innerText = mb.toFixed(8);
-            document.getElementById('tW').innerText = wb.toFixed(4);
-            document.getElementById('mW').innerText = wb.toFixed(4);
-            document.getElementById('sP').innerText = sp.toFixed(3);
+        function update() {
+            document.getElementById('m-bal').innerText = mb.toFixed(8);
+            document.getElementById('top-w').innerText = wb.toFixed(4);
+            document.getElementById('w-bal').innerText = wb.toFixed(4);
         }
 
-        async function buy(cost, add) {
-            if(!tonConnectUI.connected) {
-                Telegram.WebApp.showAlert("Lütfen önce cüzdanınızı bağlayın!");
-                return;
-            }
-            const tx = {
-                validUntil: Math.floor(Date.now() / 1000) + 60,
-                messages: [{ address: MY_WALLET, amount: (cost * 1000000000).toString() }]
-            };
-            try {
-                await tonConnectUI.sendTransaction(tx);
-                sp += add; localStorage.setItem('sp', sp);
-                ui();
-                Telegram.WebApp.showAlert("Paket Alındı!");
-            } catch (e) { Telegram.WebApp.showAlert("İşlem reddedildi."); }
-        }
-
-        window.onload = () => { if(isM) start(); ui(); };
+        window.onload = () => { if(isM) doStart(); update(); };
         Telegram.WebApp.ready();
     </script>
 </body>
