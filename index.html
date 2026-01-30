@@ -1,70 +1,183 @@
-<style>
-    /* Liderlik Tablosu Tasarımı */
-    .leader-item { 
-        background: white; margin: 10px 15px; padding: 15px; border-radius: 20px; 
-        display: flex; align-items: center; justify-content: space-between;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.03); border: 1px solid #eee;
-    }
-    .rank-circle { 
-        width: 30px; height: 30px; border-radius: 50%; background: #eef6ff; 
-        display: flex; align-items: center; justify-content: center; 
-        font-weight: bold; color: var(--blue); margin-right: 15px;
-    }
-    .user-info { flex-grow: 1; text-align: left; }
-    .gold-rank { background: #fff9e6 !important; border: 1px solid var(--gold) !important; }
-    .my-rank { border: 2px solid var(--blue) !important; background: #f0f7ff !important; }
-</style>
-
-<div id="leaderboardPage" class="page">
-    <h2 style="text-align:center; margin-top:30px;">Titan Leaders 🏆</h2>
-    <p style="text-align:center; color:#888; margin-bottom:20px;">Top miners by balance</p>
-
-    <div class="leader-item gold-rank">
-        <div class="rank-circle" style="background:var(--gold); color:white;">1</div>
-        <div class="user-info"><b>@ton_king</b><br><small>145.20 TON</small></div>
-        <div style="font-size:20px;">🥇</div>
-    </div>
-
-    <div class="leader-item">
-        <div class="rank-circle">2</div>
-        <div class="user-info"><b>@crypto_titan</b><br><small>98.45 TON</small></div>
-        <div style="font-size:20px;">🥈</div>
-    </div>
-
-    <div class="leader-item">
-        <div class="rank-circle">3</div>
-        <div class="user-info"><b>@miner_pro</b><br><small>74.12 TON</small></div>
-        <div style="font-size:20px;">🥉</div>
-    </div>
-
-    <div class="leader-item my-rank">
-        <div class="rank-circle" style="background:var(--blue); color:white;">?</div>
-        <div class="user-info"><b>You (Your Rank)</b><br><small id="leaderMyBal">0.0000 TON</small></div>
-        <div style="font-size:12px; color:var(--blue);">Mining...</div>
-    </div>
-</div>
-
-<div class="nav-bar">
-    <div class="nav-item active" onclick="showPage('homePage')" id="nav-home"><b>🏠</b>Home</div>
-    <div class="nav-item" onclick="showPage('walletPage')" id="nav-wallet"><b>👛</b>Wallet</div>
-    <div class="nav-item" onclick="showPage('boostPage')" id="nav-boosts"><b>🚀</b>Packages</div>
-    <div class="nav-item" onclick="showPage('leaderboardPage')" id="nav-leaderboard"><b>🏆</b>Leaders</div>
-</div>
-
-<script>
-    // JS Kısmında showPage fonksiyonuna leaderboardPage desteği ekle
-    function showPage(pageId) {
-        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-        document.getElementById(pageId).classList.add('active');
-        // Navigasyon ismini düzeltmek için
-        let navId = 'nav-' + pageId.replace('Page', '');
-        if(document.getElementById(navId)) document.getElementById(navId).classList.add('active');
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>TITAN NETWORK</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        :root { --blue: #007aff; --bg: #f8f9fa; --card: #ffffff; --green: #2ecc71; --gold: #f1c40f; }
+        body { background: var(--bg); font-family: -apple-system, sans-serif; margin: 0; padding: 0; color: #333; overflow: hidden; width: 100vw; }
         
-        // Liderlik tablosundaki bakiyeni güncelle
-        if(pageId === 'leaderboardPage') {
-            document.getElementById('leaderMyBal').innerText = walletBalance.toFixed(4) + " TON";
+        .page { display: none; height: calc(100vh - 70px); overflow-y: auto; padding-bottom: 20px; box-sizing: border-box; }
+        .page.active { display: block; }
+
+        /* Navbar Tasarımı - Garantiye Alındı */
+        .nav-bar { 
+            position: fixed; bottom: 0; left: 0; width: 100%; height: 70px;
+            background: #ffffff; display: flex; align-items: center; justify-content: space-around;
+            border-top: 1px solid #eee; z-index: 9999; box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
         }
-        Telegram.WebApp.HapticFeedback.impactOccurred('light');
-    }
-</script>
+        .nav-item { 
+            flex: 1; text-align: center; color: #999; cursor: pointer; 
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+        }
+        .nav-item.active { color: var(--blue); font-weight: bold; }
+        .nav-item span { font-size: 24px; margin-bottom: 2px; }
+        .nav-item label { font-size: 10px; cursor: pointer; }
+
+        /* Cüzdan Kartı */
+        .wallet-card { background: var(--card); margin: 15px; padding: 20px; border-radius: 25px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); text-align: center; }
+        
+        /* Madencilik */
+        .mining-area { text-align: center; padding-top: 20px; }
+        .reactor { width: 160px; height: 160px; margin: 0 auto; border: 8px solid #eef6ff; border-radius: 50%; position: relative; display: flex; align-items: center; justify-content: center; }
+        .blades { width: 130px; height: 130px; background: conic-gradient(from 0deg, transparent 0%, var(--blue) 30%, transparent 40%, var(--blue) 70%, transparent 80%); border-radius: 50%; animation: spin 2s linear infinite; opacity: 0.8; }
+        .reactor-core { position: absolute; font-size: 20px; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        .balance-main { font-size: 36px; font-weight: 800; margin: 15px 0; font-variant-numeric: tabular-nums; }
+        .btn-action { background: var(--blue); color: white; border: none; width: 85%; padding: 15px; border-radius: 15px; font-size: 16px; font-weight: bold; }
+
+        /* Liderlik */
+        .leader-item { background: white; margin: 8px 15px; padding: 12px; border-radius: 15px; display: flex; align-items: center; border: 1px solid #eee; }
+        .rank-id { width: 25px; font-weight: bold; color: var(--blue); }
+    </style>
+</head>
+<body>
+
+    <div id="homePage" class="page active">
+        <div style="display:flex; justify-content:space-between; padding:15px;">
+            <div style="background:white; padding:8px 15px; border-radius:12px; border:1px solid #eee;">💎 <span id="topWallet">0.0000</span></div>
+            <button onclick="saveToWallet()" style="background:var(--green); color:white; border:none; padding:8px 15px; border-radius:12px; font-weight:bold;">📥 Save</button>
+        </div>
+        <div class="mining-area">
+            <div class="reactor"><div class="blades"></div><div class="reactor-core">⚡</div></div>
+            <div class="balance-main" id="balanceDisplay">0.00000000</div>
+            <div style="color:var(--blue); font-weight:bold; margin-bottom:20px;" id="speedDisplay">⚡ 0.012 PPH</div>
+            <button class="btn-action" id="mineBtn" onclick="startMining()">🚀 Start Mining</button>
+        </div>
+    </div>
+
+    <div id="walletPage" class="page">
+        <h2 style="text-align:center;">Wallet</h2>
+        <div class="wallet-card">
+            <div style="font-size:40px;">👛</div>
+            <div style="font-size:32px; font-weight:800; margin:10px 0;"><span id="mainWallet">0.0000</span> TON</div>
+            <button onclick="Telegram.WebApp.showAlert('Yakında!')" style="background:var(--blue); color:white; border:none; width:100%; padding:15px; border-radius:12px; font-weight:bold;">Withdraw</button>
+        </div>
+    </div>
+
+    <div id="boostPage" class="page">
+        <h2 style="text-align:center;">Shop</h2>
+        <div style="padding:0 15px;">
+            <div style="background:white; padding:15px; border-radius:15px; display:flex; justify-content:space-between; margin-bottom:10px; border:1px solid #eee;">
+                <div><b>Starter (+0.50)</b></div>
+                <button onclick="buyPackage(0.50, 2)" style="background:var(--blue); color:white; border:none; padding:8px 15px; border-radius:10px;">2 TON</button>
+            </div>
+            <div style="background:white; padding:15px; border-radius:15px; display:flex; justify-content:space-between; margin-bottom:10px; border:1px solid #eee;">
+                <div><b>Pro (+1.50)</b></div>
+                <button onclick="buyPackage(1.50, 5)" style="background:var(--blue); color:white; border:none; padding:8px 15px; border-radius:10px;">5 TON</button>
+            </div>
+            <div style="background:white; padding:15px; border-radius:15px; display:flex; justify-content:space-between; margin-bottom:10px; border:1px solid #eee;">
+                <div><b>Industrial (+4.0)</b></div>
+                <button onclick="buyPackage(4.0, 10)" style="background:var(--blue); color:white; border:none; padding:8px 15px; border-radius:10px;">10 TON</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="leaderPage" class="page">
+        <h2 style="text-align:center;">Top Titans 🏆</h2>
+        <div class="leader-item">
+            <div class="rank-id">1</div>
+            <div style="flex:1;"><b>@king_ton</b><br><small>150.0 TON</small></div>
+            <span>🥇</span>
+        </div>
+        <div class="leader-item" style="border:2px solid var(--blue);">
+            <div class="rank-id">?</div>
+            <div style="flex:1;"><b>Sen</b><br><small id="leaderMyBal">0.0000 TON</small></div>
+            <span>⛏️</span>
+        </div>
+    </div>
+
+    <div class="nav-bar">
+        <div class="nav-item active" onclick="showPage('homePage')" id="nav-home"><span>🏠</span><label>Home</label></div>
+        <div class="nav-item" onclick="showPage('walletPage')" id="nav-wallet"><span>👛</span><label>Wallet</label></div>
+        <div class="nav-item" onclick="showPage('boostPage')" id="nav-boost"><span>🚀</span><label>Shop</label></div>
+        <div class="nav-item" onclick="showPage('leaderPage')" id="nav-leader"><span>🏆</span><label>Leaders</label></div>
+    </div>
+
+    <script>
+        let miningBalance = parseFloat(localStorage.getItem('miningBalance')) || 0;
+        let walletBalance = parseFloat(localStorage.getItem('walletBalance')) || 0;
+        let currentSpeed = parseFloat(localStorage.getItem('currentSpeed')) || 0.012;
+        let lastTime = localStorage.getItem('lastTime') || Date.now();
+        let isMining = localStorage.getItem('isMining') === 'true';
+
+        window.onload = function() {
+            if(isMining) {
+                let diff = (Date.now() - lastTime) / 1000;
+                miningBalance += (currentSpeed / 3600) * diff;
+                startMining();
+            }
+            updateUI();
+        };
+
+        function showPage(id) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            
+            // Buton aktiflik kontrolü
+            if(id === 'homePage') document.getElementById('nav-home').classList.add('active');
+            if(id === 'walletPage') document.getElementById('nav-wallet').classList.add('active');
+            if(id === 'boostPage') document.getElementById('nav-boost').classList.add('active');
+            if(id === 'leaderPage') document.getElementById('nav-leader').classList.add('active');
+            
+            if(id === 'leaderPage') document.getElementById('leaderMyBal').innerText = walletBalance.toFixed(4) + " TON";
+            Telegram.WebApp.HapticFeedback.impactOccurred('light');
+        }
+
+        function updateUI() {
+            document.getElementById('balanceDisplay').innerText = miningBalance.toFixed(8);
+            document.getElementById('topWallet').innerText = walletBalance.toFixed(4);
+            document.getElementById('mainWallet').innerText = walletBalance.toFixed(4);
+            document.getElementById('speedDisplay').innerText = "⚡ " + currentSpeed.toFixed(3) + " PPH";
+            if(isMining) {
+                document.getElementById('mineBtn').innerText = "⛏️ Mining...";
+                document.getElementById('mineBtn').style.background = "#2ecc71";
+            }
+        }
+
+        function startMining() {
+            isMining = true;
+            localStorage.setItem('isMining', 'true');
+            updateUI();
+            setInterval(() => {
+                miningBalance += (currentSpeed / 3600);
+                document.getElementById('balanceDisplay').innerText = miningBalance.toFixed(8);
+                localStorage.setItem('miningBalance', miningBalance);
+                localStorage.setItem('lastTime', Date.now());
+            }, 1000);
+        }
+
+        function saveToWallet() {
+            walletBalance += miningBalance; miningBalance = 0;
+            localStorage.setItem('walletBalance', walletBalance);
+            localStorage.setItem('miningBalance', 0);
+            updateUI();
+            Telegram.WebApp.HapticFeedback.notificationOccurred('success');
+        }
+
+        function buyPackage(add, cost) {
+            if(walletBalance < cost) { Telegram.WebApp.showAlert("Yetersiz TON!"); return; }
+            walletBalance -= cost; currentSpeed += add;
+            localStorage.setItem('walletBalance', walletBalance);
+            localStorage.setItem('currentSpeed', currentSpeed);
+            updateUI();
+            Telegram.WebApp.showAlert("Paket Alındı!");
+        }
+        Telegram.WebApp.ready();
+    </script>
+</body>
+</html>
