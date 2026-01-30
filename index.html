@@ -3,114 +3,126 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>GOGIRCIN TITAN PRO</title>
+    <title>GOGIRCIN TITAN PRO - CYBER</title>
     <script src="https://unpkg.com/@tonconnect/ui@2.0.9/dist/tonconnect-ui.min.js"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        :root { --blue: #007aff; --bg: #0f172a; --card: rgba(30, 41, 59, 0.7); --text: #f8fafc; --green: #22c55e; --gold: #fbbf24; }
+        :root { --blue: #00d2ff; --bg: #020617; --card: rgba(15, 23, 42, 0.8); --text: #f8fafc; --green: #10b981; --gold: #fbbf24; --neon: 0 0 15px rgba(0, 210, 255, 0.5); }
         body { 
-            background: #0f172a url('https://images.unsplash.com/photo-1639762681485-074b7f938ba0?q=80&w=2000&auto=format&fit=crop') no-repeat center center fixed; 
-            background-size: cover; color: var(--text); font-family: sans-serif; margin: 0; padding: 0; overflow: hidden; 
+            background: var(--bg) url('https://images.unsplash.com/photo-1639762681485-074b7f938ba0?q=80&w=2000') no-repeat center center fixed; 
+            background-size: cover; color: var(--text); font-family: 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 0; overflow: hidden; 
         }
         .page { 
             display: none; height: 100vh; padding: 20px; box-sizing: border-box; overflow-y: auto; padding-bottom: 120px;
-            backdrop-filter: blur(15px); background: rgba(15, 23, 42, 0.6); 
+            backdrop-filter: blur(20px); background: rgba(2, 6, 23, 0.7); 
         }
         .page.active { display: block !important; }
         .card { 
-            background: var(--card); border-radius: 16px; padding: 20px; margin-bottom: 15px; border: 1px solid rgba(255, 255, 255, 0.1); text-align: center;
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            background: var(--card); border-radius: 20px; padding: 25px; margin-bottom: 15px; 
+            border: 1px solid rgba(0, 210, 255, 0.2); text-align: center;
+            box-shadow: var(--neon); position: relative; overflow: hidden;
         }
-        .btn { background: var(--blue); color: white; border: none; padding: 14px; border-radius: 12px; font-weight: bold; width: 100%; cursor: pointer; font-size: 16px; transition: 0.2s; }
-        .btn:active { transform: scale(0.96); }
+        .card::before { content: ""; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: var(--blue); }
         
-        /* Kayar Yazı Stili */
-        .live-ticker { background: rgba(0, 122, 255, 0.2); padding: 10px; font-size: 13px; color: var(--gold); border-bottom: 1px solid rgba(255, 255, 255, 0.1); overflow: hidden; white-space: nowrap; font-weight: bold; backdrop-filter: blur(5px); }
-        .ticker-text { display: inline-block; animation: scroll 20s linear infinite; }
+        .btn { 
+            background: linear-gradient(90deg, #00d2ff, #3a86ff); color: white; border: none; padding: 16px; 
+            border-radius: 14px; font-weight: 800; width: 100%; cursor: pointer; font-size: 16px; 
+            text-transform: uppercase; letter-spacing: 1px; transition: 0.3s; box-shadow: 0 4px 15px rgba(0, 210, 255, 0.3);
+        }
+        .btn:active { transform: scale(0.95); opacity: 0.9; }
+        
+        .live-ticker { background: rgba(0, 0, 0, 0.5); padding: 12px; font-size: 12px; color: var(--blue); border-bottom: 1px solid var(--blue); font-family: monospace; }
+        .ticker-text { display: inline-block; animation: scroll 15s linear infinite; text-shadow: var(--neon); }
         @keyframes scroll { from { transform: translateX(100%); } to { transform: translateX(-100%); } }
 
-        .navbar { position: fixed; bottom: 0; width: 100%; height: 75px; background: rgba(30, 41, 59, 0.9); display: flex; border-top: 1px solid rgba(255, 255, 255, 0.1); z-index: 100; backdrop-filter: blur(10px); }
-        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 11px; color: #94a3b8; cursor: pointer; }
-        .nav-item.active { color: var(--blue); }
-        
-        #game-coin { width: 130px; height: 130px; cursor: pointer; transition: 0.1s; user-select: none; -webkit-tap-highlight-color: transparent; }
-        #game-coin:active { transform: scale(0.85); }
+        .navbar { position: fixed; bottom: 0; width: 100%; height: 80px; background: rgba(15, 23, 42, 0.95); display: flex; border-top: 1px solid var(--blue); z-index: 100; backdrop-filter: blur(15px); }
+        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 10px; color: #64748b; cursor: pointer; transition: 0.3s; }
+        .nav-item.active { color: var(--blue); text-shadow: var(--neon); }
+        .nav-item span { font-size: 24px; margin-bottom: 4px; }
+
+        #m-bal { font-family: monospace; text-shadow: 0 0 20px rgba(0, 210, 255, 0.8); }
+        .glow-text { color: var(--blue); font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <div class="live-ticker"><div class="ticker-text" id="ticker">Sistem Aktif: Çekimler kontrol ediliyor...</div></div>
+    <div class="live-ticker"><div class="ticker-text" id="ticker">CORE_SYSTEM: ACTIVE // MINING_STATUS: ENCRYPTED // LAST_PAYOUT: 4.52 TON...</div></div>
 
     <div id="p-home" class="page active">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <div class="card" style="margin:0; padding: 10px 20px; display: flex; align-items: center; gap: 8px;"><span>💎</span> <span id="top-bal">0.0000</span></div>
-            <button class="btn" style="width: auto; background: var(--green); padding: 10px 25px;" onclick="claim()">Claim</button>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+            <div class="card" style="margin:0; padding: 12px 25px; border-left: 4px solid var(--blue);">
+                <span style="font-size: 12px; color: #94a3b8; display: block;">WALLET BALANCE</span>
+                <span id="top-bal" class="glow-text" style="font-size: 20px;">0.0000</span> <span style="font-size: 12px;">💎</span>
+            </div>
+            <button class="btn" style="width: auto; background: var(--green); padding: 12px 30px; box-shadow: 0 0 15px rgba(16, 185, 129, 0.4);" onclick="claim()">CLAIM</button>
         </div>
 
-        <div class="card" style="border: 1px solid var(--gold); background: rgba(251, 191, 36, 0.1);">
-            <div style="font-size: 14px; color: var(--gold); margin-bottom: 10px;">🎁 Günlük Hediye</div>
-            <button id="daily-btn" class="btn" style="background: var(--gold); color: #000; padding: 8px;" onclick="getDailyBonus()">Hediyeni Al</button>
+        <div class="card" style="background: rgba(251, 191, 36, 0.05); border: 1px solid rgba(251, 191, 36, 0.3);">
+            <div style="font-size: 12px; color: var(--gold); letter-spacing: 2px;">[ DAILY_REWARD ]</div>
+            <button id="daily-btn" class="btn" style="background: var(--gold); color: #000; margin-top: 10px; padding: 10px;" onclick="getDailyBonus()">ACCESS REWARD</button>
         </div>
 
         <div class="card">
-            <div style="font-size: 50px; margin-bottom: 10px;">⚡</div>
-            <div style="font-size: 38px; font-weight: 800; color: var(--blue);" id="m-bal">0.00000000</div>
-            <p id="pph-text" style="background: rgba(0,122,255,0.1); padding: 5px 15px; border-radius: 20px; color: var(--blue); font-weight: bold;">⚡ 0.512 PPH</p>
-            <button id="start-btn" class="btn" style="margin-top: 15px;" onclick="startMining()">🚀 Start Mining</button>
+            <div style="position: absolute; top: 10px; right: 10px; font-size: 10px; color: var(--blue); font-family: monospace;">SYS_VER: 2.0.4</div>
+            <div style="font-size: 60px; margin-bottom: 15px; filter: drop-shadow(var(--neon));">⚡</div>
+            <div style="font-size: 42px; font-weight: 900; color: var(--text);" id="m-bal">0.00000000</div>
+            <div style="display: flex; justify-content: center; gap: 10px; margin: 15px 0;">
+                <span id="pph-text" style="background: rgba(0, 210, 255, 0.1); padding: 6px 18px; border-radius: 30px; border: 1px solid var(--blue); color: var(--blue); font-size: 14px; font-weight: bold;">⚡ 0.512 PPH</span>
+            </div>
+            <button id="start-btn" class="btn" onclick="startMining()">INITIALIZE MINING</button>
         </div>
     </div>
 
     <div id="p-game" class="page">
-        <h2 style="text-align:center;">🎮 Tıkla Kazan</h2>
+        <h2 style="text-align:center; color: var(--blue); letter-spacing: 3px;">TERMINAL_TAP</h2>
         <div class="card">
-            <p>Oyun Kazancı</p>
-            <h2 id="game-bal" style="color: var(--gold); font-size: 32px;">0.0000</h2>
-            <div style="margin: 20px 0;">
-                <img src="https://cdn-icons-png.flaticon.com/512/3514/3514104.png" id="game-coin" onclick="tapGame()">
+            <p style="font-size: 12px; color: #94a3b8;">EARNINGS_BUFFER</p>
+            <h2 id="game-bal" class="glow-text" style="font-size: 36px; margin: 10px 0;">0.0000</h2>
+            <div style="margin: 30px 0; position: relative;">
+                <img src="https://cdn-icons-png.flaticon.com/512/3514/3514104.png" id="game-coin" style="width: 140px; filter: drop-shadow(0 0 20px var(--blue));" onclick="tapGame()">
             </div>
-            <p style="font-size: 12px; color: #94a3b8;">Paraya dokunarak bakiye biriktir!</p>
+            <p style="font-size: 11px; font-family: monospace;">PROTOCOL: MANUAL_OVERRIDE_ENABLED</p>
         </div>
     </div>
 
     <div id="p-shop" class="page">
-        <h2 style="text-align:center;">🚀 Market</h2>
-        <div class="card"><h3>V1 Paketi</h3><p>1.9 TON</p><button class="btn" onclick="buySpeed(1.9, 0.5)">Yatırım Yap</button></div>
-        <div class="card"><h3>V2 Paketi</h3><p>5.0 TON</p><button class="btn" onclick="buySpeed(5.0, 2.5)">Yatırım Yap</button></div>
-        <div class="card"><h3>V3 Paketi</h3><p>15.0 TON</p><button class="btn" onclick="buySpeed(15.0, 10)">Yatırım Yap</button></div>
+        <h2 style="text-align:center; color: var(--blue);">UPGRADE_CENTER</h2>
+        <div class="card"><h3>TITAN_V1</h3><p class="glow-text">1.9 TON</p><button class="btn" onclick="buySpeed(1.9, 0.5)">UPGRADE</button></div>
+        <div class="card"><h3>TITAN_V2</h3><p class="glow-text">5.0 TON</p><button class="btn" onclick="buySpeed(5.0, 2.5)">UPGRADE</button></div>
+        <div class="card"><h3>TITAN_V3</h3><p class="glow-text">15.0 TON</p><button class="btn" onclick="buySpeed(15.0, 10)">UPGRADE</button></div>
     </div>
 
     <div id="p-rank" class="page">
-        <h2 style="text-align:center;">🏆 Liderler Tablosu</h2>
-        <div class="card" style="padding: 10px;">
-            <table style="width: 100%; border-collapse: collapse; text-align: left;">
-                <tr style="color: var(--gold); border-bottom: 1px solid rgba(255,255,255,0.1);">
-                    <th style="padding: 10px;">Sıra</th><th>Kullanıcı</th><th>Bakiye</th>
+        <h2 style="text-align:center; color: var(--blue);">GLOBAL_LEADERS</h2>
+        <div class="card">
+            <table style="width: 100%; border-collapse: collapse; font-family: monospace;">
+                <tr style="color: var(--blue); border-bottom: 1px solid var(--blue);">
+                    <th style="padding: 10px;">ID</th><th>DATA</th><th>STATUS</th>
                 </tr>
-                <tr><td style="padding: 10px;">1.</td><td>Emre***</td><td>14.20 TON</td></tr>
-                <tr><td style="padding: 10px;">2.</td><td>Jessica***</td><td>11.05 TON</td></tr>
-                <tr><td style="padding: 10px;">3.</td><td>Mert***</td><td>8.45 TON</td></tr>
-                <tr style="background: rgba(0,122,255,0.1);"><td style="padding: 10px;">Siz</td><td>Siz</td><td id="rank-my-bal">0.00 TON</td></tr>
+                <tr><td style="padding: 10px;">01</td><td>Emre***</td><td class="glow-text">14.20</td></tr>
+                <tr><td style="padding: 10px;">02</td><td>Selin***</td><td class="glow-text">11.05</td></tr>
+                <tr style="background: rgba(0, 210, 255, 0.1);"><td style="padding: 10px;">YOU</td><td>USER_ID</td><td id="rank-my-bal" class="glow-text">0.00</td></tr>
             </table>
         </div>
-        <button class="btn" onclick="copyRef()">🔗 Referans Linkini Kopyala</button>
+        <button class="btn" onclick="copyRef()">GENERATE_REF_LINK</button>
     </div>
 
     <div id="p-wallet" class="page">
-        <h2 style="text-align:center;">👛 Cüzdan</h2>
+        <h2 style="text-align:center; color: var(--blue);">NETWORK_WALLET</h2>
         <div class="card">
-            <p>Toplam Bakiyeniz</p>
-            <h1 id="wallet-ton" style="font-size: 36px; color: var(--blue);">0.0500</h1>
-            <div id="ton-connect-btn" style="display: flex; justify-content: center; margin: 15px 0;"></div>
-            <button class="btn" onclick="handleWithdraw()">📤 Para Çek</button>
+            <p>AVAILABLE_ASSETS</p>
+            <h1 id="wallet-ton" style="font-size: 40px; color: var(--text);">0.0500</h1>
+            <div id="ton-connect-btn" style="display: flex; justify-content: center; margin-bottom: 20px;"></div>
+            <button class="btn" onclick="handleWithdraw()">WITHDRAW_ASSETS</button>
         </div>
     </div>
 
     <div class="navbar">
-        <div class="nav-item active" onclick="go('home')" id="n-home"><span>🏠</span>Ev</div>
-        <div class="nav-item" onclick="go('game')" id="n-game"><span>🎮</span>Oyun</div>
-        <div class="nav-item" onclick="go('rank')" id="n-rank"><span>🏆</span>Rank</div>
-        <div class="nav-item" onclick="go('shop')" id="n-shop"><span>🚀</span>Market</div>
-        <div class="nav-item" onclick="go('wallet')" id="n-wallet"><span>👛</span>Cüzdan</div>
+        <div class="nav-item active" onclick="go('home')" id="n-home"><span>📡</span>CORE</div>
+        <div class="nav-item" onclick="go('game')" id="n-game"><span>🎮</span>TAP</div>
+        <div class="nav-item" onclick="go('rank')" id="n-rank"><span>🏆</span>RANK</div>
+        <div class="nav-item" onclick="go('shop')" id="n-shop"><span>🚀</span>STORE</div>
+        <div class="nav-item" onclick="go('wallet')" id="n-wallet"><span>👛</span>DATA</div>
     </div>
 
     <script>
@@ -132,52 +144,45 @@
             document.getElementById('n-'+p).classList.add('active');
         }
 
-        function tapGame() {
-            wBal += 0.0002;
-            update();
-        }
+        function tapGame() { wBal += 0.0002; update(); }
 
         function getDailyBonus() {
             const now = Date.now();
-            if (now - lastBonus < 86400000) return Telegram.WebApp.showAlert("Hediyeni zaten aldın!");
+            if (now - lastBonus < 86400000) return Telegram.WebApp.showAlert("ERROR: RETRY_IN_24H");
             const prize = (Math.random() * 0.01).toFixed(4);
             wBal += parseFloat(prize);
-            lastBonus = now;
-            localStorage.setItem('lastBonus', lastBonus);
-            update();
-            Telegram.WebApp.showAlert("🎁 " + prize + " TON kazandın!");
+            lastBonus = now; localStorage.setItem('lastBonus', lastBonus);
+            update(); Telegram.WebApp.showAlert("SUCCESS: " + prize + " TON RECEIVED");
             checkBonusStatus();
         }
 
         function checkBonusStatus() {
             const btn = document.getElementById('daily-btn');
-            if (Date.now() - lastBonus < 86400000) { btn.disabled = true; btn.innerText = "Yarın Gel"; }
-            else { btn.disabled = false; btn.innerText = "Hediyeni Al"; }
+            if (Date.now() - lastBonus < 86400000) { btn.disabled = true; btn.innerText = "COOLDOWN..."; }
         }
 
         function updateTicker() {
-            const names = ["Emre", "Arda", "Selin", "Can", "Zeynep"];
+            const names = ["Dmitry", "Alex", "Satoshi", "Elena", "Mehmet"];
             const name = names[Math.floor(Math.random() * names.length)];
             const amount = (Math.random() * 10 + 1.9).toFixed(2);
-            document.getElementById('ticker').innerText = `🔥 TEBRİKLER: ${name}*** ${amount} TON çekim yaptı! • `;
+            document.getElementById('ticker').innerText = `>> SYSTEM_LOG: ${name}*** WITHDRAWN ${amount} TON // NETWORK_STABLE... `;
         }
-        setInterval(updateTicker, 12000); updateTicker();
+        setInterval(updateTicker, 10000); updateTicker();
 
         function startMining() {
             if(isMining) return;
             isMining = true; localStorage.setItem('isMining', 'true');
-            document.getElementById('start-btn').innerText = "Kazılıyor...";
+            document.getElementById('start-btn').innerText = "MINING_PROCESS_ACTIVE";
             setInterval(() => { mBal += (pph/3600); update(); }, 1000);
         }
 
         function claim() {
-            wBal += mBal; mBal = 0;
-            localStorage.setItem('mBal', 0); update();
-            Telegram.WebApp.showAlert("Bakiyeye eklendi!");
+            wBal += mBal; mBal = 0; localStorage.setItem('mBal', 0); update();
+            Telegram.WebApp.showAlert("SYNC_COMPLETE: CREDITS_ADDED");
         }
 
         async function buySpeed(amt, boost) {
-            if(!tonConnectUI.connected) return Telegram.WebApp.showAlert("Cüzdan bağla!");
+            if(!tonConnectUI.connected) return Telegram.WebApp.showAlert("ERROR: WALLET_NOT_LINKED");
             try { 
                 await tonConnectUI.sendTransaction({ validUntil: Math.floor(Date.now()/1000)+60, messages:[{address: MY_WALLET, amount:(amt*1000000000).toString()}] });
                 pph += boost; hasInv = true; localStorage.setItem('pph', pph); localStorage.setItem('hasInv', 'true'); update();
@@ -185,9 +190,9 @@
         }
 
         function handleWithdraw() {
-            if(!hasInv) return Telegram.WebApp.showAlert("⚠️ En az V1 paketi almalısın!");
-            if(wBal < 1.9) return Telegram.WebApp.showAlert("❌ Min çekim 1.9 TON!");
-            Telegram.WebApp.showConfirm("Çekim talebi oluşturulsun mu?", (c) => { if(c) { wBal=0; update(); Telegram.WebApp.showAlert("Talep alındı!"); } });
+            if(!hasInv) return Telegram.WebApp.showAlert("ACCESS_DENIED: V1_MINIMUM_REQUIRED");
+            if(wBal < 1.9) return Telegram.WebApp.showAlert("ERROR: INSUFFICIENT_FUNDS");
+            Telegram.WebApp.showConfirm("INITIATE_WITHDRAWAL?", (c) => { if(c) { wBal=0; update(); Telegram.WebApp.showAlert("REQUEST_LOGGED: PROCESSING..."); } });
         }
 
         function copyRef() {
@@ -195,7 +200,7 @@
             if (user) {
                 const link = `https://t.me/${botUsername}?start=${user.id}`;
                 const el = document.createElement('textarea'); el.value = link; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el);
-                Telegram.WebApp.showAlert("🔗 Link kopyalandı!");
+                Telegram.WebApp.showAlert("LINK_COPIED_TO_CLIPBOARD");
             }
         }
 
@@ -203,9 +208,9 @@
             document.getElementById('top-bal').innerText = wBal.toFixed(4);
             document.getElementById('m-bal').innerText = mBal.toFixed(8);
             document.getElementById('game-bal').innerText = wBal.toFixed(4);
-            document.getElementById('wallet-ton').innerText = wBal.toFixed(4) + " 💎";
+            document.getElementById('wallet-ton').innerText = wBal.toFixed(4);
             document.getElementById('pph-text').innerText = "⚡ " + pph.toFixed(3) + " PPH";
-            document.getElementById('rank-my-bal').innerText = wBal.toFixed(2) + " TON";
+            document.getElementById('rank-my-bal').innerText = wBal.toFixed(2);
             localStorage.setItem('wBal', wBal);
         }
 
