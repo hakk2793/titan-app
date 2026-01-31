@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>GOGIRCIN TITAN PRO - FULL</title>
+    <title>GOGIRCIN TITAN PRO - V3</title>
     <script src="https://unpkg.com/@tonconnect/ui@2.0.9/dist/tonconnect-ui.min.js"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
@@ -12,10 +12,10 @@
         .page { display: none; height: 100vh; padding: 20px; box-sizing: border-box; overflow-y: auto; padding-bottom: 120px; backdrop-filter: blur(20px); background: rgba(2, 6, 23, 0.7); }
         .page.active { display: block !important; }
         .card { background: var(--card); border-radius: 20px; padding: 25px; margin-bottom: 15px; border: 1px solid rgba(0, 210, 255, 0.2); text-align: center; box-shadow: var(--neon); position: relative; }
-        .btn { background: linear-gradient(90deg, #00d2ff, #3a86ff); color: white; border: none; padding: 14px; border-radius: 12px; font-weight: 800; width: 100%; cursor: pointer; text-transform: uppercase; }
-        .btn:disabled { background: #475569; box-shadow: none; cursor: not-allowed; }
+        .btn { background: linear-gradient(90deg, #00d2ff, #3a86ff); color: white; border: none; padding: 14px; border-radius: 12px; font-weight: 800; width: 100%; cursor: pointer; text-transform: uppercase; transition: 0.3s; }
+        .btn:disabled { background: rgba(0, 210, 255, 0.2); color: var(--blue); border: 1px solid var(--blue); cursor: not-allowed; box-shadow: none; }
         .live-ticker { background: rgba(0, 0, 0, 0.5); padding: 10px; font-size: 11px; color: var(--blue); border-bottom: 1px solid var(--blue); overflow: hidden; white-space: nowrap; }
-        .ticker-text { display: inline-block; animation: scroll 15s linear infinite; }
+        .ticker-text { display: inline-block; animation: scroll 20s linear infinite; }
         @keyframes scroll { from { transform: translateX(100%); } to { transform: translateX(-100%); } }
         .navbar { position: fixed; bottom: 0; width: 100%; height: 80px; background: rgba(15, 23, 42, 0.95); display: flex; border-top: 1px solid var(--blue); z-index: 100; }
         .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 10px; color: #64748b; }
@@ -25,7 +25,7 @@
 </head>
 <body>
 
-    <div class="live-ticker"><div class="ticker-text" id="ticker">SİSTEM: AKTİF // SON ÇEKİM: 8.14 TON // AĞ DURUMU: GÜVENLİ...</div></div>
+    <div class="live-ticker"><div class="ticker-text" id="ticker">SİSTEM YÜKLENİYOR...</div></div>
 
     <div id="p-home" class="page active">
         <div class="card" style="display:flex; justify-content: space-between; align-items:center;">
@@ -50,43 +50,16 @@
         </div>
     </div>
 
-    <div id="p-game" class="page">
-        <h2 style="text-align:center; color:var(--blue)">TIKLA KAZAN</h2>
-        <div class="card">
-            <h1 id="game-bal" style="color:var(--blue); font-size: 40px;">0.0000</h1>
-            <img src="https://cdn-icons-png.flaticon.com/512/3514/3514104.png" style="width:140px; filter: drop-shadow(var(--neon));" onclick="tapGame()">
-        </div>
-    </div>
-
     <div id="p-shop" class="page">
-        <h2 style="text-align:center; color:var(--blue)">MARKET</h2>
-        <div class="card"><h3>TITAN V1</h3><p style="color:var(--gold)">1.9 TON / +0.5 PPH</p><button class="btn" onclick="buySpeed(1.9, 0.5)">SATIN AL</button></div>
-        <div class="card"><h3>TITAN V2</h3><p style="color:var(--gold)">5.0 TON / +2.5 PPH</p><button class="btn" onclick="buySpeed(5.0, 2.5)">SATIN AL</button></div>
-        <div class="card"><h3>TITAN V3</h3><p style="color:var(--gold)">15.0 TON / +10 PPH</p><button class="btn" onclick="buySpeed(15.0, 10)">SATIN AL</button></div>
+        <h2 style="text-align:center; color:var(--blue)">YÜKSELTME MERKEZİ</h2>
+        <div class="card"><h3>TITAN V1</h3><p style="color:var(--gold)">4.9 TON / +1.5 PPH</p><button class="btn" onclick="buySpeed(4.9, 1.5)">SATIN AL</button></div>
+        <div class="card"><h3>TITAN V2</h3><p style="color:var(--gold)">12.0 TON / +5.0 PPH</p><button class="btn" onclick="buySpeed(12.0, 5.0)">SATIN AL</button></div>
+        <div class="card"><h3>TITAN V3</h3><p style="color:var(--gold)">25.0 TON / +15 PPH</p><button class="btn" onclick="buySpeed(25.0, 15)">SATIN AL</button></div>
     </div>
 
-    <div id="p-rank" class="page">
-        <h2 style="text-align:center; color:var(--blue)">SIRALAMA</h2>
-        <div class="card">
-            <table style="width:100%; text-align: left;">
-                <tr style="color:var(--blue)"><th>#</th><th>Kullanıcı</th><th>Bakiye</th></tr>
-                <tr><td>1</td><td>Ahmet***</td><td>24.50</td></tr>
-                <tr><td>2</td><td>Selin***</td><td>18.20</td></tr>
-                <tr style="background:rgba(0,210,255,0.1)"><td>Siz</td><td>Kullanıcı</td><td id="rank-my">0.00</td></tr>
-            </table>
-        </div>
-        <button class="btn" onclick="copyRef()">REF LİNKİNİ KOPYALA</button>
-    </div>
-
-    <div id="p-wallet" class="page">
-        <h2 style="text-align:center; color:var(--blue)">CÜZDAN</h2>
-        <div class="card">
-            <small>TOPLAM BAKİYE</small>
-            <h1 id="wallet-bal" style="font-size: 45px;">0.0000</h1>
-            <div id="ton-connect-btn" style="display:flex; justify-content:center; margin: 20px 0;"></div>
-            <button class="btn" onclick="handleWithdraw()">PARA ÇEK</button>
-        </div>
-    </div>
+    <div id="p-game" class="page"><div class="card"><h2>TIKLA KAZAN</h2><h1 id="game-bal" style="color:var(--blue)">0.00</h1><img src="https://cdn-icons-png.flaticon.com/512/3514/3514104.png" style="width:140px;" onclick="tapGame()"></div></div>
+    <div id="p-rank" class="page"><div class="card"><h2>SIRALAMA</h2><table style="width:100%; text-align: left;"><tr><td>1</td><td>Admin***</td><td>99.90</td></tr><tr style="background:rgba(0,210,255,0.1)"><td>Siz</td><td>Kullanıcı</td><td id="rank-my">0.00</td></tr></table><br><button class="btn" onclick="copyRef()">REF LİNKİ</button></div></div>
+    <div id="p-wallet" class="page"><div class="card"><small>TON BAKİYE</small><h1 id="wallet-bal">0.00</h1><div id="ton-connect-btn" style="display:flex; justify-content:center; margin:20px 0;"></div><button class="btn" onclick="handleWithdraw()">PARA ÇEK</button></div></div>
 
     <div class="navbar">
         <div class="nav-item active" onclick="go('home')" id="n-home"><span>📡</span>ÜS</div>
@@ -113,33 +86,37 @@
             document.getElementById('n-'+p).classList.add('active');
         }
 
-        function doTask(id, link, reward) {
-            if(localStorage.getItem(id)) return;
-            window.open(link, '_blank');
-            setTimeout(() => {
-                wBal += reward;
-                localStorage.setItem(id, 'done');
-                document.getElementById(id+'-btn').innerText = "ALINDI";
-                document.getElementById(id+'-btn').disabled = true;
+        // DİNAMİK KAYAR YAZI SİSTEMİ
+        function startTicker() {
+            const updates = [
+                "SİSTEM: BAĞLANTI GÜVENLİ // AĞ DURUMU: OPTİMİZE",
+                "ÖDEME: Ahmet*** 4.50 TON ÇEKİM YAPTI",
+                "ÖDEME: Selin*** 12.20 TON ÇEKİM YAPTI",
+                "GÜNCELLEME: TITAN V3 ÜRETİMİ %15 ARTIRILDI",
+                "ÖDEME: Mert*** 2.10 TON ÇEKİM YAPTI",
+                "BİLGİ: GÜNLÜK AKTİF MADENCİ SAYISI: 1,420"
+            ];
+            let i = 0;
+            setInterval(() => {
+                document.getElementById('ticker').innerText = updates[i];
+                i = (i + 1) % updates.length;
+            }, 10000); 
+            document.getElementById('ticker').innerText = updates[0];
+        }
+
+        function startMining() {
+            if(isMining) return;
+            isMining = true;
+            localStorage.setItem('isMining', 'true');
+            document.getElementById('start-btn').innerText = "KAZIM YAPILIYOR...";
+            document.getElementById('start-btn').disabled = true;
+            
+            setInterval(() => {
+                mBal += (pph/3600);
                 update();
-                Telegram.WebApp.showAlert("GÖREV TAMAM: +1 TON!");
-            }, 5000);
+            }, 1000);
         }
 
-        function tapGame() { wBal += 0.0002; update(); }
-        function startMining() { if(isMining) return; isMining = true; localStorage.setItem('isMining', 'true'); setInterval(() => { mBal += (pph/3600); update(); }, 1000); }
-        function claim() { wBal += mBal; mBal = 0; update(); }
-
-        async function buySpeed(amt, boost) {
-            if(!tonConnectUI.connected) return Telegram.WebApp.showAlert("CÜZDAN BAĞLI DEĞİL!");
-            try { 
-                await tonConnectUI.sendTransaction({ validUntil: Math.floor(Date.now()/1000)+60, messages:[{address: MY_WALLET, amount:(amt*1000000000).toString()}] });
-                pph += boost; localStorage.setItem('pph', pph); update();
-            } catch(e) {}
-        }
-
-        function handleWithdraw() { Telegram.WebApp.showAlert("MİNİMUM ÇEKİM 10 TON!"); }
-        
         function update() {
             document.getElementById('top-bal').innerText = wBal.toFixed(4);
             document.getElementById('m-bal').innerText = mBal.toFixed(8);
@@ -150,10 +127,30 @@
             localStorage.setItem('wBal', wBal);
             localStorage.setItem('mBal', mBal);
         }
-        
+
+        // DİĞER FONKSİYONLAR (Claim, Task, Buy vb.)
+        function claim() { wBal += mBal; mBal = 0; update(); Telegram.WebApp.showAlert("BAKİYE CÜZDANA AKTARILDI!"); }
+        function doTask(id, link, reward) {
+            if(localStorage.getItem(id)) return;
+            window.open(link, '_blank');
+            setTimeout(() => { wBal += reward; localStorage.setItem(id, 'done'); update(); document.getElementById(id+'-btn').innerText="ALINDI"; document.getElementById(id+'-btn').disabled=true; }, 5000);
+        }
+        function tapGame() { wBal += 0.0005; update(); }
+        async function buySpeed(amt, boost) {
+            if(!tonConnectUI.connected) return Telegram.WebApp.showAlert("CÜZDAN BAĞLA!");
+            try { await tonConnectUI.sendTransaction({ validUntil: Math.floor(Date.now()/1000)+60, messages:[{address: MY_WALLET, amount:(amt*1000000000).toString()}] });
+            pph += boost; localStorage.setItem('pph', pph); update(); } catch(e){}
+        }
+        function handleWithdraw() { Telegram.WebApp.showAlert("MİNİMUM ÇEKİM 10 TON!"); }
+
         window.onload = () => { 
-            if(localStorage.getItem('t1')) { document.getElementById('t1-btn').innerText = "ALINDI"; document.getElementById('t1-btn').disabled = true; }
-            if(isMining) { isMining=false; startMining(); } 
+            startTicker();
+            if(isMining) {
+                document.getElementById('start-btn').innerText = "KAZIM YAPILIYOR...";
+                document.getElementById('start-btn').disabled = true;
+                isMining = false; startMining(); 
+            }
+            if(localStorage.getItem('t1')) { document.getElementById('t1-btn').innerText="ALINDI"; document.getElementById('t1-btn').disabled=true; }
             update(); 
         };
     </script>
