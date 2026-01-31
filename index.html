@@ -12,13 +12,18 @@
         .page { display: none; height: 100vh; padding: 20px; box-sizing: border-box; overflow-y: auto; padding-bottom: 120px; backdrop-filter: blur(20px); background: rgba(2, 6, 23, 0.7); }
         .page.active { display: block !important; }
         .card { background: var(--card); border-radius: 20px; padding: 20px; margin-bottom: 15px; border: 1px solid rgba(0, 210, 255, 0.2); text-align: center; box-shadow: var(--neon); }
-        .btn { background: linear-gradient(90deg, #00d2ff, #3a86ff); color: white; border: none; padding: 14px; border-radius: 12px; font-weight: 800; width: 100%; cursor: pointer; text-transform: uppercase; }
+        .btn { background: linear-gradient(90deg, #00d2ff, #3a86ff); color: white; border: none; padding: 14px; border-radius: 12px; font-weight: 800; width: 100%; cursor: pointer; text-transform: uppercase; transition: 0.2s; }
+        .btn:active { transform: scale(0.96); }
         .live-ticker { background: rgba(0, 0, 0, 0.6); padding: 10px; font-size: 11px; color: var(--blue); border-bottom: 1px solid var(--blue); overflow: hidden; white-space: nowrap; font-family: monospace; }
         .ticker-text { display: inline-block; animation: scroll 25s linear infinite; }
         @keyframes scroll { from { transform: translateX(100%); } to { transform: translateX(-100%); } }
         .navbar { position: fixed; bottom: 0; width: 100%; height: 80px; background: rgba(15, 23, 42, 0.95); display: flex; border-top: 1px solid var(--blue); z-index: 100; }
-        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 10px; color: #64748b; }
+        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 10px; color: #64748b; cursor: pointer; }
         .nav-item.active { color: var(--blue); text-shadow: var(--neon); }
+        /* Tablo Stili */
+        .rank-table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 13px; }
+        .rank-table th { color: var(--blue); padding: 10px; border-bottom: 1px solid rgba(0, 210, 255, 0.2); }
+        .rank-table td { padding: 12px 5px; border-bottom: 1px solid rgba(255,255,255,0.05); }
     </style>
 </head>
 <body>
@@ -50,9 +55,40 @@
         <div class="card"><h3>TITAN V3</h3><p style="color:var(--gold)">25.0 TON / +15 PPH</p><button class="btn" onclick="buySpeed(25.0, 15)">SATIN AL</button></div>
     </div>
 
-    <div id="p-tasks" class="page"><h2 style="text-align:center; color:var(--blue)">GÖREVLER</h2><div class="card"><span>Kanala Katıl (+1 TON)</span><br><br><button id="t1-btn" class="btn" onclick="doTask('t1', 'https://t.me/GogircinOfficial', 1.0)">KATIL</button></div></div>
-    <div id="p-rank" class="page"><h2 style="text-align:center; color:var(--blue)">REFERANS</h2><div class="card"><p>Her davet için: <b style="color:var(--green)">+0.50 TON</b></p><button class="btn" onclick="copyRef()">LİNKİ KOPYALA</button></div></div>
-    <div id="p-wallet" class="page"><h2 style="text-align:center; color:var(--blue)">CÜZDAN</h2><div class="card"><h1 id="wallet-bal">0.00</h1><div id="ton-connect-btn"></div><button class="btn" onclick="handleWithdraw()">ÇEK</button></div></div>
+    <div id="p-tasks" class="page">
+        <h2 style="text-align:center; color:var(--blue)">GÖREVLER</h2>
+        <div class="card"><span>Kanala Katıl (+1 TON)</span><br><br><button id="t1-btn" class="btn" onclick="doTask('t1', 'https://t.me/GogircinOfficial', 1.0)">KATIL</button></div>
+    </div>
+
+    <div id="p-rank" class="page">
+        <h2 style="text-align:center; color:var(--blue)">TOP TITANS</h2>
+        <div class="card">
+            <p>Her davet için: <b style="color:var(--green)">+0.50 TON</b></p>
+            <button class="btn" onclick="copyRef()">LİNKİ KOPYALA</button>
+        </div>
+        <div class="card" style="padding: 10px;">
+            <table class="rank-table">
+                <thead>
+                    <tr>
+                        <th>SIRA</th>
+                        <th style="text-align:left">OYUNCU</th>
+                        <th style="text-align:right">BAKİYE</th>
+                    </tr>
+                </thead>
+                <tbody id="leaderboard-body">
+                    </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="p-wallet" class="page">
+        <h2 style="text-align:center; color:var(--blue)">CÜZDAN</h2>
+        <div class="card">
+            <h1 id="wallet-bal">0.00</h1>
+            <div id="ton-connect-btn" style="display:flex; justify-content:center; margin-bottom:10px;"></div>
+            <button class="btn" onclick="handleWithdraw()">ÇEK</button>
+        </div>
+    </div>
 
     <div class="navbar">
         <div class="nav-item active" onclick="go('home')" id="n-home"><span>📡</span>ÜS</div>
@@ -71,7 +107,6 @@
         let pph = parseFloat(localStorage.getItem('pph')) || 0.512;
         let isMining = localStorage.getItem('isMining') === 'true';
 
-        // GELİŞMİŞ KAYAR YAZI (Yükleme ve Çekim)
         function startTicker() {
             const users = ["Mert***", "Selin***", "Can***", "Zeynep***", "Demir***", "Hülya***", "Bora***", "Arzu***"];
             const updates = [
@@ -87,11 +122,31 @@
             document.getElementById('ticker').innerText = updates[2]();
         }
 
+        // LİDERLİK TABLOSUNU DOLDURAN FONKSİYON
+        function loadRank() {
+            const players = [
+                { n: "Hakki U.", b: "452.10", s: "🥇" },
+                { n: "Mert K.", b: "310.45", s: "🥈" },
+                { n: "Selin G.", b: "215.30", s: "🥉" },
+                { n: "Can X.", b: "142.00", s: "4" },
+                { n: "Zeynep T.", b: "98.50", s: "5" }
+            ];
+            const body = document.getElementById('leaderboard-body');
+            body.innerHTML = players.map(p => `
+                <tr>
+                    <td>${p.s}</td>
+                    <td style="text-align:left; font-weight:bold;">${p.n}</td>
+                    <td style="text-align:right; color:var(--gold); font-weight:bold;">${p.b} TON</td>
+                </tr>
+            `).join('');
+        }
+
         function go(p) {
             document.querySelectorAll('.page').forEach(x => x.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(x => x.classList.remove('active'));
             document.getElementById('p-'+p).classList.add('active');
             document.getElementById('n-'+p).classList.add('active');
+            if(p === 'rank') loadRank(); // Ref sayfasına girince tabloyu yükle
         }
 
         function startMining() {
