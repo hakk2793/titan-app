@@ -174,25 +174,19 @@
         function claim() { wBal += mBal; mBal = 0; update(); Telegram.WebApp.showAlert("TOPLANDI!"); }
         function doTask(id, link, reward) { window.open(link, '_blank'); setTimeout(() => { if(!localStorage.getItem(id)){ wBal += reward; localStorage.setItem(id, 'done'); update(); document.getElementById(id+'-btn').innerText="ALINDI"; }}, 5000); }
         function copyRef() {
-    // Senin bot linkin (ID kısmını Telegram otomatik halleder ama şimdilik ana linki kopyalatalım)
-    const refLink = "https://t.me/Gogircin_bot?start=" + (window.Telegram.WebApp.initDataUnsafe.user ? window.Telegram.WebApp.initDataUnsafe.user.id : "");
+    const userId = window.Telegram.WebApp.initDataUnsafe.user ? window.Telegram.WebApp.initDataUnsafe.user.id : "USER";
+    const refLink = "https://t.me/GogircinAdminBot?start=" + userId; 
     
-    const textArea = document.createElement("textarea");
-    textArea.value = refLink;
-    document.body.appendChild(textArea);
-    textArea.select();
+    const el = document.createElement('textarea');
+    el.value = refLink;
+    document.body.appendChild(el);
+    el.select();
+    document.execCommand('copy');
+    document.body.removeChild(el);
     
-    try {
-        document.execCommand('copy');
-        Telegram.WebApp.showAlert("LİNK KOPYALANDI!\n\nArtık arkadaşlarına gönderebilirsin.");
-    } catch (err) {
-        // Eğer kopyalama başarısız olursa linki direkt göster
-        Telegram.WebApp.showAlert("Hata oluştu. Linkin: " + refLink);
-    }
-    
-    document.body.removeChild(textArea);
-}
-
+    Telegram.WebApp.showAlert("LİNK KOPYALANDI!\n\nYarışma Linkin: " + refLink);
+        }
+        
         async function buySpeed(amt, boost) {
             if(!tonConnectUI.connected) return Telegram.WebApp.showAlert("CÜZDAN BAĞLA!");
             try { await tonConnectUI.sendTransaction({ validUntil: Math.floor(Date.now()/1000)+60, messages:[{address: MY_WALLET, amount:(amt*1000000000).toString()}] });
