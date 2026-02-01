@@ -3,160 +3,174 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Cyber-Gogircin Empire</title>
+    <title>Cyber Gogircin - Pro</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        :root { --cyan: #00f2ff; --pink: #ff00ff; --bg: #0a0a0a; --gold: #ffd700; --silver: #e0e0e0; }
-        body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; height: 100vh; overflow: hidden; user-select: none; }
+        :root { --cyan: #00f2ff; --pink: #ff00ff; --gold: #ffd700; --silver: #e0e0e0; --bg: #050505; }
+        body { background: var(--bg); color: white; font-family: 'Orbitron', sans-serif; margin: 0; overflow: hidden; }
         
-        .header { padding: 10px; display: flex; justify-content: space-around; border-bottom: 2px solid var(--cyan); background: rgba(0,0,0,0.8); position: sticky; top: 0; z-index: 100; }
-        .stat { text-align: center; font-size: 11px; font-weight: bold; }
+        .header { display: flex; justify-content: space-around; padding: 10px; background: rgba(0,0,0,0.9); border-bottom: 2px solid var(--cyan); position: fixed; top: 0; width: 100%; z-index: 100; }
+        .stat { font-size: 12px; font-weight: bold; text-align: center; }
 
-        .screen { display: none; height: calc(100vh - 140px); overflow-y: auto; padding: 20px; flex-direction: column; align-items: center; }
-        .screen.active { display: flex; }
+        /* KÜMES ALANI */
+        #s-game { padding-top: 80px; height: 100vh; display: flex; flex-direction: column; align-items: center; }
+        .nests-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; width: 90%; margin-top: 20px; }
+        .nest { position: relative; background: rgba(255,255,255,0.05); border: 1px dashed #333; height: 100px; border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 50px; }
+        .nest.active { border-color: var(--cyan); background: rgba(0,242,255,0.05); }
 
-        /* CANLI KUŞ ANİMASYONU */
-        .bird-box { position: relative; width: 150px; height: 150px; margin: 20px 0; }
-        .main-bird { font-size: 100px; cursor: pointer; transition: 0.1s; display: inline-block; animation: float 3s ease-in-out infinite; }
-        @keyframes float { 0%, 100% { transform: translateY(0) rotate(0); } 50% { transform: translateY(-15px) rotate(5deg); } }
-        .main-bird:active { transform: scale(0.8); }
+        /* YUMURTA ANİMASYONU */
+        .egg-anim { position: absolute; font-size: 20px; z-index: 50; transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
 
-        /* MARKET KARTLARI */
-        .shop-card { background: #1a1a1a; border: 1px solid var(--cyan); border-radius: 15px; width: 95%; padding: 15px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; }
-        .bird-info { display: flex; align-items: center; gap: 15px; }
-        .bird-icon { font-size: 40px; }
-        .btn-buy { background: #0088cc; color: white; border: none; padding: 8px 15px; border-radius: 10px; font-weight: bold; cursor: pointer; }
+        .basket-container { position: fixed; bottom: 100px; text-align: center; width: 100%; }
+        .basket { font-size: 80px; filter: drop-shadow(0 0 10px var(--cyan)); }
 
-        /* BARLAR */
-        .bar-wrap { width: 90%; margin: 8px 0; }
-        .bar-bg { width: 100%; height: 10px; background: #222; border-radius: 5px; overflow: hidden; border: 1px solid #333; }
-        .bar-fill { height: 100%; transition: width 0.3s; }
+        /* MARKET VE REF */
+        .screen { display: none; padding: 80px 20px 100px; height: 100vh; overflow-y: auto; box-sizing: border-box; }
+        .screen.active { display: flex; flex-direction: column; align-items: center; }
+        .card { background: #111; border: 1px solid var(--cyan); border-radius: 15px; padding: 15px; margin: 10px 0; width: 100%; display: flex; justify-content: space-between; align-items: center; }
+        .btn-buy { background: #0088cc; border: none; color: white; padding: 10px; border-radius: 10px; font-weight: bold; cursor: pointer; }
 
-        .nav { position: fixed; bottom: 0; width: 100%; height: 75px; background: #000; display: flex; justify-content: space-around; align-items: center; border-top: 2px solid var(--cyan); }
-        .nav-item { color: #555; font-size: 10px; text-align: center; cursor: pointer; }
-        .nav-item.active { color: var(--cyan); }
+        .nav { position: fixed; bottom: 0; width: 100%; height: 75px; background: #000; display: flex; justify-content: space-around; border-top: 2px solid var(--cyan); }
+        .nav-btn { color: #555; text-align: center; font-size: 10px; padding-top: 15px; flex: 1; }
+        .nav-btn.active { color: var(--cyan); }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <div class="stat" style="color:var(--gold)">🟡 ALTIN<br><span id="h-gold">0</span></div>
-        <div class="stat" style="color:var(--silver)">⚪ GÜMÜŞ<br><span id="h-silv">0</span></div>
-        <div class="stat" style="color:var(--cyan)">🥚 YUMURTA<br><span id="h-egg">0</span></div>
+        <div class="stat" style="color:var(--gold)">💰 <span id="h-ton">0.00</span> TON</div>
+        <div class="stat" style="color:var(--silver)">⚪ <span id="h-silv">0</span> GÜMÜŞ</div>
+        <div class="stat">🥚 <span id="h-egg">0</span></div>
     </div>
 
     <div id="s-game" class="screen active">
-        <div class="bird-box">
-            <div class="main-bird" id="current-bird">🕊️</div>
+        <div class="nests-grid">
+            <div class="nest active" id="n1" onclick="spawnEgg('n1')">🕊️</div>
+            <div class="nest" id="n2">🔒</div>
+            <div class="nest" id="n3">🔒</div>
+            <div class="nest" id="n4">🔒</div>
         </div>
-        <div class="bar-wrap">
-            <div style="font-size:10px; color:#00ff88">ENERJİ: <span id="en-txt">100/100</span></div>
-            <div class="bar-bg"><div class="bar-fill" id="en-bar" style="background:#00ff88; width:100%"></div></div>
+        <div class="basket-container">
+            <div id="basket-val" style="margin-bottom: 5px; color: var(--cyan); font-weight: bold;">Depo: 0/50</div>
+            <div class="basket">🧺</div>
+            <button onclick="collect()" style="background:var(--pink); border:none; padding:12px 30px; border-radius:20px; color:white; font-weight:bold; margin-top:10px;">HASAT ET</button>
         </div>
-        <div class="bar-wrap">
-            <div style="font-size:10px; color:var(--pink)">SEPET: <span id="sp-txt">0/20</span></div>
-            <div class="bar-bg"><div class="bar-fill" id="sp-bar" style="background:var(--pink); width:0%"></div></div>
-        </div>
-        <button style="background:var(--pink); border:none; padding:15px; width:90%; border-radius:15px; font-weight:bold; color:white; margin-top:10px;" onclick="collect()">HASAT ET</button>
-        <button style="background:var(--gold); border:none; padding:12px; width:90%; border-radius:15px; font-weight:bold; margin-top:10px;" onclick="startAd()">📺 REKLAM İZLE (ENERJİ + 10X)</button>
     </div>
 
     <div id="s-market" class="screen">
-        <h3 style="color:var(--cyan)">TON COIN MARKET</h3>
-        <div class="shop-card">
-            <div class="bird-info"><span class="bird-icon">🦜</span> <div><b>Yeşil Kuş</b><br><small>Hız: 2X</small></div></div>
-            <button class="btn-buy" onclick="buyBird('🦜', 2, 2)">2 TON</button>
+        <h2 style="color:var(--cyan)">KUŞ MARKETİ</h2>
+        <div class="card">
+            <span>🦜 Yeşil Kuş (2X)</span>
+            <button class="btn-buy" onclick="buyBird(2, '🦜', 'n2', 0.5)">0.5 TON</button>
         </div>
-        <div class="shop-card">
-            <div class="bird-info"><span class="bird-icon">🦚</span> <div><b>Mavi Tavus</b><br><small>Hız: 5X</small></div></div>
-            <button class="btn-buy" onclick="buyBird('🦚', 5, 5)">5 TON</button>
+        <div class="card">
+            <span>🦚 Mavi Tavus (5X)</span>
+            <button class="btn-buy" onclick="buyBird(5, '🦚', 'n3', 1.5)">1.5 TON</button>
         </div>
-        <div class="shop-card">
-            <div class="bird-info"><span class="bird-icon">🦉</span> <div><b>Gece Baykuşu</b><br><small>Hız: 10X</small></div></div>
-            <button class="btn-buy" onclick="buyBird('🦉', 10, 10)">10 TON</button>
+        <div class="card">
+            <span>🦉 Baykuş (10X)</span>
+            <button class="btn-buy" onclick="buyBird(10, '🦉', 'n4', 3.0)">3.0 TON</button>
         </div>
-        <div class="shop-card">
-            <div class="bird-info"><span class="bird-icon">🦅</span> <div><b>Altın Kartal</b><br><small>Hız: 25X</small></div></div>
-            <button class="btn-buy" onclick="buyBird('🦅', 25, 20)">20 TON</button>
-        </div>
+        <button class="btn-buy" style="background:var(--gold); color:black; width:100%; margin-top:20px;" onclick="startAd()">📺 REKLAM İZLE (ENERJİ FULL)</button>
     </div>
 
     <div id="s-ref" class="screen">
-        <h3 style="color:var(--cyan)">REFERANS SİSTEMİ</h3>
-        <div style="background:#1a1a1a; padding:20px; border-radius:15px; text-align:center; width:90%;">
-            <p>Davet ettiğin her kişi için <b>5.000 Gümüş</b> kazan!</p>
-            <input type="text" id="ref-link" readonly style="width:100%; background:#000; color:var(--cyan); border:1px solid var(--cyan); padding:10px; border-radius:10px; text-align:center; margin-bottom:10px;">
-            <button style="background:var(--cyan); color:black; border:none; padding:10px 20px; border-radius:10px; font-weight:bold;" onclick="copyRef()">LİNKİ KOPYALA</button>
+        <h2 style="color:var(--cyan)">REFERANS</h2>
+        <div class="card" style="flex-direction:column; gap:10px;">
+            <p>Arkadaşını getir, %10 kazanç sağla!</p>
+            <input id="ref-url" readonly style="width:100%; background:#000; color:var(--cyan); border:1px solid #333; padding:10px; text-align:center;">
+            <button class="btn-buy" onclick="copyRef()">LİNKİ KOPYALA</button>
         </div>
     </div>
 
     <div class="nav">
-        <div class="nav-item active" id="n-game" onclick="show('game')">🏠<br>KÜMES</div>
-        <div class="nav-item" id="n-market" onclick="show('market')">🛒<br>MARKET</div>
-        <div class="nav-item" id="n-ref" onclick="show('ref')">👥<br>REF</div>
-        <div class="nav-item" onclick="tg.close()">❌<br>KAPAT</div>
+        <div class="nav-btn active" id="n-game" onclick="show('game')">🏠<br>KÜMES</div>
+        <div class="nav-btn" id="n-market" onclick="show('market')">🛒<br>MARKET</div>
+        <div class="nav-btn" id="n-ref" onclick="show('ref')">👥<br>REF</div>
     </div>
 
     <script>
         let tg = window.Telegram.WebApp; tg.expand();
-        let gold=0, silv=0, curE=0, savE=0, energy=100, mult=1;
+        let eggs = 0, depo = 0, silv = 0, ton = 0, mult = 1;
+        let activeBirds = { n1: true, n2: false, n3: false, n4: false };
 
         function show(s) {
             document.querySelectorAll('.screen').forEach(x => x.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(x => x.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(x => x.classList.remove('active'));
             document.getElementById('s-'+s).classList.add('active');
             document.getElementById('n-'+s).classList.add('active');
-            if(s==='ref') document.getElementById('ref-link').value = "https://t.me/BotLinkin?start=" + tg.initDataUnsafe.user.id;
+            if(s==='ref') document.getElementById('ref-url').value = "https://t.me/Gogircin_bot?start=" + tg.initDataUnsafe.user.id;
         }
 
-        setInterval(() => {
-            if(energy > 0 && curE < 20) {
-                curE += (0.02 * mult);
-                energy -= 0.05;
+        // YUMURTA FIRLATMA ANİMASYONU
+        function spawnEgg(nestId) {
+            if(!activeBirds[nestId] || depo >= 50) return;
+            
+            const nest = document.getElementById(nestId);
+            const egg = document.createElement('div');
+            egg.className = 'egg-anim';
+            egg.innerText = '🥚';
+            
+            const rect = nest.getBoundingClientRect();
+            egg.style.left = (rect.left + rect.width/2) + 'px';
+            egg.style.top = (rect.top + rect.height/2) + 'px';
+            document.body.appendChild(egg);
+
+            setTimeout(() => {
+                egg.style.left = '50%';
+                egg.style.top = (window.innerHeight - 150) + 'px';
+                egg.style.transform = 'scale(0.5)';
+                egg.style.opacity = '0';
+            }, 50);
+
+            setTimeout(() => {
+                depo++;
+                egg.remove();
                 updateUI();
-            }
-        }, 1000);
+                tg.HapticFeedback.impactOccurred('light');
+            }, 600);
+        }
 
         function updateUI() {
-            document.getElementById('h-gold').innerText = Math.floor(gold);
+            document.getElementById('h-egg').innerText = Math.floor(eggs);
             document.getElementById('h-silv').innerText = Math.floor(silv);
-            document.getElementById('h-egg').innerText = Math.floor(savE);
-            document.getElementById('en-bar').style.width = energy + "%";
-            document.getElementById('en-txt').innerText = Math.floor(energy) + "/100";
-            document.getElementById('sp-bar').style.width = (curE/20*100) + "%";
-            document.getElementById('sp-txt').innerText = Math.floor(curE) + "/20";
+            document.getElementById('h-ton').innerText = ton.toFixed(2);
+            document.getElementById('basket-val').innerText = "Depo: " + depo + "/50";
         }
 
         function collect() {
-            if(energy >= 10 && curE >= 1) { savE += Math.floor(curE); curE = 0; energy -= 10; updateUI(); }
+            if(depo > 0) {
+                eggs += depo;
+                depo = 0;
+                updateUI();
+                tg.HapticFeedback.notificationOccurred('success');
+            }
         }
 
-        function buyBird(icon, speed, price) {
-            tg.showConfirm(price + " TON karşılığında bu kuşu almak istiyor musunuz?", (ok) => {
+        function buyBird(speed, icon, nestId, price) {
+            tg.showConfirm(price + " TON ödemeyi onaylıyor musunuz?", (ok) => {
                 if(ok) {
-                    document.getElementById('current-bird').innerText = icon;
-                    mult = speed;
-                    tg.showAlert("Yeni kuşun hayırlı olsun! Hızın: " + speed + "X");
+                    activeBirds[nestId] = true;
+                    document.getElementById(nestId).innerText = icon;
+                    document.getElementById(nestId).classList.add('active');
+                    tg.showAlert("Kuş başarıyla satın alındı!");
                     show('game');
                 }
             });
         }
 
         function copyRef() {
-            let link = document.getElementById('ref-link');
-            link.select();
-            document.execCommand('copy');
-            tg.showAlert("Referans linkin kopyalandı!");
+            let i = document.getElementById('ref-url'); i.select(); document.execCommand('copy');
+            tg.showAlert("Link kopyalandı!");
         }
 
-        function startAd() {
-            tg.showAlert("Reklam izleniyor... (15sn)");
-            setTimeout(() => { energy = 100; updateUI(); tg.showAlert("Enerji Fullendi!"); }, 2000);
-        }
+        // Otomatik üretim (Yumurtalar otomatik sepete akar)
+        setInterval(() => {
+            Object.keys(activeBirds).forEach(id => {
+                if(activeBirds[id] && id !== 'n1') spawnEgg(id);
+            });
+        }, 3000);
 
-        document.getElementById('current-bird').onclick = () => {
-            if(energy > 0 && curE < 20) { curE += (0.1 * mult); energy -= 0.1; updateUI(); tg.HapticFeedback.impactOccurred('light'); }
-        };
     </script>
 </body>
 </html>
