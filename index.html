@@ -2,199 +2,83 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>GOGIRCIN TITAN PRO - LIVE</title>
-    <script src="https://unpkg.com/@tonconnect/ui@2.0.9/dist/tonconnect-ui.min.js"></script>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gogircin Cyber-Farm</title>
     <style>
-        :root { --blue: #00d2ff; --bg: #020617; --card: rgba(15, 23, 42, 0.8); --text: #f8fafc; --green: #10b981; --gold: #fbbf24; --neon: 0 0 15px rgba(0, 210, 255, 0.5); }
-        body { background: var(--bg) url('https://images.unsplash.com/photo-1639762681485-074b7f938ba0?q=80&w=2000') no-repeat center center fixed; background-size: cover; color: var(--text); font-family: sans-serif; margin: 0; padding: 0; overflow: hidden; }
-        .page { display: none; height: 100vh; padding: 20px; box-sizing: border-box; overflow-y: auto; padding-bottom: 120px; backdrop-filter: blur(20px); background: rgba(2, 6, 23, 0.7); }
-        .page.active { display: block !important; }
-        .card { background: var(--card); border-radius: 20px; padding: 20px; margin-bottom: 15px; border: 1px solid rgba(0, 210, 255, 0.2); text-align: center; box-shadow: var(--neon); }
-        .btn { background: linear-gradient(90deg, #00d2ff, #3a86ff); color: white; border: none; padding: 14px; border-radius: 12px; font-weight: 800; width: 100%; cursor: pointer; text-transform: uppercase; transition: 0.2s; }
-        .btn:active { transform: scale(0.96); }
-        .live-ticker { background: rgba(0, 0, 0, 0.6); padding: 10px; font-size: 11px; color: var(--blue); border-bottom: 1px solid var(--blue); overflow: hidden; white-space: nowrap; font-family: monospace; }
-        .ticker-text { display: inline-block; animation: scroll 25s linear infinite; }
-        @keyframes scroll { from { transform: translateX(100%); } to { transform: translateX(-100%); } }
-        .navbar { position: fixed; bottom: 0; width: 100%; height: 80px; background: rgba(15, 23, 42, 0.95); display: flex; border-top: 1px solid var(--blue); z-index: 100; }
-        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 10px; color: #64748b; cursor: pointer; }
-        .nav-item.active { color: var(--blue); text-shadow: var(--neon); }
-        /* Tablo Stili */
-        .rank-table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 13px; }
-        .rank-table th { color: var(--blue); padding: 10px; border-bottom: 1px solid rgba(0, 210, 255, 0.2); }
-        .rank-table td { padding: 12px 5px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        :root { --neon-cyan: #00f2ff; --neon-pink: #ff00ff; --bg-dark: #0a0a0b; }
+        body { 
+            background-color: var(--bg-dark); color: white; 
+            font-family: 'Segoe UI', sans-serif; margin: 0; overflow: hidden;
+            display: flex; flex-direction: column; height: 100vh;
+        }
+        /* Üst Panel (Bakiye ve Enerji) */
+        .top-bar {
+            padding: 15px; display: flex; justify-content: space-between;
+            background: rgba(255, 255, 255, 0.05); border-bottom: 1px solid var(--neon-cyan);
+        }
+        .stat-item { text-shadow: 0 0 10px var(--neon-cyan); font-weight: bold; }
+
+        /* Oyun Alanı (Kuş ve Yumurtalar) */
+        .game-area {
+            flex-grow: 1; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; position: relative;
+        }
+        .bird-box {
+            font-size: 80px; position: relative;
+            filter: drop-shadow(0 0 20px var(--neon-pink));
+            animation: hover 3s infinite ease-in-out;
+        }
+        @keyframes hover { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
+
+        /* Yumurta Sepeti Alanı */
+        .basket-zone {
+            width: 90%; background: rgba(0, 242, 255, 0.1);
+            border: 1px dashed var(--neon-cyan); border-radius: 15px;
+            padding: 10px; text-align: center; margin-bottom: 80px;
+        }
+
+        /* Alt Menü (Birds Empire Stilinde) */
+        .bottom-nav {
+            position: fixed; bottom: 0; width: 100%; height: 70px;
+            background: #151517; display: flex; justify-content: space-around;
+            align-items: center; border-top: 2px solid var(--neon-pink);
+        }
+        .nav-item { text-align: center; font-size: 12px; color: #888; text-decoration: none; }
+        .nav-item.active { color: var(--neon-cyan); }
+        .nav-icon { font-size: 24px; display: block; margin-bottom: 4px; }
+
+        /* Reklam Butonu */
+        .ad-btn {
+            background: linear-gradient(45deg, var(--neon-pink), #800080);
+            border: none; color: white; padding: 10px 20px;
+            border-radius: 20px; font-weight: bold; box-shadow: 0 0 15px var(--neon-pink);
+        }
     </style>
 </head>
 <body>
 
-    <div class="live-ticker"><div class="ticker-text" id="ticker">AĞA BAĞLANILIYOR...</div></div>
-
-    <div id="p-home" class="page active">
-        <div class="card" style="display:flex; justify-content: space-between; align-items:center;">
-            <div><small>CÜZDAN</small><br><b id="top-bal" style="color:var(--blue)">0.0000</b></div>
-            <button class="btn" style="width:auto; background:var(--green);" onclick="claim()">TOPLA</button>
-        </div>
-        <div class="card">
-            <div style="font-size: 50px; filter: drop-shadow(var(--neon));">⚡</div>
-            <div style="font-size: 32px; font-weight: 900;" id="m-bal">0.00000000</div>
-            <p id="pph-text" style="color:var(--blue); font-weight: bold;">⚡ 0.512 PPH</p>
-            <button id="start-btn" class="btn" onclick="startMining()">MADENCİLİĞİ BAŞLAT</button>
-        </div>
-        <div class="card" style="border: 1px dashed var(--gold);">
-            <small style="color:var(--gold)">HEDİYE KODU KULLAN</small><br>
-            <input type="text" id="promo-input" style="background:rgba(255,255,255,0.05); border:1px solid var(--gold); border-radius:10px; padding:10px; color:white; width:80%; margin:10px 0; text-align:center;" placeholder="KODU YAZIN">
-            <button class="btn" style="background:var(--gold); color:black;" onclick="usePromo()">KULLAN</button>
-        </div>
+    <div class="top-bar">
+        <div class="stat-item">💰 0.00 TON</div>
+        <div class="stat-item">⚡ %100</div>
     </div>
 
-    <div id="p-shop" class="page">
-        <h2 style="text-align:center; color:var(--blue)">MARKET</h2>
-        <div class="card"><h3>TITAN V1</h3><p style="color:var(--gold)">4.9 TON / +1.5 PPH</p><button class="btn" onclick="buySpeed(4.9, 1.5)">SATIN AL</button></div>
-        <div class="card"><h3>TITAN V2</h3><p style="color:var(--gold)">12.0 TON / +5.0 PPH</p><button class="btn" onclick="buySpeed(12.0, 5.0)">SATIN AL</button></div>
-        <div class="card"><h3>TITAN V3</h3><p style="color:var(--gold)">25.0 TON / +15 PPH</p><button class="btn" onclick="buySpeed(25.0, 15)">SATIN AL</button></div>
+    <div class="game-area">
+        <div class="bird-box">🕊️</div>
+        <div style="color: var(--neon-cyan); margin-top: 10px;">CYBER-GOGIRCIN v1</div>
+        <button class="ad-btn" onclick="alert('Reklam Sistemi Hazırlanıyor...')">🌾 YEM VER (AD)</button>
     </div>
 
-    <div id="p-tasks" class="page">
-        <h2 style="text-align:center; color:var(--blue)">GÖREVLER</h2>
-        <div class="card"><span>Kanala Katıl (+1 TON)</span><br><br><button id="t1-btn" class="btn" onclick="doTask('t1', 'https://t.me/GogircinOfficial', 1.0)">KATIL</button></div>
+    <div class="basket-zone">
+        🥚 Yumurta Deposu: 0 / 20
     </div>
 
-    <div id="p-rank" class="page">
-        <h2 style="text-align:center; color:var(--blue)">TOP TITANS</h2>
-        <div class="card">
-            <p>Her davet için: <b style="color:var(--green)">+0.50 TON</b></p>
-            <button class="btn" onclick="copyRef()">LİNKİ KOPYALA</button>
-        </div>
-        <div class="card" style="padding: 10px;">
-            <table class="rank-table">
-                <thead>
-                    <tr>
-                        <th>SIRA</th>
-                        <th style="text-align:left">OYUNCU</th>
-                        <th style="text-align:right">BAKİYE</th>
-                    </tr>
-                </thead>
-                <tbody id="leaderboard-body">
-                    </tbody>
-            </table>
-        </div>
-    </div>
+    <nav class="bottom-nav">
+        <a href="#" class="nav-item active"><span class="nav-icon">🏠</span>Kümes</a>
+        <a href="#" class="nav-item"><span class="nav-icon">📊</span>Görevler</a>
+        <a href="#" class="nav-item"><span class="nav-icon">🥚</span>Depo</a>
+        <a href="#" class="nav-item"><span class="nav-icon">🛒</span>Market</a>
+        <a href="#" class="nav-item"><span class="nav-icon">⚙️</span>Menü</a>
+    </nav>
 
-    <div id="p-wallet" class="page">
-        <h2 style="text-align:center; color:var(--blue)">CÜZDAN</h2>
-        <div class="card">
-            <h1 id="wallet-bal">0.00</h1>
-            <div id="ton-connect-btn" style="display:flex; justify-content:center; margin-bottom:10px;"></div>
-            <button class="btn" onclick="handleWithdraw()">ÇEK</button>
-        </div>
-    </div>
-
-    <div class="navbar">
-        <div class="nav-item active" onclick="go('home')" id="n-home"><span>📡</span>ÜS</div>
-        <div class="nav-item" onclick="go('tasks')" id="n-tasks"><span>📋</span>GÖREV</div>
-        <div class="nav-item" onclick="go('shop')" id="n-shop"><span>🚀</span>MARKET</div>
-        <div class="nav-item" onclick="go('rank')" id="n-rank"><span>🏆</span>REF</div>
-        <div class="nav-item" onclick="go('wallet')" id="n-wallet"><span>👛</span>CÜZDAN</div>
-    </div>
-
-    <script>
-        const MY_WALLET = "UQC8qx530ORsKhEMwVVd_3UtPfjnAxKyA0DgTB1yR513oBOd";
-        const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({ manifestUrl: 'https://hakk2793.github.io/titan-app/tonconnect-manifest.json', buttonRootId: 'ton-connect-btn' });
-
-        let wBal = parseFloat(localStorage.getItem('wBal')) || 0.05;
-        let mBal = parseFloat(localStorage.getItem('mBal')) || 0;
-        let pph = parseFloat(localStorage.getItem('pph')) || 0.512;
-        let isMining = localStorage.getItem('isMining') === 'true';
-
-        function startTicker() {
-            const users = ["Mert***", "Selin***", "Can***", "Zeynep***", "Demir***", "Hülya***", "Bora***", "Arzu***"];
-            const updates = [
-                () => `ÖDEME: ${users[Math.floor(Math.random()*users.length)]} ${ (Math.random()*15 + 2).toFixed(2) } TON çekim yaptı.`,
-                () => `MARKET: ${users[Math.floor(Math.random()*users.length)]} TITAN V${Math.floor(Math.random()*3)+1} satın aldı!`,
-                () => `SİSTEM: Aktif madenci sayısı 1.460 // Ağ durumu stabil.`,
-                () => `ÖDEME: ${users[Math.floor(Math.random()*users.length)]} ${ (Math.random()*50 + 5).toFixed(2) } TON cüzdanına çekti.`
-            ];
-            setInterval(() => {
-                const randUpdate = updates[Math.floor(Math.random()*updates.length)]();
-                document.getElementById('ticker').innerText = randUpdate;
-            }, 8000);
-            document.getElementById('ticker').innerText = updates[2]();
-        }
-
-        // LİDERLİK TABLOSUNU DOLDURAN FONKSİYON
-        function loadRank() {
-            const players = [
-                { n: "Hakki U.", b: "452.10", s: "🥇" },
-                { n: "Mert K.", b: "310.45", s: "🥈" },
-                { n: "Selin G.", b: "215.30", s: "🥉" },
-                { n: "Can X.", b: "142.00", s: "4" },
-                { n: "Zeynep T.", b: "98.50", s: "5" }
-            ];
-            const body = document.getElementById('leaderboard-body');
-            body.innerHTML = players.map(p => `
-                <tr>
-                    <td>${p.s}</td>
-                    <td style="text-align:left; font-weight:bold;">${p.n}</td>
-                    <td style="text-align:right; color:var(--gold); font-weight:bold;">${p.b} TON</td>
-                </tr>
-            `).join('');
-        }
-
-        function go(p) {
-            document.querySelectorAll('.page').forEach(x => x.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(x => x.classList.remove('active'));
-            document.getElementById('p-'+p).classList.add('active');
-            document.getElementById('n-'+p).classList.add('active');
-            if(p === 'rank') loadRank(); // Ref sayfasına girince tabloyu yükle
-        }
-
-        function startMining() {
-            if(isMining) return; isMining = true; localStorage.setItem('isMining', 'true');
-            document.getElementById('start-btn').innerText = "KAZIM YAPILIYOR..."; document.getElementById('start-btn').disabled = true;
-            setInterval(() => { mBal += (pph/3600); update(); }, 1000);
-        }
-
-        function update() {
-            document.getElementById('top-bal').innerText = wBal.toFixed(4);
-            document.getElementById('m-bal').innerText = mBal.toFixed(8);
-            document.getElementById('wallet-bal').innerText = wBal.toFixed(4);
-            document.getElementById('pph-text').innerText = "⚡ " + pph.toFixed(3) + " PPH";
-            localStorage.setItem('wBal', wBal); localStorage.setItem('mBal', mBal);
-        }
-
-        function usePromo() {
-            const code = document.getElementById('promo-input').value.trim().toUpperCase();
-            if(code === "GOGIRCINPRO" && !localStorage.getItem('promo_used')) {
-                wBal += 2.0; localStorage.setItem('promo_used', 'true'); update();
-                Telegram.WebApp.showAlert("TEBRİKLER! +2 TON EKLENDİ.");
-            } else { Telegram.WebApp.showAlert("GEÇERSİZ KOD VEYA KULLANILMIŞ."); }
-        }
-
-        function claim() { wBal += mBal; mBal = 0; update(); Telegram.WebApp.showAlert("TOPLANDI!"); }
-        function doTask(id, link, reward) { window.open(link, '_blank'); setTimeout(() => { if(!localStorage.getItem(id)){ wBal += reward; localStorage.setItem(id, 'done'); update(); document.getElementById(id+'-btn').innerText="ALINDI"; }}, 5000); }
-        function copyRef() {
-    const userId = window.Telegram.WebApp.initDataUnsafe.user ? window.Telegram.WebApp.initDataUnsafe.user.id : "USER";
-    const refLink = "https://t.me/GogircinAdminBot?start=" + userId; 
-    
-    const el = document.createElement('textarea');
-    el.value = refLink;
-    document.body.appendChild(el);
-    el.select();
-    document.execCommand('copy');
-    document.body.removeChild(el);
-    
-    Telegram.WebApp.showAlert("LİNK KOPYALANDI!\n\nYarışma Linkin: " + refLink);
-        }
-        
-        async function buySpeed(amt, boost) {
-            if(!tonConnectUI.connected) return Telegram.WebApp.showAlert("CÜZDAN BAĞLA!");
-            try { await tonConnectUI.sendTransaction({ validUntil: Math.floor(Date.now()/1000)+60, messages:[{address: MY_WALLET, amount:(amt*1000000000).toString()}] });
-            pph += boost; localStorage.setItem('pph', pph); update(); } catch(e){}
-        }
-        function handleWithdraw() { Telegram.WebApp.showAlert("MİNİMUM ÇEKİM 10 TON!"); }
-
-        window.onload = () => { startTicker(); if(isMining) { isMining = false; startMining(); } update(); };
-    </script>
 </body>
 </html>
