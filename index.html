@@ -3,97 +3,170 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Gogircin Pro - AdEngine</title>
+    <title>Cyber-Gogircin PRO</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        :root { --n-cyan: #00f2ff; --n-pink: #ff00ff; --bg: #050505; --gold: #ffd700; --silver: #e0e0e0; }
+        :root { --cyan: #00f2ff; --pink: #ff00ff; --bg: #050505; --gold: #ffd700; --silver: #e0e0e0; --card: #111; }
         body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; user-select: none; }
-        .header { padding: 10px; display: flex; justify-content: space-around; border-bottom: 1px solid var(--n-cyan); background: rgba(0,242,255,0.05); font-size: 11px; }
-        .screen { display: none; flex-direction: column; align-items: center; justify-content: center; flex-grow: 1; padding: 20px; }
-        .screen.active { display: flex; }
-        .bird { font-size: 100px; filter: drop-shadow(0 0 15px var(--n-pink)); cursor: pointer; }
         
-        /* Enerji Barı */
-        .stat-wrap { width: 85%; margin: 10px 0; }
-        .bar-bg { width: 100%; height: 8px; background: #222; border-radius: 4px; overflow: hidden; border: 1px solid #333; }
-        .bar-fill-energy { height: 100%; background: linear-gradient(90deg, #ff0000, #00ff00); transition: width 0.3s; }
-        .bar-fill-egg { height: 100%; background: linear-gradient(90deg, var(--n-cyan), var(--n-pink)); }
+        /* Üst Panel */
+        .header { padding: 12px; display: flex; justify-content: space-around; border-bottom: 2px solid var(--cyan); background: rgba(0,242,255,0.1); box-shadow: 0 0 15px var(--cyan); }
+        .stat-item { text-align: center; font-weight: bold; font-size: 13px; }
 
-        .btn-main { background: linear-gradient(45deg, var(--n-pink), #800080); border: none; color: white; padding: 12px 30px; border-radius: 20px; font-weight: bold; cursor: pointer; width: 85%; margin: 5px; }
-        .btn-ad { background: linear-gradient(45deg, #ffd700, #b8860b); color: black !important; }
+        .screen { display: none; flex-direction: column; align-items: center; justify-content: center; flex-grow: 1; padding: 20px; overflow-y: auto; padding-bottom: 100px; }
+        .screen.active { display: flex; }
+
+        /* Kuş ve Animasyonlar */
+        .bird-container { position: relative; margin: 20px; }
+        .bird { font-size: 110px; filter: drop-shadow(0 0 20px var(--pink)); cursor: pointer; transition: transform 0.1s; }
+        .bird:active { transform: scale(0.85); }
+        .turbo-glow { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 150px; height: 150px; background: radial-gradient(circle, var(--gold) 0%, transparent 70%); display: none; z-index: -1; animation: pulse 1s infinite; }
+
+        /* Barlar */
+        .bar-container { width: 90%; margin: 10px 0; }
+        .label { display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 4px; color: var(--cyan); font-weight: bold; }
+        .bar-bg { width: 100%; height: 12px; background: #222; border-radius: 6px; border: 1px solid #333; overflow: hidden; box-shadow: inset 0 0 5px #000; }
+        .fill { height: 100%; transition: width 0.3s; }
+        .energy-fill { background: linear-gradient(90deg, #ff4d4d, #00ff88); }
+        .egg-fill { background: linear-gradient(90deg, var(--cyan), var(--pink)); }
+
+        /* Butonlar */
+        .btn { border: none; color: white; padding: 15px 30px; border-radius: 15px; font-weight: bold; cursor: pointer; width: 100%; margin: 8px 0; font-size: 14px; text-transform: uppercase; transition: 0.2s; }
+        .btn-collect { background: linear-gradient(45deg, var(--pink), #800080); box-shadow: 0 5px 15px rgba(255, 0, 255, 0.3); }
+        .btn-ad { background: linear-gradient(45deg, #ffd700, #b8860b); color: black !important; box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4); }
+
+        /* Takas Kartı (Resimdeki stile yakınlaştırıldı) */
+        .trade-card { background: var(--card); border: 2px solid var(--cyan); border-radius: 20px; width: 95%; padding: 20px; box-sizing: border-box; box-shadow: 0 0 25px rgba(0,242,255,0.2); }
+        .trade-title { color: var(--cyan); margin-top: 0; font-size: 20px; border-bottom: 1px solid #333; padding-bottom: 10px; }
+        .trade-info { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #222; font-size: 14px; }
+        .val { color: var(--gold); font-weight: bold; }
+
+        /* Alt Navigasyon */
+        .nav { position: fixed; bottom: 0; width: 100%; height: 75px; background: #080808; display: flex; justify-content: space-around; align-items: center; border-top: 2px solid var(--cyan); z-index: 1000; }
+        .nav-item { color: #555; font-size: 10px; text-align: center; cursor: pointer; transition: 0.3s; flex: 1; }
+        .nav-item.active { color: var(--cyan); transform: translateY(-5px); }
+        .nav-item i { font-size: 24px; display: block; margin-bottom: 4px; }
 
         /* Video Overlay */
-        #video-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.98); z-index: 100; flex-direction: column; align-items: center; justify-content: center; }
+        #ad-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.98); z-index: 9999; flex-direction: column; align-items: center; justify-content: center; }
+        
+        @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
     </style>
 </head>
 <body>
 
-    <div id="video-overlay">
-        <h3 style="color:yellow">📺 REKLAM İZLENİYOR...</h3>
-        <div style="font-size: 40px;" id="ad-timer">15</div>
-        <p>Enerji doluyor ve üretim 10X hızlanıyor!</p>
+    <div id="ad-overlay">
+        <div style="font-size: 60px;">📺</div>
+        <h2 style="color:var(--gold)">VİDEO İZLENİYOR...</h2>
+        <div style="font-size: 40px; font-weight: bold;" id="ad-timer">15</div>
+        <p style="padding: 20px; text-align: center; color: #888;">Video bitene kadar kuşunuz 20X hızında yumurtluyor!</p>
     </div>
 
     <div class="header">
-        <div style="color:var(--gold)">🟡 ALTIN: <span id="h-gold">0</span></div>
-        <div style="color:var(--silver)">⚪ GÜMÜŞ: <span id="h-silv">0</span></div>
+        <div class="stat-item" style="color:var(--gold)">🟡 ALTIN<br><span id="h-gold">0</span></div>
+        <div class="stat-item" style="color:var(--silver)">⚪ GÜMÜŞ<br><span id="h-silv">0</span></div>
+        <div class="stat-item">🥚 DEPO<br><span id="h-egg">0</span></div>
     </div>
 
     <div id="s-game" class="screen active">
-        <div class="bird" id="main-bird">🕊️</div>
-        
-        <div class="stat-wrap">
-            <div style="font-size:10px; color:#00ff00">ENERJİ: <span id="energy-val">100/100</span></div>
-            <div class="bar-bg"><div class="bar-fill-energy" id="energy-bar" style="width:100%"></div></div>
+        <div class="bird-container">
+            <div class="turbo-glow" id="glow"></div>
+            <div class="bird" id="bird-btn">🕊️</div>
         </div>
 
-        <div class="stat-wrap">
-            <div style="font-size:10px; color:var(--n-cyan)">SEPET: <span id="egg-val">0/20</span></div>
-            <div class="bar-bg"><div class="bar-fill-egg" id="egg-bar" style="width:0%"></div></div>
+        <div class="bar-container">
+            <div class="label"><span>ENERJİ</span> <span id="energy-text">100/100</span></div>
+            <div class="bar-bg"><div class="fill energy-fill" id="energy-bar" style="width: 100%;"></div></div>
         </div>
 
-        <button class="btn-main" onclick="collect()">HASAT ET (-10 Enerji)</button>
-        <button class="btn-main btn-ad" onclick="startAd()">📺 REKLAM İZLE (FULL ENERJİ + 10X)</button>
+        <div class="bar-container">
+            <div class="label"><span>SEPET DOLULUĞU</span> <span id="egg-text">0/20</span></div>
+            <div class="bar-bg"><div class="fill egg-fill" id="egg-bar" style="width: 0%;"></div></div>
+        </div>
+
+        <button class="btn btn-collect" onclick="collect()">📥 HASAT ET (-10 Enerji)</button>
+        <button class="btn btn-ad" onclick="startAd()">📺 REKLAM İZLE (FULL ENERJİ + 20X)</button>
     </div>
 
-    <div id="s-pazar" class="screen">
-        <h3 style="color:var(--n-cyan)">TAKAS</h3>
-        <p>Depodaki Yumurta: <span id="saved-eggs">0</span></p>
-        <button class="btn-main" onclick="confirmTrade()">YUMURTALARI SAT</button>
+    <div id="s-trade" class="screen">
+        <div class="trade-card">
+            <h3 class="trade-title">Yumurtaları Sat:</h3>
+            <div style="color: #888; font-size: 12px; margin-bottom: 15px;">100 eggs = 1 coin</div>
+            
+            <div class="trade-info">
+                <span>Yumurtaların:</span>
+                <span class="val" id="t-eggs">0</span>
+            </div>
+            
+            <div class="trade-info">
+                <span>Gümüş (Alımlar):</span>
+                <span class="val" style="color:var(--silver)" id="t-silver">+0</span>
+            </div>
+
+            <div class="trade-info">
+                <span>Altın (Çekilebilir):</span>
+                <span class="val" id="t-gold">+0</span>
+            </div>
+
+            <button class="btn btn-collect" style="margin-top: 20px; background: #28a745;" onclick="confirmTrade()">🔄 TAKAS ET</button>
+        </div>
     </div>
 
-    <div class="nav-bar" style="position:fixed; bottom:0; width:100%; display:flex; justify-content:space-around; background:#111; padding:15px; border-top:1px solid var(--n-cyan);">
-        <div onclick="show('game')">🏠</div>
-        <div onclick="show('pazar')">🔄</div>
+    <div class="nav">
+        <div class="nav-item active" id="n-game" onclick="show('game')">🏠<br>KÜMES</div>
+        <div class="nav-item" id="n-trade" onclick="show('trade')">🔄<br>TAKAS</div>
+        <div class="nav-item" onclick="tg.showAlert('Yakında!')">🛒<br>MARKET</div>
+        <div class="nav-item" onclick="window.Telegram.WebApp.close()">❌<br>KAPAT</div>
     </div>
 
     <script>
         let tg = window.Telegram.WebApp; tg.expand();
-        let curE = 0, savE = 0, gold = 0, silv = 0, energy = 100, mult = 1;
+        let gold = 0, silv = 0, curE = 0, savE = 0, energy = 100, mult = 1;
 
         function show(s) {
             document.querySelectorAll('.screen').forEach(x => x.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(x => x.classList.remove('active'));
             document.getElementById('s-'+s).classList.add('active');
+            document.getElementById('n-'+s).classList.add('active');
             updateUI();
         }
 
-        // OTOMATİK ÜRETİM (Sadece enerji varsa çalışır)
-        setInterval(() => { 
-            if(energy > 0 && curE < 20) { 
-                curE += (0.02 * mult); 
-                energy -= 0.05; // Üretirken enerji harcar
-                updateUI(); 
-            } 
+        // Tıklama Sistemi
+        document.getElementById('bird-btn').onclick = function() {
+            if(curE < 20 && energy > 0) {
+                curE += (0.1 * mult);
+                energy -= 0.1;
+                tg.HapticFeedback.impactOccurred('light');
+                updateUI();
+            }
+        };
+
+        // Otomatik Üretim
+        setInterval(() => {
+            if(energy > 0 && curE < 20) {
+                curE += (0.02 * mult);
+                energy -= 0.05;
+                updateUI();
+            }
         }, 1000);
 
         function updateUI() {
-            document.getElementById('h-gold').innerText = Math.floor(gold);
-            document.getElementById('h-silv').innerText = Math.floor(silv);
-            document.getElementById('energy-val').innerText = Math.max(0, Math.floor(energy)) + "/100";
+            // Header & Stats
+            document.getElementById('h-gold').innerText = Math.floor(gold).toLocaleString();
+            document.getElementById('h-silv').innerText = Math.floor(silv).toLocaleString();
+            document.getElementById('h-egg').innerText = Math.floor(savE).toLocaleString();
+            
+            // Barlar
+            document.getElementById('energy-text').innerText = Math.max(0, Math.floor(energy)) + "/100";
             document.getElementById('energy-bar').style.width = energy + "%";
-            document.getElementById('egg-val').innerText = Math.floor(curE) + "/20";
+            document.getElementById('egg-text').innerText = Math.floor(curE) + "/20";
             document.getElementById('egg-bar').style.width = (curE/20*100) + "%";
-            document.getElementById('saved-eggs').innerText = Math.floor(savE);
+
+            // Takas Ekranı
+            document.getElementById('t-eggs').innerText = Math.floor(savE).toLocaleString();
+            let coins = Math.floor(savE / 100);
+            document.getElementById('t-silver').innerText = "+" + Math.floor(coins/2);
+            document.getElementById('t-gold').innerText = "+" + Math.floor(coins/2);
         }
 
         function collect() {
@@ -104,16 +177,19 @@
                 updateUI();
                 tg.HapticFeedback.notificationOccurred('success');
             } else if(energy < 10) {
-                tg.showAlert("Enerjin bitti! Reklam izleyerek doldur.");
+                tg.showAlert("Yorgun kuş! Reklam izleyerek enerji topla.");
             }
         }
 
         function startAd() {
-            let overlay = document.getElementById('video-overlay');
+            let overlay = document.getElementById('ad-overlay');
             let timerEl = document.getElementById('ad-timer');
+            let glow = document.getElementById('glow');
             let timeLeft = 15;
+            
             overlay.style.display = 'flex';
-            mult = 20; // Reklam sırasında aşırı hızlı üretim
+            mult = 20;
+            glow.style.display = 'block';
 
             let itv = setInterval(() => {
                 timeLeft--;
@@ -121,18 +197,29 @@
                 if(timeLeft <= 0) {
                     clearInterval(itv);
                     overlay.style.display = 'none';
+                    glow.style.display = 'none';
                     mult = 1;
-                    energy = 100; // Enerji fullenir
+                    energy = 100;
                     updateUI();
-                    tg.showAlert("Enerji dolduruldu! Üretim devam ediyor.");
+                    tg.showAlert("Enerji Depolandı! 20X Üretim Tamamlandı.");
                 }
             }, 1000);
         }
 
         function confirmTrade() {
             let coins = Math.floor(savE / 100);
-            if(coins >= 1) { gold += coins/2; silv += coins/2; savE %= 100; updateUI(); }
+            if(coins >= 1) {
+                gold += coins/2;
+                silv += coins/2;
+                savE %= 100;
+                updateUI();
+                tg.showAlert("Takas başarılı! Altın ve Gümüş hesabına geçti.");
+            } else {
+                tg.showAlert("Henüz yeterli yumurtan yok!");
+            }
         }
+        
+        updateUI();
     </script>
 </body>
 </html>
