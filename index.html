@@ -3,142 +3,135 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Gogircin Cyber-Economy</title>
+    <title>Gogircin Pro - AdEngine</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root { --n-cyan: #00f2ff; --n-pink: #ff00ff; --bg: #050505; --gold: #ffd700; --silver: #e0e0e0; }
         body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; user-select: none; }
-        
-        /* Üst Göstergeler */
-        .header { padding: 10px; display: flex; justify-content: space-around; border-bottom: 1px solid var(--n-cyan); background: rgba(0,242,255,0.05); font-size: 12px; font-weight: bold; }
-        
+        .header { padding: 10px; display: flex; justify-content: space-around; border-bottom: 1px solid var(--n-cyan); background: rgba(0,242,255,0.05); font-size: 11px; }
         .screen { display: none; flex-direction: column; align-items: center; justify-content: center; flex-grow: 1; padding: 20px; }
         .screen.active { display: flex; }
+        .bird { font-size: 100px; filter: drop-shadow(0 0 15px var(--n-pink)); cursor: pointer; }
+        
+        /* Enerji Barı */
+        .stat-wrap { width: 85%; margin: 10px 0; }
+        .bar-bg { width: 100%; height: 8px; background: #222; border-radius: 4px; overflow: hidden; border: 1px solid #333; }
+        .bar-fill-energy { height: 100%; background: linear-gradient(90deg, #ff0000, #00ff00); transition: width 0.3s; }
+        .bar-fill-egg { height: 100%; background: linear-gradient(90deg, var(--n-cyan), var(--n-pink)); }
 
-        /* Takas Kartı (Birds Empire Stili) */
-        .trade-card { 
-            background: linear-gradient(145deg, #111, #000); 
-            border: 2px solid var(--n-cyan); 
-            border-radius: 20px; 
-            width: 90%; 
-            padding: 20px; 
-            text-align: center;
-            box-shadow: 0 0 20px rgba(0, 242, 255, 0.2);
-        }
-        .trade-row { margin: 15px 0; padding: 10px; border-bottom: 1px solid #222; display: flex; justify-content: space-between; font-size: 14px; }
-        .trade-val { font-weight: bold; color: var(--n-cyan); }
+        .btn-main { background: linear-gradient(45deg, var(--n-pink), #800080); border: none; color: white; padding: 12px 30px; border-radius: 20px; font-weight: bold; cursor: pointer; width: 85%; margin: 5px; }
+        .btn-ad { background: linear-gradient(45deg, #ffd700, #b8860b); color: black !important; }
 
-        /* Kuş Alanı */
-        .bird { font-size: 90px; filter: drop-shadow(0 0 15px var(--n-pink)); cursor: pointer; transition: 0.1s; }
-        .bird:active { transform: scale(0.85); }
-
-        /* Butonlar */
-        .btn-main { background: linear-gradient(45deg, var(--n-pink), #800080); border: none; color: white; padding: 15px 40px; border-radius: 30px; font-weight: bold; cursor: pointer; box-shadow: 0 0 15px var(--n-pink); margin-top: 15px; width: 100%; }
-        .btn-nav { color: #666; font-size: 10px; text-align: center; cursor: pointer; text-decoration: none; }
-        .btn-nav.active { color: var(--n-cyan); }
-
-        .nav-bar { position: fixed; bottom: 0; width: 100%; height: 70px; background: #0a0a0a; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid var(--n-cyan); }
+        /* Video Overlay */
+        #video-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.98); z-index: 100; flex-direction: column; align-items: center; justify-content: center; }
     </style>
 </head>
 <body>
 
+    <div id="video-overlay">
+        <h3 style="color:yellow">📺 REKLAM İZLENİYOR...</h3>
+        <div style="font-size: 40px;" id="ad-timer">15</div>
+        <p>Enerji doluyor ve üretim 10X hızlanıyor!</p>
+    </div>
+
     <div class="header">
         <div style="color:var(--gold)">🟡 ALTIN: <span id="h-gold">0</span></div>
         <div style="color:var(--silver)">⚪ GÜMÜŞ: <span id="h-silv">0</span></div>
-        <div style="color:white">🥚 <span id="h-egg">0</span></div>
     </div>
 
     <div id="s-game" class="screen active">
         <div class="bird" id="main-bird">🕊️</div>
-        <p style="color:var(--n-cyan); font-size:12px;">Depo: <span id="depo-val">0/20</span></p>
-        <button class="btn-main" onclick="collect()">HASAT ET (DEPOYA)</button>
+        
+        <div class="stat-wrap">
+            <div style="font-size:10px; color:#00ff00">ENERJİ: <span id="energy-val">100/100</span></div>
+            <div class="bar-bg"><div class="bar-fill-energy" id="energy-bar" style="width:100%"></div></div>
+        </div>
+
+        <div class="stat-wrap">
+            <div style="font-size:10px; color:var(--n-cyan)">SEPET: <span id="egg-val">0/20</span></div>
+            <div class="bar-bg"><div class="bar-fill-egg" id="egg-bar" style="width:0%"></div></div>
+        </div>
+
+        <button class="btn-main" onclick="collect()">HASAT ET (-10 Enerji)</button>
+        <button class="btn-main btn-ad" onclick="startAd()">📺 REKLAM İZLE (FULL ENERJİ + 10X)</button>
     </div>
 
     <div id="s-pazar" class="screen">
-        <div class="trade-card">
-            <h2 style="margin-top:0; color:var(--n-cyan);">Yumurtaları Sat:</h2>
-            <div style="font-size:13px; color:#aaa; margin-bottom:10px;">100 eggs = 1 coin</div>
-            
-            <div class="trade-row">
-                <span>Yumurtaların:</span>
-                <span class="trade-val" id="t-eggs">0</span>
-            </div>
-            
-            <div class="trade-row" style="color:var(--silver)">
-                <span>Satın Alımlar İçin Gümüş:</span>
-                <span id="t-get-silv">0</span>
-            </div>
-
-            <div class="trade-row" style="color:var(--gold)">
-                <span>Çekilebilir Altın:</span>
-                <span id="t-get-gold">0</span>
-            </div>
-
-            <button class="btn-main" style="background:var(--gold); color:black;" onclick="confirmTrade()">TAKAS</button>
-        </div>
+        <h3 style="color:var(--n-cyan)">TAKAS</h3>
+        <p>Depodaki Yumurta: <span id="saved-eggs">0</span></p>
+        <button class="btn-main" onclick="confirmTrade()">YUMURTALARI SAT</button>
     </div>
 
-    <div class="nav-bar">
-        <div class="nav-item btn-nav active" onclick="show('game')">🏠<br>KÜMES</div>
-        <div class="nav-item btn-nav" onclick="show('pazar')">🔄<br>TAKAS</div>
-        <div class="nav-item btn-nav" onclick="Telegram.WebApp.close()">❌<br>KAPAT</div>
+    <div class="nav-bar" style="position:fixed; bottom:0; width:100%; display:flex; justify-content:space-around; background:#111; padding:15px; border-top:1px solid var(--n-cyan);">
+        <div onclick="show('game')">🏠</div>
+        <div onclick="show('pazar')">🔄</div>
     </div>
 
     <script>
         let tg = window.Telegram.WebApp; tg.expand();
-        let curE = 0, savE = 0, gold = 0, silv = 0, cap = 20;
+        let curE = 0, savE = 0, gold = 0, silv = 0, energy = 100, mult = 1;
 
         function show(s) {
             document.querySelectorAll('.screen').forEach(x => x.classList.remove('active'));
-            document.querySelectorAll('.btn-nav').forEach(x => x.classList.remove('active'));
             document.getElementById('s-'+s).classList.add('active');
-            event.currentTarget.classList.add('active');
             updateUI();
         }
 
-        setInterval(() => { if(curE < cap) { curE += 0.01; updateUI(); } }, 1000);
+        // OTOMATİK ÜRETİM (Sadece enerji varsa çalışır)
+        setInterval(() => { 
+            if(energy > 0 && curE < 20) { 
+                curE += (0.02 * mult); 
+                energy -= 0.05; // Üretirken enerji harcar
+                updateUI(); 
+            } 
+        }, 1000);
 
         function updateUI() {
-            // Header
-            document.getElementById('h-egg').innerText = Math.floor(savE);
             document.getElementById('h-gold').innerText = Math.floor(gold);
             document.getElementById('h-silv').innerText = Math.floor(silv);
-            
-            // Game
-            document.getElementById('depo-val').innerText = Math.floor(curE) + "/" + cap;
-            
-            // Trade Screen
-            document.getElementById('t-eggs').innerText = Math.floor(savE).toLocaleString();
-            let totalCoins = Math.floor(savE / 100);
-            document.getElementById('t-get-silv').innerText = "+" + Math.floor(totalCoins / 2).toLocaleString();
-            document.getElementById('t-get-gold').innerText = "+" + Math.floor(totalCoins / 2).toLocaleString();
+            document.getElementById('energy-val').innerText = Math.max(0, Math.floor(energy)) + "/100";
+            document.getElementById('energy-bar').style.width = energy + "%";
+            document.getElementById('egg-val').innerText = Math.floor(curE) + "/20";
+            document.getElementById('egg-bar').style.width = (curE/20*100) + "%";
+            document.getElementById('saved-eggs').innerText = Math.floor(savE);
         }
 
-        document.getElementById('main-bird').onclick = () => { 
-            if(curE < cap) { curE += 0.05; updateUI(); tg.HapticFeedback.impactOccurred('light'); } 
-        };
-
         function collect() {
-            if(curE >= 1) {
+            if(energy >= 10 && curE >= 1) {
                 savE += Math.floor(curE);
                 curE = 0;
+                energy -= 10;
                 updateUI();
                 tg.HapticFeedback.notificationOccurred('success');
+            } else if(energy < 10) {
+                tg.showAlert("Enerjin bitti! Reklam izleyerek doldur.");
             }
+        }
+
+        function startAd() {
+            let overlay = document.getElementById('video-overlay');
+            let timerEl = document.getElementById('ad-timer');
+            let timeLeft = 15;
+            overlay.style.display = 'flex';
+            mult = 20; // Reklam sırasında aşırı hızlı üretim
+
+            let itv = setInterval(() => {
+                timeLeft--;
+                timerEl.innerText = timeLeft;
+                if(timeLeft <= 0) {
+                    clearInterval(itv);
+                    overlay.style.display = 'none';
+                    mult = 1;
+                    energy = 100; // Enerji fullenir
+                    updateUI();
+                    tg.showAlert("Enerji dolduruldu! Üretim devam ediyor.");
+                }
+            }, 1000);
         }
 
         function confirmTrade() {
-            let totalCoins = Math.floor(savE / 100);
-            if(totalCoins >= 1) {
-                let half = Math.floor(totalCoins / 2);
-                gold += half;
-                silv += half;
-                savE = savE % 100; // Artan yumurtalar kalsın
-                updateUI();
-                tg.showAlert("Takas Başarılı! \n+" + half + " Altın \n+" + half + " Gümüş");
-            } else {
-                tg.showAlert("Takas için en az 100 yumurta gerekli!");
-            }
+            let coins = Math.floor(savE / 100);
+            if(coins >= 1) { gold += coins/2; silv += coins/2; savE %= 100; updateUI(); }
         }
     </script>
 </body>
