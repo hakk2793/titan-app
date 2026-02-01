@@ -2,83 +2,144 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gogircin Cyber-Farm</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Gogircin Cyber-Economy</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        :root { --neon-cyan: #00f2ff; --neon-pink: #ff00ff; --bg-dark: #0a0a0b; }
-        body { 
-            background-color: var(--bg-dark); color: white; 
-            font-family: 'Segoe UI', sans-serif; margin: 0; overflow: hidden;
-            display: flex; flex-direction: column; height: 100vh;
-        }
-        /* Üst Panel (Bakiye ve Enerji) */
-        .top-bar {
-            padding: 15px; display: flex; justify-content: space-between;
-            background: rgba(255, 255, 255, 0.05); border-bottom: 1px solid var(--neon-cyan);
-        }
-        .stat-item { text-shadow: 0 0 10px var(--neon-cyan); font-weight: bold; }
+        :root { --n-cyan: #00f2ff; --n-pink: #ff00ff; --bg: #050505; --gold: #ffd700; --silver: #e0e0e0; }
+        body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; user-select: none; }
+        
+        /* Üst Göstergeler */
+        .header { padding: 10px; display: flex; justify-content: space-around; border-bottom: 1px solid var(--n-cyan); background: rgba(0,242,255,0.05); font-size: 12px; font-weight: bold; }
+        
+        .screen { display: none; flex-direction: column; align-items: center; justify-content: center; flex-grow: 1; padding: 20px; }
+        .screen.active { display: flex; }
 
-        /* Oyun Alanı (Kuş ve Yumurtalar) */
-        .game-area {
-            flex-grow: 1; display: flex; flex-direction: column;
-            align-items: center; justify-content: center; position: relative;
+        /* Takas Kartı (Birds Empire Stili) */
+        .trade-card { 
+            background: linear-gradient(145deg, #111, #000); 
+            border: 2px solid var(--n-cyan); 
+            border-radius: 20px; 
+            width: 90%; 
+            padding: 20px; 
+            text-align: center;
+            box-shadow: 0 0 20px rgba(0, 242, 255, 0.2);
         }
-        .bird-box {
-            font-size: 80px; position: relative;
-            filter: drop-shadow(0 0 20px var(--neon-pink));
-            animation: hover 3s infinite ease-in-out;
-        }
-        @keyframes hover { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
+        .trade-row { margin: 15px 0; padding: 10px; border-bottom: 1px solid #222; display: flex; justify-content: space-between; font-size: 14px; }
+        .trade-val { font-weight: bold; color: var(--n-cyan); }
 
-        /* Yumurta Sepeti Alanı */
-        .basket-zone {
-            width: 90%; background: rgba(0, 242, 255, 0.1);
-            border: 1px dashed var(--neon-cyan); border-radius: 15px;
-            padding: 10px; text-align: center; margin-bottom: 80px;
-        }
+        /* Kuş Alanı */
+        .bird { font-size: 90px; filter: drop-shadow(0 0 15px var(--n-pink)); cursor: pointer; transition: 0.1s; }
+        .bird:active { transform: scale(0.85); }
 
-        /* Alt Menü (Birds Empire Stilinde) */
-        .bottom-nav {
-            position: fixed; bottom: 0; width: 100%; height: 70px;
-            background: #151517; display: flex; justify-content: space-around;
-            align-items: center; border-top: 2px solid var(--neon-pink);
-        }
-        .nav-item { text-align: center; font-size: 12px; color: #888; text-decoration: none; }
-        .nav-item.active { color: var(--neon-cyan); }
-        .nav-icon { font-size: 24px; display: block; margin-bottom: 4px; }
+        /* Butonlar */
+        .btn-main { background: linear-gradient(45deg, var(--n-pink), #800080); border: none; color: white; padding: 15px 40px; border-radius: 30px; font-weight: bold; cursor: pointer; box-shadow: 0 0 15px var(--n-pink); margin-top: 15px; width: 100%; }
+        .btn-nav { color: #666; font-size: 10px; text-align: center; cursor: pointer; text-decoration: none; }
+        .btn-nav.active { color: var(--n-cyan); }
 
-        /* Reklam Butonu */
-        .ad-btn {
-            background: linear-gradient(45deg, var(--neon-pink), #800080);
-            border: none; color: white; padding: 10px 20px;
-            border-radius: 20px; font-weight: bold; box-shadow: 0 0 15px var(--neon-pink);
-        }
+        .nav-bar { position: fixed; bottom: 0; width: 100%; height: 70px; background: #0a0a0a; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid var(--n-cyan); }
     </style>
 </head>
 <body>
 
-    <div class="top-bar">
-        <div class="stat-item">💰 0.00 TON</div>
-        <div class="stat-item">⚡ %100</div>
+    <div class="header">
+        <div style="color:var(--gold)">🟡 ALTIN: <span id="h-gold">0</span></div>
+        <div style="color:var(--silver)">⚪ GÜMÜŞ: <span id="h-silv">0</span></div>
+        <div style="color:white">🥚 <span id="h-egg">0</span></div>
     </div>
 
-    <div class="game-area">
-        <div class="bird-box">🕊️</div>
-        <div style="color: var(--neon-cyan); margin-top: 10px;">CYBER-GOGIRCIN v1</div>
-        <button class="ad-btn" onclick="alert('Reklam Sistemi Hazırlanıyor...')">🌾 YEM VER (AD)</button>
+    <div id="s-game" class="screen active">
+        <div class="bird" id="main-bird">🕊️</div>
+        <p style="color:var(--n-cyan); font-size:12px;">Depo: <span id="depo-val">0/20</span></p>
+        <button class="btn-main" onclick="collect()">HASAT ET (DEPOYA)</button>
     </div>
 
-    <div class="basket-zone">
-        🥚 Yumurta Deposu: 0 / 20
+    <div id="s-pazar" class="screen">
+        <div class="trade-card">
+            <h2 style="margin-top:0; color:var(--n-cyan);">Yumurtaları Sat:</h2>
+            <div style="font-size:13px; color:#aaa; margin-bottom:10px;">100 eggs = 1 coin</div>
+            
+            <div class="trade-row">
+                <span>Yumurtaların:</span>
+                <span class="trade-val" id="t-eggs">0</span>
+            </div>
+            
+            <div class="trade-row" style="color:var(--silver)">
+                <span>Satın Alımlar İçin Gümüş:</span>
+                <span id="t-get-silv">0</span>
+            </div>
+
+            <div class="trade-row" style="color:var(--gold)">
+                <span>Çekilebilir Altın:</span>
+                <span id="t-get-gold">0</span>
+            </div>
+
+            <button class="btn-main" style="background:var(--gold); color:black;" onclick="confirmTrade()">TAKAS</button>
+        </div>
     </div>
 
-    <nav class="bottom-nav">
-        <a href="#" class="nav-item active"><span class="nav-icon">🏠</span>Kümes</a>
-        <a href="#" class="nav-item"><span class="nav-icon">📊</span>Görevler</a>
-        <a href="#" class="nav-item"><span class="nav-icon">🥚</span>Depo</a>
-        <a href="#" class="nav-item"><span class="nav-icon">🛒</span>Market</a>
-        <a href="#" class="nav-item"><span class="nav-icon">⚙️</span>Menü</a>
-    </nav>
+    <div class="nav-bar">
+        <div class="nav-item btn-nav active" onclick="show('game')">🏠<br>KÜMES</div>
+        <div class="nav-item btn-nav" onclick="show('pazar')">🔄<br>TAKAS</div>
+        <div class="nav-item btn-nav" onclick="Telegram.WebApp.close()">❌<br>KAPAT</div>
+    </div>
 
+    <script>
+        let tg = window.Telegram.WebApp; tg.expand();
+        let curE = 0, savE = 0, gold = 0, silv = 0, cap = 20;
+
+        function show(s) {
+            document.querySelectorAll('.screen').forEach(x => x.classList.remove('active'));
+            document.querySelectorAll('.btn-nav').forEach(x => x.classList.remove('active'));
+            document.getElementById('s-'+s).classList.add('active');
+            event.currentTarget.classList.add('active');
+            updateUI();
+        }
+
+        setInterval(() => { if(curE < cap) { curE += 0.01; updateUI(); } }, 1000);
+
+        function updateUI() {
+            // Header
+            document.getElementById('h-egg').innerText = Math.floor(savE);
+            document.getElementById('h-gold').innerText = Math.floor(gold);
+            document.getElementById('h-silv').innerText = Math.floor(silv);
+            
+            // Game
+            document.getElementById('depo-val').innerText = Math.floor(curE) + "/" + cap;
+            
+            // Trade Screen
+            document.getElementById('t-eggs').innerText = Math.floor(savE).toLocaleString();
+            let totalCoins = Math.floor(savE / 100);
+            document.getElementById('t-get-silv').innerText = "+" + Math.floor(totalCoins / 2).toLocaleString();
+            document.getElementById('t-get-gold').innerText = "+" + Math.floor(totalCoins / 2).toLocaleString();
+        }
+
+        document.getElementById('main-bird').onclick = () => { 
+            if(curE < cap) { curE += 0.05; updateUI(); tg.HapticFeedback.impactOccurred('light'); } 
+        };
+
+        function collect() {
+            if(curE >= 1) {
+                savE += Math.floor(curE);
+                curE = 0;
+                updateUI();
+                tg.HapticFeedback.notificationOccurred('success');
+            }
+        }
+
+        function confirmTrade() {
+            let totalCoins = Math.floor(savE / 100);
+            if(totalCoins >= 1) {
+                let half = Math.floor(totalCoins / 2);
+                gold += half;
+                silv += half;
+                savE = savE % 100; // Artan yumurtalar kalsın
+                updateUI();
+                tg.showAlert("Takas Başarılı! \n+" + half + " Altın \n+" + half + " Gümüş");
+            } else {
+                tg.showAlert("Takas için en az 100 yumurta gerekli!");
+            }
+        }
+    </script>
 </body>
 </html>
