@@ -3,93 +3,103 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Gogircin Empire Pro</title>
+    <title>Gogircin Titan Pro</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        :root { --cyan: #00f2ff; --pink: #ff00ff; --gold: #ffd700; --bg: #0a0b10; }
+        :root { --cyan: #00f2ff; --pink: #ff00ff; --gold: #ffd700; --bg: #0a0b10; --silver: #bdc3c7; }
         body { 
             background: var(--bg); background-image: radial-gradient(circle at 50% 50%, #1a1b26 0%, #0a0b10 100%);
-            color: white; font-family: 'Segoe UI', sans-serif; margin: 0; overflow: hidden; 
+            color: white; font-family: 'Segoe UI', sans-serif; margin: 0; overflow: hidden; touch-action: manipulation;
         }
         
-        .header { display: flex; justify-content: space-around; padding: 15px 5px; background: rgba(0,0,0,0.9); border-bottom: 2px solid var(--cyan); position: fixed; top: 0; width: 100%; z-index: 100; }
-        .stat-box { text-align: center; font-size: 10px; }
-        .stat-val { display: block; font-size: 15px; color: var(--gold); font-weight: bold; }
+        /* Üst Panel */
+        .header { display: flex; justify-content: space-around; padding: 15px 5px; background: rgba(0,0,0,0.9); border-bottom: 2px solid var(--cyan); position: fixed; top: 0; width: 100%; z-index: 100; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
+        .stat-box { text-align: center; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; }
+        .stat-val { display: block; font-size: 15px; color: var(--gold); font-weight: bold; margin-top: 3px; }
 
-        .screen { display: none; height: 100vh; padding: 90px 15px 100px; box-sizing: border-box; flex-direction: column; overflow-y: auto; }
+        .screen { display: none; height: 100vh; padding: 95px 15px 100px; box-sizing: border-box; flex-direction: column; overflow-y: auto; }
         .screen.active { display: flex; }
 
-        /* KÜMES VE KUŞLAR */
-        .nest-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 10px; }
+        /* KÜMES & KUŞLAR */
+        .nest-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 5px; }
         .nest { 
-            height: 150px; background: rgba(255,255,255,0.03); border: 1px solid #333; border-radius: 20px; 
+            height: 160px; background: rgba(255,255,255,0.03); border: 1px solid #333; border-radius: 25px; 
             display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative;
+            transition: 0.3s;
         }
-        .bird-img { font-size: 50px; animation: süzülme 3s ease-in-out infinite; cursor: pointer; }
-        @keyframes süzülme { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
-        .bird-label { font-size: 10px; color: var(--cyan); margin-top: 5px; }
+        .bird-img { font-size: 55px; filter: drop-shadow(0 0 10px var(--cyan)); animation: floating 3s ease-in-out infinite; cursor: pointer; }
+        @keyframes floating { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
+        .bird-name { font-size: 11px; color: var(--cyan); font-weight: bold; margin-top: 8px; }
+        .bird-prod { font-size: 9px; color: #888; }
 
-        /* DEPO VE SATIŞ */
-        .depo-panel { background: rgba(0,0,0,0.6); border: 1px solid #444; border-radius: 25px; padding: 15px; margin-top: auto; text-align: center; }
-        .progress-bar { width: 100%; height: 12px; background: #111; border-radius: 6px; margin: 10px 0; border: 1px solid #333; overflow: hidden; }
-        .progress-fill { height: 100%; background: linear-gradient(90deg, var(--cyan), var(--pink)); width: 0%; transition: 0.5s; }
+        /* YUMURTA PARÇACIĞI */
+        .egg-particle { position: absolute; font-size: 20px; z-index: 200; pointer-events: none; transition: all 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+
+        /* DEPO VE AKSİYON PANELİ */
+        .control-panel { background: rgba(0,0,0,0.7); border: 1px solid #444; border-radius: 30px; padding: 15px; margin-top: auto; text-align: center; }
+        .storage-info { font-size: 13px; color: var(--cyan); margin-bottom: 8px; font-weight: bold; }
+        .bar-bg { width: 100%; height: 12px; background: #111; border-radius: 6px; border: 1px solid #333; overflow: hidden; margin-bottom: 12px; }
+        .bar-fill { height: 100%; background: linear-gradient(90deg, var(--cyan), var(--pink)); width: 0%; transition: 0.5s; }
 
         /* BUTONLAR */
-        .btn { background: linear-gradient(45deg, var(--cyan), #0088cc); border: none; color: #000; padding: 12px; width: 100%; border-radius: 12px; font-weight: bold; margin: 5px 0; }
-        .btn-sell { background: linear-gradient(45deg, #4caf50, #2e7d32); color: white; }
+        .btn { background: linear-gradient(45deg, var(--cyan), #0088cc); border: none; color: #000; padding: 14px; width: 100%; border-radius: 15px; font-weight: bold; font-size: 14px; margin: 5px 0; box-shadow: 0 4px 10px rgba(0,242,255,0.2); }
+        .btn-sell { background: linear-gradient(45deg, #2ecc71, #27ae60); color: white; }
+
+        /* MARKET KARTLARI */
+        .market-card { background: #111; padding: 15px; border-radius: 20px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #222; }
 
         /* NAVİGASYON */
-        .nav { position: fixed; bottom: 0; width: 100%; height: 75px; background: #000; display: flex; justify-content: space-around; border-top: 1px solid #222; }
-        .nav-item { color: #555; font-size: 10px; text-align: center; padding-top: 15px; flex: 1; }
-        .nav-item.active { color: var(--cyan); }
+        .nav { position: fixed; bottom: 0; width: 100%; height: 75px; background: #000; display: flex; justify-content: space-around; border-top: 1px solid #222; box-shadow: 0 -5px 15px rgba(0,0,0,0.5); }
+        .nav-item { color: #555; font-size: 10px; text-align: center; padding-top: 15px; flex: 1; text-decoration: none; }
+        .nav-item.active { color: var(--cyan); font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <div class="header">
+    <div class="header" id="main-header">
         <div class="stat-box">🟡 ALTIN<span class="stat-val" id="h-gold">0</span></div>
-        <div class="stat-box">🥚 YUMURTA<span class="stat-val" id="h-egg" style="color:var(--cyan)">0</span></div>
-        <div class="stat-box">🥈 GÜMÜŞ<span class="stat-val" id="h-silver" style="color:#bdc3c7">0</span></div>
+        <div class="stat-box">🥈 GÜMÜŞ<span class="stat-val" id="h-silver">0</span></div>
+        <div class="stat-box">⚡ GÜÇ<span class="stat-val" id="h-power" style="color:var(--pink)">0</span></div>
     </div>
 
     <div id="s-game" class="screen active">
-        <div class="nest-grid" id="main-nest">
+        <div class="nest-grid" id="nest-container">
             </div>
 
-        <div class="depo-panel">
-            <div style="font-size:12px">Depo Kapasitesi (2M)</div>
-            <div class="progress-bar"><div class="progress-fill" id="depo-fill"></div></div>
-            <div style="font-size:14px; margin-bottom:10px;"><span id="depo-count">0</span> / 2,000,000</div>
+        <div class="control-panel">
+            <div class="storage-info">DEPO: <span id="depo-val">0</span> / <span id="depo-max">2,000,000</span></div>
+            <div class="bar-bg"><div class="bar-fill" id="depo-bar"></div></div>
             <button class="btn" onclick="collectToDepo()">🧺 YUMURTALARI TOPLA</button>
             <button class="btn btn-sell" onclick="sellEggs()">💰 YUMURTALARI SAT (TAKAS)</button>
         </div>
     </div>
 
     <div id="s-market" class="screen">
-        <h2 style="color:var(--cyan)">KUŞ PAZARI</h2>
+        <h2 style="color:var(--cyan); text-align:center;">TITAN PAZARI</h2>
         <div id="market-list"></div>
     </div>
 
     <div class="nav">
         <div class="nav-item active" onclick="show('game')">🏠<br>KÜMES</div>
         <div class="nav-item" onclick="show('market')">🛒<br>MARKET</div>
-        <div class="nav-item" onclick="tg.showAlert('Yakında!')">👥<br>REF</div>
-        <div class="nav-item" onclick="tg.showAlert('Yakında!')">👤<br>PROFİL</div>
+        <div class="nav-item" onclick="tg.showAlert('Referans sistemi bakımda!')">👥<br>REF</div>
+        <div class="nav-item" onclick="tg.showAlert('Profil yakında!')">👤<br>PROFİL</div>
     </div>
 
     <script>
-        let tg = window.Telegram.WebApp;
-        let gold=0, silver=0, eggsInDepo=0, maxDepo=2000000;
+        let tg = window.Telegram.WebApp; tg.expand();
+        let gold=0, silver=500, depo=0, maxDepo=2000000;
         
+        // ÖZGÜN KUŞ KADROSU
         const birdTypes = [
-            { name: "Baby", img: "🐥", rate: 42, cost: 1000, color: "#f1c40f" },
-            { name: "Green", img: "🦜", rate: 221, cost: 5000, color: "#2ecc71" },
-            { name: "Yellow", img: "🐤", rate: 1160, cost: 25000, color: "#f39c12" },
-            { name: "Blue", img: "🐦", rate: 6091, cost: 125000, color: "#3498db" },
-            { name: "Red", img: "🏮", rate: 31979, cost: 625000, color: "#e74c3c" }
+            { id: 1, name: "SARI KANAT", img: "🐥", rate: 50, cost: 1000 },
+            { id: 2, name: "ZÜMRÜT SAVAŞÇI", img: "🦜", rate: 250, cost: 5000 },
+            { id: 3, name: "ALTIN PENÇE", img: "🐤", rate: 1200, cost: 25000 },
+            { id: 4, name: "GÖK MİRALAYI", img: "🐦", rate: 6500, cost: 125000 },
+            { id: 5, name: "KIZIL HAN", img: "🏮", rate: 35000, cost: 750000 }
         ];
 
-        let myBirds = [birdTypes[0]]; // Başlangıç kuşu
+        let myBirds = [birdTypes[0]]; // Başlangıçta 1 adet Sarı Kanat
 
         function init() {
             renderNests();
@@ -97,55 +107,97 @@
             updateUI();
         }
 
+        function show(s) {
+            document.querySelectorAll('.screen').forEach(x => x.classList.remove('active'));
+            document.getElementById('s-'+s).classList.add('active');
+            document.querySelectorAll('.nav-item').forEach(x => x.classList.remove('active'));
+            // Navigasyon aktifi burada ayarlanabilir
+        }
+
         function renderNests() {
-            const grid = document.getElementById('main-nest');
-            grid.innerHTML = "";
-            myBirds.forEach(b => {
-                grid.innerHTML += `
-                    <div class="nest">
+            const container = document.getElementById('nest-container');
+            container.innerHTML = "";
+            myBirds.forEach((b, index) => {
+                container.innerHTML += `
+                    <div class="nest" id="nest-${index}">
                         <div class="bird-img" onclick="vibrate()">${b.img}</div>
-                        <div class="bird-label">${b.name}</div>
-                        <div style="font-size:9px; color:#999">${b.rate}/saat</div>
-                    </div>`;
+                        <div class="bird-name">${b.name}</div>
+                        <div class="bird-prod">${b.rate}/saat</div>
+                    </div>
+                `;
             });
         }
 
         function renderMarket() {
             const list = document.getElementById('market-list');
+            list.innerHTML = "";
             birdTypes.forEach(b => {
                 list.innerHTML += `
-                    <div style="background:#111; padding:15px; border-radius:15px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; border:1px solid #333">
-                        <div><b>${b.img} ${b.name}</b><br><small>${b.rate} Yumurta/Saat</small></div>
-                        <button class="btn" style="width:auto; padding:5px 15px;" onclick="buyBird('${b.name}')">${b.cost} Gümüş</button>
-                    </div>`;
+                    <div class="market-card">
+                        <div><span style="font-size:30px">${b.img}</span> <b>${b.name}</b><br><small>${b.rate} Yumurta/Saat</small></div>
+                        <button class="btn" style="width:auto; padding:8px 12px;" onclick="buyBird(${b.id})">${b.cost} Gümüş</button>
+                    </div>
+                `;
             });
         }
 
         function collectToDepo() {
-            let totalProduced = myBirds.reduce((a, b) => a + b.rate, 0) / 10; // Örnek toplama
-            eggsInDepo = Math.min(maxDepo, eggsInDepo + totalProduced);
-            updateUI();
+            // Animasyonlu toplama
+            myBirds.forEach((b, i) => {
+                const nest = document.getElementById(`nest-${i}`);
+                if(!nest) return;
+                const rect = nest.getBoundingClientRect();
+                const egg = document.createElement('div');
+                egg.className = 'egg-particle';
+                egg.innerText = '🥚';
+                egg.style.left = rect.left + (rect.width/2) + 'px';
+                egg.style.top = rect.top + (rect.height/2) + 'px';
+                document.body.appendChild(egg);
+
+                setTimeout(() => {
+                    egg.style.left = '50%';
+                    egg.style.top = (window.innerHeight - 150) + 'px';
+                    egg.style.opacity = '0';
+                }, 50);
+
+                setTimeout(() => {
+                    depo = Math.min(maxDepo, depo + (b.rate / 60)); // Basit üretim mantığı
+                    updateUI();
+                    egg.remove();
+                }, 750);
+            });
             tg.HapticFeedback.notificationOccurred('success');
         }
 
         function sellEggs() {
-            if(eggsInDepo <= 0) return tg.showAlert("Depo boş!");
-            silver += Math.floor(eggsInDepo / 100); // 100 yumurta = 1 Gümüş
-            eggsInDepo = 0;
+            if(depo < 100) return tg.showAlert("Satış için en az 100 yumurta gerekli!");
+            let earned = Math.floor(depo / 100);
+            silver += earned;
+            depo = 0;
             updateUI();
-            tg.showAlert("Yumurtalar satıldı! Gümüş kazanıldı.");
+            tg.showConfirm(`${earned} Gümüş kazandın! Bakiyene eklendi.`);
+        }
+
+        function buyBird(id) {
+            const b = birdTypes.find(x => x.id === id);
+            if(silver >= b.cost) {
+                silver -= b.cost;
+                myBirds.push(b);
+                renderNests();
+                updateUI();
+                tg.showAlert(`${b.name} satın alındı! Kümesine eklendi.`);
+            } else {
+                tg.showAlert("Yetersiz Gümüş!");
+            }
         }
 
         function updateUI() {
             document.getElementById('h-gold').innerText = gold;
-            document.getElementById('h-silver').innerText = silver;
-            document.getElementById('depo-count').innerText = Math.floor(eggsInDepo).toLocaleString();
-            document.getElementById('depo-fill').style.width = (eggsInDepo / maxDepo * 100) + "%";
-        }
-
-        function show(s) {
-            document.querySelectorAll('.screen').forEach(x => x.classList.remove('active'));
-            document.getElementById('s-'+s).classList.add('active');
+            document.getElementById('h-silver').innerText = silver.toLocaleString();
+            document.getElementById('h-power').innerText = myBirds.reduce((a, b) => a + b.rate, 0);
+            document.getElementById('depo-val').innerText = Math.floor(depo).toLocaleString();
+            document.getElementById('depo-max').innerText = maxDepo.toLocaleString();
+            document.getElementById('depo-bar').style.width = (depo/maxDepo*100) + "%";
         }
 
         function vibrate() { tg.HapticFeedback.impactOccurred('medium'); }
