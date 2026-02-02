@@ -3,99 +3,97 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Gogircin Admin Bot - Zümrüdü Anka</title>
+    <title>Gogircin Admin Bot - Anka Elite</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        :root { --neon: #00f2ff; --pink: #ff00ff; --gold: #ffd700; --bg: #03040a; --glass: rgba(255, 255, 255, 0.05); }
-        body { margin: 0; background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
+        :root { --neon: #00f2ff; --gold: #ffd700; --fire: #ff4500; --bg: #0a0b14; }
+        body { margin: 0; background: var(--bg); color: white; font-family: 'Inter', sans-serif; overflow: hidden; }
         
-        .screen { display: none; height: 100vh; width: 100vw; position: absolute; overflow-y: auto; padding-bottom: 80px; }
-        .active { display: block; }
+        /* HEADER & STATUS */
+        .header { background: rgba(255,255,255,0.03); padding: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(0,242,255,0.2); }
+        .ton-badge { background: linear-gradient(90deg, #0088cc, #00f2ff); padding: 5px 12px; border-radius: 20px; font-weight: bold; font-size: 14px; }
 
-        /* GÖKYÜZÜ */
-        #sky { height: 50vh; position: relative; background: radial-gradient(circle at center, #1a1f3c 0%, #03040a 100%); overflow: hidden; border-bottom: 2px solid var(--neon); }
-        .bird { position: absolute; font-size: 40px; transition: 3s ease-in-out; filter: drop-shadow(0 0 10px var(--neon)); z-index: 10; }
-        .anka-effect { filter: drop-shadow(0 0 25px var(--gold)) !important; font-size: 65px !important; }
+        /* SKY & ANIMATION */
+        #sky { height: 40vh; position: relative; overflow: hidden; background: radial-gradient(circle at center, #1c234a 0%, #0a0b14 100%); }
+        .bird { position: absolute; transition: 4s linear; z-index: 10; font-size: 40px; }
+        .anka-bird { font-size: 80px !important; filter: drop-shadow(0 0 20px var(--fire)); z-index: 20; }
 
-        /* PANEL TASARIMI */
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 15px; }
-        .stat-card { background: var(--glass); padding: 15px; border-radius: 15px; border: 1px solid rgba(0,242,255,0.2); text-align: center; }
-        .stat-value { display: block; font-size: 1.2rem; font-weight: bold; color: var(--neon); }
+        /* SHOP GRID (AI TASARIM) */
+        .shop-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 15px; height: 45vh; overflow-y: auto; }
+        .bird-card { background: #161b2e; border-radius: 15px; border: 1px solid #252a41; padding: 10px; text-align: center; transition: 0.3s; }
+        .bird-card img { width: 100%; border-radius: 10px; margin-bottom: 10px; height: 80px; object-fit: cover; }
+        .bird-card h4 { margin: 5px 0; font-size: 14px; }
+        .bird-card p { font-size: 11px; color: #888; margin: 5px 0; }
 
-        /* MAĞAZA KARTLARI */
-        .shop-card { background: #121526; margin: 15px; border-radius: 20px; overflow: hidden; border: 1px solid #222; transition: 0.3s; }
-        .shop-card:active { transform: scale(0.98); }
-        .bird-img { width: 100%; height: 150px; object-fit: cover; border-bottom: 1px solid #333; }
-        .card-content { padding: 15px; }
+        /* BUTTONS */
+        .btn { width: 100%; padding: 10px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; font-size: 12px; }
+        .btn-buy { background: var(--neon); color: #000; margin-bottom: 5px; }
+        .btn-ad { background: #ff00ff; color: white; }
 
-        .btn { width: 100%; padding: 12px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; margin-top: 8px; font-size: 14px; }
-        .btn-ton { background: linear-gradient(45deg, #0088cc, #00aaff); color: white; }
-        .btn-ad { background: linear-gradient(45deg, #ff00ff, #800080); color: white; }
-        
+        /* ANKA SATIN ALMA EFEKTİ */
+        #anka-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 5000; display: none; align-items: center; justify-content: center; flex-direction: column; animation: fadeIn 0.5s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .fire-text { font-size: 30px; font-weight: bold; color: var(--fire); text-shadow: 0 0 20px var(--fire); text-align: center; }
+
         /* NAV BAR */
-        .nav-bar { position: fixed; bottom: 0; width: 100%; background: rgba(10, 12, 22, 0.95); display: flex; justify-content: space-around; padding: 12px 0; border-top: 1px solid var(--neon); backdrop-filter: blur(10px); }
-        .nav-item { color: #888; font-size: 11px; text-align: center; }
-        .nav-item.active { color: var(--neon); text-shadow: 0 0 10px var(--neon); }
-
-        /* CEBİNDEN ÖDEME YAPMAMA UYARISI */
-        #payout-info { font-size: 10px; color: #666; text-align: center; margin-top: 10px; }
+        .nav { position: fixed; bottom: 0; width: 100%; background: #0f1221; display: flex; justify-content: space-around; padding: 15px 0; border-top: 1px solid var(--neon); }
     </style>
 </head>
 <body>
 
-    <div id="home" class="screen active">
+    <div id="anka-overlay">
+        <div class="fire-text">🔥 EFSANE DOĞDU! 🔥<br>ZÜMRÜDÜ ANKA SİZİNLE</div>
+        <img src="https://i.ibb.co/Jz1Q1XQ/Z-mr-d-Anka.png" style="width: 80%; margin-top: 20px; filter: drop-shadow(0 0 30px var(--fire));">
+    </div>
+
+    <div class="header">
+        <div style="font-weight:bold; color:var(--neon)">@GogircinAdminBot</div>
+        <div class="ton-badge" id="gold-txt">0.00 TON</div>
+    </div>
+
+    <div id="home" class="screen">
         <div id="sky"></div>
-        <div class="stats-grid">
-            <div class="stat-card"><span>🥚 DEPO</span><span class="stat-value" id="egg-txt">0</span></div>
-            <div class="stat-card"><span>⚡ ENERJİ</span><span class="stat-value" id="en-txt">100%</span></div>
-            <div class="stat-card" style="grid-column: span 2;">
-                <span>💰 ÇEKİLEBİLİR BAKİYE</span>
-                <span class="stat-value" style="color:var(--gold)" id="gold-txt">0.00 TON</span>
+        <div style="padding: 15px; background: #0f1221; border-radius: 20px 20px 0 0; margin-top: -20px; position: relative;">
+            <div style="display:flex; justify-content:space-between; margin-bottom: 15px;">
+                <span>🥚 DEPO: <b id="egg-txt">0</b></span>
+                <span>⚡ ENERJİ: <b id="en-txt">100%</b></span>
             </div>
-        </div>
-        <div style="padding: 0 15px;">
-            <button class="btn" style="background:var(--neon); color:#000" onclick="collect()">🧺 HASADI TOPLA & SAT</button>
+            <button class="btn btn-buy" style="height: 50px; font-size: 16px;" onclick="collect()">🧺 HASADI TOPLA VE NAKDE ÇEVİR</button>
         </div>
     </div>
 
-    <div id="shop" class="screen">
-        <h2 style="text-align:center; color:var(--neon)">KUŞ PAZARI</h2>
-        
-        <div class="shop-card">
-            <img src="https://via.placeholder.com/400x150/ffcc00/000?text=Sari+Kanat" class="bird-img">
-            <div class="card-content">
-                <h3>🐥 SARI KANAT</h3>
-                <p>Üretim: 42/Saat</p>
-                <button class="btn btn-ad" onclick="buyBird('ad', 42, '🐥')">📺 REKLAM İZLE & AL</button>
+    <div id="shop" class="screen" style="display:none">
+        <div class="shop-grid">
+            <div class="bird-card">
+                <img src="https://i.ibb.co/C07Bf5x/Siber-Serce.png">
+                <h4>Siber Serçe</h4>
+                <p>Hız: 50/s</p>
+                <button class="btn btn-ad" onclick="buy('ad', 50, '🐦')">📺 REKLAMLA AL</button>
+            </div>
+            <div class="bird-card" style="border-color: var(--fire); grid-column: span 2;">
+                <img src="https://i.ibb.co/Jz1Q1XQ/Z-mr-d-Anka.png" style="height: 150px;">
+                <h4 style="color:var(--fire)">ZÜMRÜDÜ ANKA</h4>
+                <p>Hız: 50,000/s + VIP STATÜSÜ</p>
+                <button class="btn btn-buy" style="background:var(--fire); color:white" onclick="buy('ton', 50000, '🔥')">💎 25 TON İLE SATIN AL</button>
+                <button class="btn btn-ad" onclick="buy('anka_ad', 50000, '🔥')">📺 150 REKLAMLA AL</button>
             </div>
         </div>
-
-        <div class="shop-card" style="border-color: var(--gold)">
-            <img src="https://i.ibb.co/Jz1Q1XQ/Z-mr-d-Anka.png" class="bird-img">
-            <div class="card-content">
-                <h3 style="color:var(--gold)">🔥 ZÜMRÜDÜ ANKA (VIP)</h3>
-                <p>Üretim: 50,000/Saat</p>
-                <button class="btn btn-ton" onclick="buyBird('ton', 50000, '🔥')">💎 25 TON İLE AL</button>
-                <button class="btn btn-ad" onclick="buyBird('ad_anka', 50000, '🔥')">📺 150 REKLAMLA AL</button>
-            </div>
-        </div>
-        <p id="payout-info">Ödemeler reklam gelirlerinden karşılanır. Cebinizden ödeme yapmanız gerekmez.</p>
     </div>
 
-    <div class="nav-bar">
-        <div class="nav-item active" onclick="show('home')">🏠 KÜMES</div>
-        <div class="nav-item" onclick="show('shop')">🛒 MARKET</div>
-        <div class="nav-item" onclick="show('ref')">👥 REF</div>
+    <div class="nav">
+        <div onclick="toggle('home')">🏠 KÜMES</div>
+        <div onclick="toggle('shop')">🛒 MARKET</div>
+        <div onclick="tg.close()">❌ ÇIKIŞ</div>
     </div>
 
     <script>
         let tg = window.Telegram.WebApp; tg.expand();
-        let eggs = 0, energy = 100, gold = 0, adsWatched = 0;
+        let eggs = 0, energy = 100, gold = 0;
         let birds = [{img: "🐦", rate: 100, isAnka: false}];
 
-        function show(id) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
+        function toggle(id) {
+            document.getElementById('home').style.display = id === 'home' ? 'block' : 'none';
+            document.getElementById('shop').style.display = id === 'shop' ? 'block' : 'none';
         }
 
         function initSky() {
@@ -103,57 +101,49 @@
             sky.innerHTML = "";
             birds.forEach(b => {
                 const d = document.createElement('div');
-                d.className = `bird ${b.isAnka ? 'anka-effect' : ''}`;
+                d.className = `bird ${b.isAnka ? 'anka-bird' : ''}`;
                 d.innerText = b.img;
                 sky.appendChild(d);
-                animateBird(d);
+                animate(d);
             });
         }
 
-        function animateBird(el) {
-            const move = () => {
-                el.style.left = Math.random() * 85 + "%";
-                el.style.top = Math.random() * 75 + "%";
-            };
-            move();
-            setInterval(move, 4000);
+        function animate(el) {
+            const m = () => { el.style.left = Math.random()*80+"%"; el.style.top = Math.random()*70+"%"; };
+            m(); setInterval(m, 4000);
         }
 
-        // ÜRETİM DÖNGÜSÜ
         setInterval(() => {
             if(energy > 0) {
-                let totalRate = birds.reduce((a, b) => a + b.rate, 0);
-                eggs += (totalRate / 3600);
-                energy -= 0.05;
+                let r = birds.reduce((a, b) => a + b.rate, 0);
+                eggs += (r / 3600);
+                energy -= 0.01;
             }
             document.getElementById('egg-txt').innerText = Math.floor(eggs);
             document.getElementById('en-txt').innerText = Math.floor(energy) + "%";
-            document.getElementById('gold-txt').innerText = gold.toFixed(2) + " TON";
+            document.getElementById('gold-txt').innerText = gold.toFixed(3) + " TON";
         }, 1000);
 
-        function buyBird(type, rate, img) {
-            if(type === 'ad' || type === 'ad_anka') {
-                adsWatched++;
-                birds.push({img: img, rate: rate, isAnka: type === 'ad_anka'});
-                initSky();
-                tg.showAlert("Reklam izlendi ve kuş kümese eklendi!");
+        function buy(type, rate, img) {
+            if(type === 'ton' || type === 'anka_ad') {
+                // ANKA EFEKTİ
+                document.getElementById('anka-overlay').style.display = 'flex';
+                setTimeout(() => {
+                    document.getElementById('anka-overlay').style.display = 'none';
+                    birds.push({img: img, rate: rate, isAnka: true});
+                    initSky();
+                }, 3000);
             } else {
-                tg.showConfirm(rate + " hızlı kuş için TON ödemesi yapılsın mı?", (ok) => {
-                    if(ok) {
-                        birds.push({img: img, rate: rate, isAnka: true});
-                        initSky();
-                    }
-                });
+                birds.push({img: img, rate: rate, isAnka: false});
+                initSky();
+                tg.showAlert("Kuş eklendi!");
             }
         }
 
         function collect() {
-            if(eggs < 10) { tg.showAlert("Toplamak için biraz daha birikmeli!"); return; }
-            // Yumurtayı Altına/TON'a çevirme mantığı
-            let earnedGold = (eggs / 10000); 
-            gold += earnedGold;
-            eggs = 0;
-            tg.showAlert("Hasat satıldı! +" + earnedGold.toFixed(4) + " TON kazandın.");
+            let gain = (eggs / 50000);
+            gold += gain; eggs = 0;
+            tg.showAlert("Hasat toplandı! " + gain.toFixed(4) + " TON kazandın.");
         }
 
         initSky();
