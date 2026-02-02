@@ -3,114 +3,135 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Gogircin Titan Pro - Elite</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <title>Kuş Oyunu</title>
     <style>
-        :root { --neon: #00f2ff; --gold: #ffd700; --fire: #ff4500; --bg: #05060d; }
-        body { margin: 0; background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
-        
-        .header { background: #0d1117; padding: 15px; border-bottom: 2px solid var(--neon); display: flex; justify-content: space-between; }
-        .ton-box { color: var(--neon); font-weight: bold; }
-
-        /* OYUN ALANI */
-        #game-area { height: 40vh; position: relative; background: radial-gradient(circle, #1a234e 0%, #05060d 100%); overflow: hidden; }
-        .bird-icon { position: absolute; width: 60px; transition: 4s linear; z-index: 10; }
-        .vip-effect { filter: drop-shadow(0 0 15px var(--fire)); width: 120px !important; }
-
-        /* PANEL */
-        .panel { padding: 20px; background: #11141d; border-radius: 25px 25px 0 0; margin-top: -25px; position: relative; }
-        .stat { font-size: 14px; color: #888; }
-        .val { color: #fff; font-weight: bold; font-size: 18px; }
-
-        /* MARKET */
-        .shop { height: 40vh; overflow-y: auto; padding: 15px; }
-        .item { background: #1c1f2e; padding: 15px; border-radius: 15px; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; border: 1px solid #333; }
-        .item img { width: 50px; border-radius: 8px; }
-        
-        .btn { padding: 10px 15px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; }
-        .btn-ad { background: #ff00ff; color: white; }
-        .btn-ton { background: var(--neon); color: black; }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #87CEEB; /* Mavi gökyüzü */
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+        .header {
+            background-color: #333;
+            color: #fff;
+            padding: 10px;
+            text-align: center;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .balance-container {
+            display: flex;
+            align-items: center;
+        }
+        .balance-icon {
+            width: 20px;
+            height: 20px;
+            margin-right: 5px;
+        }
+        .game-area {
+            position: relative;
+            width: 100%;
+            height: 50vh;
+            background: url('https://i.ibb.co/6PqjXfP/sky.png') center/cover no-repeat; /* Arka plan resmi */
+        }
+        .bird-nest {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+        .bird-icon {
+            width: 60px;
+            height: 60px;
+            position: absolute;
+            transition: 2s ease-in-out;
+            z-index: 10;
+        }
+        .panel {
+            background-color: #fff;
+            padding: 20px;
+            text-align: center;
+            border-radius: 10px;
+            margin: 10px;
+        }
+        .shop {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 10px;
+        }
+        .item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        .item img {
+            width: 50px;
+            height: 50px;
+            margin-right: 10px;
+        }
+        .btn {
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            border: none;
+            font-weight: bold;
+        }
+        .btn-ad {
+            background-color: #ff00ff;
+            color: white;
+        }
+        .btn-ton {
+            background-color: #00f2ff;
+            color: black;
+        }
+        .egg-basket {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 150px;
+            height: 100px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            background-image: url('https://i.ibb.co/hFj4y0q/egg-basket.png');
+        }
     </style>
 </head>
 <body>
-
     <div class="header">
-        <span>@GogircinAdminBot</span>
-        <span class="ton-box" id="balance">0.000 TON</span>
+        <span>Kuş Oyunu</span>
+        <div class="balance-container">
+            <img class="balance-icon" src="https://i.ibb.co/6PqjXfP/star.png" alt="Star">
+            <span id="balance">446</span>
+        </div>
     </div>
-
-    <div id="game-area"></div>
-
+    <div id="game-area">
+        <div class="bird-nest" style="background-image: url('https://i.ibb.co/Wc63V0d/nest.png'); top: 10%; left: 10%;"></div>
+        <div class="bird-nest" style="background-image: url('https://i.ibb.co/Wc63V0d/nest.png'); top: 10%; right: 10%;"></div>
+        <div class="bird-nest" style="background-image: url('https://i.ibb.co/Wc63V0d/nest.png'); top: 40%; left: 25%;"></div>
+        <div class="bird-nest" style="background-image: url('https://i.ibb.co/Wc63V0d/nest.png'); top: 40%; right: 25%;"></div>
+        <div class="bird-nest" style="background-image: url('https://i.ibb.co/Wc63V0d/nest.png'); top: 70%; left: 35%;"></div>
+        <div class="egg-basket"></div>
+    </div>
     <div class="panel">
         <div style="display:flex; justify-content:space-between">
-            <div><span class="stat">🥚 YUMURTA</span><br><span class="val" id="egg-val">0</span></div>
-            <div><span class="stat">⚡ ENERJİ</span><br><span class="val" id="en-val">100%</span></div>
+            <div><span class="stat">🥚 YUMURTA</span><br><span class="val" id="egg-val">968k</span></div>
+            <div><span class="stat">⚡ KAMP</span><br><span class="val" id="en-val">1g 13s</span></div>
         </div>
         <button class="btn btn-ton" style="width:100%; margin-top:15px;" onclick="collect()">HASADI TOPLA & SAT</button>
     </div>
-
     <div class="shop">
-        <div class="item">
-            <img src="https://i.ibb.co/C07Bf5x/Siber-Serce.png">
-            <div><b>Siber Serçe</b><br><small>Hız: 50/s</small></div>
-            <button class="btn btn-ad" onclick="buy('ad', 50, 'https://i.ibb.co/C07Bf5x/Siber-Serce.png', false)">📺 REKLAM İZLE</button>
         </div>
-
-        <div class="item" style="border-color: var(--gold)">
-            <img src="https://i.ibb.co/Jz1Q1XQ/Z-mr-d-Anka.png">
-            <div><b style="color:var(--gold)">ZÜMRÜDÜ ANKA</b><br><small>Hız: 50,000/s</small></div>
-            <button class="btn btn-ton" onclick="buy('ton', 50000, 'https://i.ibb.co/Jz1Q1XQ/Z-mr-d-Anka.png', true)">💎 25 TON</button>
-        </div>
-    </div>
-
     <script>
-        let tg = window.Telegram.WebApp; tg.expand();
-        let eggs = 0, energy = 100, ton = 0;
-        let birds = [];
-
-        function buy(type, rate, img, isVip) {
-            if(type === 'ad') {
-                tg.showAlert("Video reklam izleniyor... (Simülasyon)");
-                // Burada reklam izletme kodun (AdSense vb.) devreye girecek
-                addBird(rate, img, isVip);
-            } else {
-                tg.showConfirm("25 TON karşılığında VIP Anka alınsın mı?", (ok) => {
-                    if(ok) addBird(rate, img, isVip);
-                });
-            }
-        }
-
-        function addBird(rate, img, isVip) {
-            birds.push({rate, img, isVip});
-            const el = document.createElement('img');
-            el.src = img;
-            el.className = `bird-icon ${isVip ? 'vip-effect' : ''}`;
-            document.getElementById('game-area').appendChild(el);
-            move(el);
-        }
-
-        function move(el) {
-            el.style.left = Math.random()*80 + "%";
-            el.style.top = Math.random()*70 + "%";
-            setTimeout(() => move(el), 4000);
-        }
-
-        setInterval(() => {
-            if(energy > 0 && birds.length > 0) {
-                let total = birds.reduce((s, b) => s + b.rate, 0);
-                eggs += (total / 3600);
-                energy -= 0.05;
-            }
-            document.getElementById('egg-val').innerText = Math.floor(eggs);
-            document.getElementById('en-val').innerText = Math.floor(energy) + "%";
-            document.getElementById('balance').innerText = ton.toFixed(3) + " TON";
-        }, 1000);
-
-        function collect() {
-            ton += (eggs / 100000); // Satış oranı
-            eggs = 0;
-            tg.showAlert("Hasat başarıyla nakde çevrildi!");
-        }
+        // JavaScript kodları buraya gelecek
     </script>
 </body>
 </html>
