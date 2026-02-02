@@ -6,203 +6,178 @@
     <title>Gogircin Titan Pro</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        :root { --cyan: #00f2ff; --pink: #ff00ff; --gold: #ffd700; --bg: #0a0b10; --silver: #bdc3c7; }
-        body { 
-            background: var(--bg); background-image: radial-gradient(circle at 50% 50%, #1a1b26 0%, #0a0b10 100%);
-            color: white; font-family: 'Segoe UI', sans-serif; margin: 0; overflow: hidden; touch-action: manipulation;
-        }
-        
-        /* Üst Panel */
-        .header { display: flex; justify-content: space-around; padding: 15px 5px; background: rgba(0,0,0,0.9); border-bottom: 2px solid var(--cyan); position: fixed; top: 0; width: 100%; z-index: 100; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
-        .stat-box { text-align: center; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; }
-        .stat-val { display: block; font-size: 15px; color: var(--gold); font-weight: bold; margin-top: 3px; }
-
-        .screen { display: none; height: 100vh; padding: 95px 15px 100px; box-sizing: border-box; flex-direction: column; overflow-y: auto; }
+        :root { --cyan: #00f2ff; --pink: #ff00ff; --gold: #ffd700; --bg: #0a0b10; }
+        body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; margin: 0; overflow: hidden; touch-action: manipulation; }
+        .header { display: flex; justify-content: space-around; padding: 15px 5px; background: rgba(0,0,0,0.9); border-bottom: 2px solid var(--cyan); position: fixed; top: 0; width: 100%; z-index: 100; }
+        .stat-box { text-align: center; }
+        .stat-val { display: block; font-size: 15px; color: var(--gold); font-weight: bold; }
+        .screen { display: none; height: 100vh; padding: 90px 15px 90px; box-sizing: border-box; flex-direction: column; overflow-y: auto; }
         .screen.active { display: flex; }
+        
+        /* KUŞLAR VE ÜRETİM */
+        .nest-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .nest { background: rgba(255,255,255,0.03); border: 1px solid #333; border-radius: 20px; padding: 10px; text-align: center; position: relative; }
+        .bird-img { font-size: 45px; animation: süzül 3s ease-in-out infinite; }
+        @keyframes süzül { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        .bird-prod { font-size: 10px; color: var(--pink); font-family: monospace; margin-top: 5px; }
 
-        /* KÜMES & KUŞLAR */
-        .nest-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 5px; }
-        .nest { 
-            height: 160px; background: rgba(255,255,255,0.03); border: 1px solid #333; border-radius: 25px; 
-            display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative;
-            transition: 0.3s;
-        }
-        .bird-img { font-size: 55px; filter: drop-shadow(0 0 10px var(--cyan)); animation: floating 3s ease-in-out infinite; cursor: pointer; }
-        @keyframes floating { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
-        .bird-name { font-size: 11px; color: var(--cyan); font-weight: bold; margin-top: 8px; }
-        .bird-prod { font-size: 9px; color: #888; }
-
-        /* YUMURTA PARÇACIĞI */
-        .egg-particle { position: absolute; font-size: 20px; z-index: 200; pointer-events: none; transition: all 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-
-        /* DEPO VE AKSİYON PANELİ */
-        .control-panel { background: rgba(0,0,0,0.7); border: 1px solid #444; border-radius: 30px; padding: 15px; margin-top: auto; text-align: center; }
-        .storage-info { font-size: 13px; color: var(--cyan); margin-bottom: 8px; font-weight: bold; }
-        .bar-bg { width: 100%; height: 12px; background: #111; border-radius: 6px; border: 1px solid #333; overflow: hidden; margin-bottom: 12px; }
-        .bar-fill { height: 100%; background: linear-gradient(90deg, var(--cyan), var(--pink)); width: 0%; transition: 0.5s; }
-
-        /* BUTONLAR */
-        .btn { background: linear-gradient(45deg, var(--cyan), #0088cc); border: none; color: #000; padding: 14px; width: 100%; border-radius: 15px; font-weight: bold; font-size: 14px; margin: 5px 0; box-shadow: 0 4px 10px rgba(0,242,255,0.2); }
+        /* DEPO VE AKSİYON */
+        .storage-card { background: rgba(0,0,0,0.8); border: 1px solid #444; border-radius: 25px; padding: 15px; margin-top: auto; }
+        .bar-bg { width: 100%; height: 10px; background: #111; border-radius: 5px; margin: 8px 0; overflow: hidden; }
+        .bar-fill { height: 100%; background: var(--cyan); width: 0%; transition: 0.3s; }
+        
+        .btn { background: linear-gradient(45deg, var(--cyan), #0088cc); border: none; color: #000; padding: 12px; border-radius: 12px; font-weight: bold; width: 100%; margin: 4px 0; font-size: 13px; }
+        .btn-vid { background: linear-gradient(45deg, var(--pink), #9000ff); color: white; }
         .btn-sell { background: linear-gradient(45deg, #2ecc71, #27ae60); color: white; }
 
-        /* MARKET KARTLARI */
-        .market-card { background: #111; padding: 15px; border-radius: 20px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #222; }
-
-        /* NAVİGASYON */
-        .nav { position: fixed; bottom: 0; width: 100%; height: 75px; background: #000; display: flex; justify-content: space-around; border-top: 1px solid #222; box-shadow: 0 -5px 15px rgba(0,0,0,0.5); }
-        .nav-item { color: #555; font-size: 10px; text-align: center; padding-top: 15px; flex: 1; text-decoration: none; }
-        .nav-item.active { color: var(--cyan); font-weight: bold; }
+        .market-item { background: #111; padding: 12px; border-radius: 15px; margin-bottom: 10px; border: 1px solid #222; }
+        .nav { position: fixed; bottom: 0; width: 100%; height: 70px; background: #000; display: flex; justify-content: space-around; border-top: 1px solid #333; }
+        .nav-item { color: #555; font-size: 10px; text-align: center; padding-top: 15px; flex: 1; }
+        .nav-item.active { color: var(--cyan); }
     </style>
 </head>
 <body>
 
-    <div class="header" id="main-header">
-        <div class="stat-box">🟡 ALTIN<span class="stat-val" id="h-gold">0</span></div>
+    <div class="header">
         <div class="stat-box">🥈 GÜMÜŞ<span class="stat-val" id="h-silver">0</span></div>
+        <div class="stat-box">🥚 DEPO<span class="stat-val" id="h-depo">0</span></div>
         <div class="stat-box">⚡ GÜÇ<span class="stat-val" id="h-power" style="color:var(--pink)">0</span></div>
     </div>
 
     <div id="s-game" class="screen active">
-        <div class="nest-grid" id="nest-container">
+        <div class="nest-grid" id="nest-container"></div>
+        <div class="storage-card">
+            <div style="font-size:12px; color:var(--cyan); display:flex; justify-content:space-between">
+                <span>Depo Kapasitesi</span><span id="depo-percent">%0</span>
             </div>
-
-        <div class="control-panel">
-            <div class="storage-info">DEPO: <span id="depo-val">0</span> / <span id="depo-max">2,000,000</span></div>
             <div class="bar-bg"><div class="bar-fill" id="depo-bar"></div></div>
-            <button class="btn" onclick="collectToDepo()">🧺 YUMURTALARI TOPLA</button>
-            <button class="btn btn-sell" onclick="sellEggs()">💰 YUMURTALARI SAT (TAKAS)</button>
+            <div style="text-align:center; font-size:14px; margin-bottom:10px;"><span id="cur-depo">0</span> / <span id="max-depo">2,000,000</span></div>
+            <button class="btn" onclick="collectAll()">🧺 YUMURTALARI TOPLA</button>
+            <button class="btn btn-sell" onclick="sellAll()">💰 YUMURTALARI SAT (TAKAS)</button>
         </div>
     </div>
 
     <div id="s-market" class="screen">
-        <h2 style="color:var(--cyan); text-align:center;">TITAN PAZARI</h2>
+        <h2 style="color:var(--cyan); text-align:center">TITAN MARKET</h2>
         <div id="market-list"></div>
     </div>
 
     <div class="nav">
         <div class="nav-item active" onclick="show('game')">🏠<br>KÜMES</div>
         <div class="nav-item" onclick="show('market')">🛒<br>MARKET</div>
-        <div class="nav-item" onclick="tg.showAlert('Referans sistemi bakımda!')">👥<br>REF</div>
-        <div class="nav-item" onclick="tg.showAlert('Profil yakında!')">👤<br>PROFİL</div>
     </div>
 
     <script>
         let tg = window.Telegram.WebApp; tg.expand();
-        let gold=0, silver=500, depo=0, maxDepo=2000000;
+        let silver = 500, depo = 0, maxDepo = 2000000;
         
-        // ÖZGÜN KUŞ KADROSU
-        const birdTypes = [
-            { id: 1, name: "SARI KANAT", img: "🐥", rate: 50, cost: 1000 },
-            { id: 2, name: "ZÜMRÜT SAVAŞÇI", img: "🦜", rate: 250, cost: 5000 },
-            { id: 3, name: "ALTIN PENÇE", img: "🐤", rate: 1200, cost: 25000 },
-            { id: 4, name: "GÖK MİRALAYI", img: "🐦", rate: 6500, cost: 125000 },
-            { id: 5, name: "KIZIL HAN", img: "🏮", rate: 35000, cost: 750000 }
+        // GÖRSELLERDEKİ NET RAKAMLAR
+        const birdData = [
+            { id: 0, name: "SARI KANAT", img: "🐥", rate: 42, cost: 1000, ads: 4, ton: 0.1 },
+            { id: 1, name: "ZÜMRÜT SAVAŞÇI", img: "🦜", rate: 221, cost: 5000, ads: 8, ton: 0.5 },
+            { id: 2, name: "ALTIN PENÇE", img: "🐤", rate: 1160, cost: 25000, ads: 15, ton: 2.5 },
+            { id: 3, name: "GÖK MİRALAYI", img: "🐦", rate: 6091, cost: 125000, ads: 25, ton: 12.5 },
+            { id: 4, name: "KIZIL HAN (VIP)", img: "🔥", rate: 31979, cost: 625000, ads: 40, ton: 62.5 }
         ];
 
-        let myBirds = [birdTypes[0]]; // Başlangıçta 1 adet Sarı Kanat
-
-        function init() {
-            renderNests();
-            renderMarket();
-            updateUI();
-        }
+        let myBirds = [{...birdData[0], prod: 0}];
+        let adProgress = [0,0,0,0,0];
 
         function show(s) {
             document.querySelectorAll('.screen').forEach(x => x.classList.remove('active'));
             document.getElementById('s-'+s).classList.add('active');
-            document.querySelectorAll('.nav-item').forEach(x => x.classList.remove('active'));
-            // Navigasyon aktifi burada ayarlanabilir
         }
 
-        function renderNests() {
-            const container = document.getElementById('nest-container');
-            container.innerHTML = "";
-            myBirds.forEach((b, index) => {
-                container.innerHTML += `
-                    <div class="nest" id="nest-${index}">
-                        <div class="bird-img" onclick="vibrate()">${b.img}</div>
-                        <div class="bird-name">${b.name}</div>
-                        <div class="bird-prod">${b.rate}/saat</div>
-                    </div>
-                `;
-            });
-        }
-
-        function renderMarket() {
-            const list = document.getElementById('market-list');
-            list.innerHTML = "";
-            birdTypes.forEach(b => {
-                list.innerHTML += `
-                    <div class="market-card">
-                        <div><span style="font-size:30px">${b.img}</span> <b>${b.name}</b><br><small>${b.rate} Yumurta/Saat</small></div>
-                        <button class="btn" style="width:auto; padding:8px 12px;" onclick="buyBird(${b.id})">${b.cost} Gümüş</button>
-                    </div>
-                `;
-            });
-        }
-
-        function collectToDepo() {
-            // Animasyonlu toplama
+        function render() {
+            const nestCont = document.getElementById('nest-container');
+            nestCont.innerHTML = "";
             myBirds.forEach((b, i) => {
-                const nest = document.getElementById(`nest-${i}`);
-                if(!nest) return;
-                const rect = nest.getBoundingClientRect();
-                const egg = document.createElement('div');
-                egg.className = 'egg-particle';
-                egg.innerText = '🥚';
-                egg.style.left = rect.left + (rect.width/2) + 'px';
-                egg.style.top = rect.top + (rect.height/2) + 'px';
-                document.body.appendChild(egg);
-
-                setTimeout(() => {
-                    egg.style.left = '50%';
-                    egg.style.top = (window.innerHeight - 150) + 'px';
-                    egg.style.opacity = '0';
-                }, 50);
-
-                setTimeout(() => {
-                    depo = Math.min(maxDepo, depo + (b.rate / 60)); // Basit üretim mantığı
-                    updateUI();
-                    egg.remove();
-                }, 750);
+                nestCont.innerHTML += `<div class="nest">
+                    <div class="bird-img">${b.img}</div>
+                    <div style="font-size:11px; font-weight:bold">${b.name}</div>
+                    <div class="bird-prod" id="bprod-${i}">${Math.floor(b.prod)}</div>
+                </div>`;
             });
-            tg.HapticFeedback.notificationOccurred('success');
+
+            const marketCont = document.getElementById('market-list');
+            marketCont.innerHTML = "";
+            birdData.forEach((b, i) => {
+                marketCont.innerHTML += `
+                <div class="market-item">
+                    <div style="display:flex; justify-content:space-between">
+                        <b>${b.img} ${b.name}</b>
+                        <span style="color:var(--gold)">${b.ton} TON</span>
+                    </div>
+                    <div style="font-size:11px; color:#888; margin:5px 0">Üretim: ${b.rate} 🥚/saat</div>
+                    <div style="display:flex; gap:5px">
+                        <button class="btn btn-vid" onclick="watchAd(${i})">📺 İzle (${adProgress[i]}/${b.ads})</button>
+                        <button class="btn" style="background:var(--gold)" onclick="buyVIP(${i})">💎 VIP AL</button>
+                    </div>
+                </div>`;
+            });
         }
 
-        function sellEggs() {
-            if(depo < 100) return tg.showAlert("Satış için en az 100 yumurta gerekli!");
-            let earned = Math.floor(depo / 100);
-            silver += earned;
+        // ÜRETİM DÖNGÜSÜ
+        setInterval(() => {
+            myBirds.forEach((b, i) => {
+                b.prod += b.rate / 3600;
+                let el = document.getElementById(`bprod-${i}`);
+                if(el) el.innerText = Math.floor(b.prod);
+            });
+            updateUI();
+        }, 1000);
+
+        function collectAll() {
+            let total = 0;
+            myBirds.forEach(b => { total += b.prod; b.prod = 0; });
+            depo = Math.min(maxDepo, depo + total);
+            tg.HapticFeedback.impactOccurred('light');
+            updateUI();
+        }
+
+        function sellAll() {
+            if(depo < 100) return tg.showAlert("Min. 100 yumurta gerekli!");
+            let gain = Math.floor(depo / 100);
+            silver += gain;
             depo = 0;
             updateUI();
-            tg.showConfirm(`${earned} Gümüş kazandın! Bakiyene eklendi.`);
+            tg.showAlert(gain + " Gümüş hesabına geçti!");
         }
 
-        function buyBird(id) {
-            const b = birdTypes.find(x => x.id === id);
-            if(silver >= b.cost) {
-                silver -= b.cost;
-                myBirds.push(b);
-                renderNests();
-                updateUI();
-                tg.showAlert(`${b.name} satın alındı! Kümesine eklendi.`);
-            } else {
-                tg.showAlert("Yetersiz Gümüş!");
-            }
+        function watchAd(id) {
+            tg.showAlert("Video İzleniyor..."); // Burası Adsgram'a bağlanacak
+            setTimeout(() => {
+                adProgress[id]++;
+                if(adProgress[id] >= birdData[id].ads) {
+                    adProgress[id] = 0;
+                    myBirds.push({...birdData[id], prod:0});
+                    tg.showAlert("Tebrikler! " + birdData[id].name + " kümesine eklendi.");
+                }
+                render();
+            }, 2000);
+        }
+
+        function buyVIP(id) {
+            tg.showConfirm(birdData[id].ton + " TON ile anında al?", (ok) => {
+                if(ok) {
+                    myBirds.push({...birdData[id], prod:0});
+                    render();
+                    tg.showAlert("VIP Alım Başarılı!");
+                }
+            });
         }
 
         function updateUI() {
-            document.getElementById('h-gold').innerText = gold;
-            document.getElementById('h-silver').innerText = silver.toLocaleString();
-            document.getElementById('h-power').innerText = myBirds.reduce((a, b) => a + b.rate, 0);
-            document.getElementById('depo-val').innerText = Math.floor(depo).toLocaleString();
-            document.getElementById('depo-max').innerText = maxDepo.toLocaleString();
-            document.getElementById('depo-bar').style.width = (depo/maxDepo*100) + "%";
+            document.getElementById('h-silver').innerText = Math.floor(silver).toLocaleString();
+            document.getElementById('h-depo').innerText = Math.floor(depo).toLocaleString();
+            document.getElementById('h-power').innerText = myBirds.reduce((a,b)=>a+b.rate,0).toLocaleString();
+            document.getElementById('cur-depo').innerText = Math.floor(depo).toLocaleString();
+            let p = (depo/maxDepo*100).toFixed(1);
+            document.getElementById('depo-bar').style.width = p + "%";
+            document.getElementById('depo-percent').innerText = "%" + p;
         }
 
-        function vibrate() { tg.HapticFeedback.impactOccurred('medium'); }
-
-        init();
+        render();
     </script>
 </body>
 </html>
