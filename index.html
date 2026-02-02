@@ -3,74 +3,84 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Gogircin Admin Bot</title>
+    <title>Gogircin Titan Pro</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
     <style>
-        :root { --neon: #00f2ff; --fire: #ff4500; --bg: #0a0b14; }
-        body { margin: 0; background: var(--bg); color: white; font-family: sans-serif; overflow: hidden; }
+        :root { --neon: #00f2ff; --fire: #ff4500; --gold: #ffd700; --bg: #05060d; }
+        body { margin: 0; background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
         
         /* HEADER */
-        .header { background: #121526; padding: 15px; display: flex; justify-content: space-between; border-bottom: 2px solid var(--neon); }
-        .ton-amt { color: var(--neon); font-weight: bold; }
+        .header { background: rgba(18, 21, 38, 0.95); padding: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--neon); box-shadow: 0 0 15px var(--neon); }
+        .ton-pill { background: linear-gradient(90deg, #0088cc, #00f2ff); padding: 6px 15px; border-radius: 20px; font-weight: bold; }
 
         /* KÜMES EKRANI */
-        #sky { height: 45vh; position: relative; background: #000 url('https://i.ibb.co/30X679p/sky-bg.jpg') center/cover; overflow: hidden; }
-        .bird { position: absolute; width: 60px; transition: 4s linear; z-index: 10; }
-        .anka-bird { width: 120px !important; filter: drop-shadow(0 0 15px var(--fire)); }
+        #sky { height: 45vh; position: relative; background: radial-gradient(circle at center, #1a234a 0%, #05060d 100%); overflow: hidden; }
+        .bird { position: absolute; width: 60px; transition: 3.5s ease-in-out; z-index: 10; filter: drop-shadow(0 0 5px var(--neon)); }
+        .anka-elite { width: 140px !important; filter: drop-shadow(0 0 20px var(--fire)) !important; z-index: 50; }
 
-        /* STATS */
-        .stats { background: #161b2e; padding: 20px; border-radius: 25px 25px 0 0; margin-top: -25px; position: relative; }
-        .btn-main { width: 100%; padding: 15px; background: var(--neon); color: #000; border: none; border-radius: 15px; font-weight: bold; font-size: 16px; box-shadow: 0 4px 15px rgba(0,242,255,0.4); }
+        /* PANEL */
+        .main-panel { background: #0f1221; padding: 20px; border-radius: 30px 30px 0 0; margin-top: -30px; position: relative; border: 1px solid rgba(0,242,255,0.2); }
+        .btn-collect { width: 100%; padding: 18px; background: var(--neon); color: #000; border: none; border-radius: 15px; font-weight: bold; font-size: 18px; cursor: pointer; text-transform: uppercase; }
 
-        /* MARKET KARTLARI (Görsel Hatası Giderildi) */
-        .shop-container { padding: 15px; height: 50vh; overflow-y: auto; display: none; }
-        .card { background: #1f243d; border-radius: 20px; margin-bottom: 20px; padding: 15px; border: 1px solid #333; text-align: center; }
-        .card img { width: 100%; border-radius: 15px; margin-bottom: 10px; border: 2px solid #444; }
-        
-        /* ALT MENÜ */
-        .nav { position: fixed; bottom: 0; width: 100%; background: #0a0c16; display: flex; justify-content: space-around; padding: 15px 0; border-top: 1px solid var(--neon); }
-        .nav-item { color: #888; font-size: 12px; cursor: pointer; }
-        .nav-item.active { color: var(--neon); font-weight: bold; }
+        /* MARKET SİSTEMİ */
+        #shop-view { display: none; padding: 15px; height: 75vh; overflow-y: auto; }
+        .shop-card { background: #1a1e36; border-radius: 20px; margin-bottom: 20px; padding: 15px; border: 1px solid #2a2f4a; text-align: center; }
+        .shop-card img { width: 100%; border-radius: 15px; border: 2px solid #3a3f5a; }
+
+        /* ANKA KUTLAMA EFEKTİ */
+        #celebration { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 9999; display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+        .fire-anim { font-size: 35px; color: var(--fire); font-weight: bold; text-shadow: 0 0 20px var(--fire); animation: pulse 1s infinite; }
+        @keyframes pulse { 0% {transform: scale(1);} 50% {transform: scale(1.1);} 100% {transform: scale(1);} }
+
+        /* NAV */
+        .nav { position: fixed; bottom: 0; width: 100%; background: #0a0b14; display: flex; justify-content: space-around; padding: 15px 0; border-top: 1px solid var(--neon); }
     </style>
 </head>
 <body>
 
+    <div id="celebration">
+        <div class="fire-anim">🔥 ZÜMRÜDÜ ANKA UYANDI! 🔥</div>
+        <img src="https://i.ibb.co/Jz1Q1XQ/Z-mr-d-Anka.png" style="width: 80%; margin: 20px 0; filter: drop-shadow(0 0 30px var(--fire));">
+        <p>Üretim Kapasiten %50,000 Arttı!</p>
+    </div>
+
     <div class="header">
-        <div style="font-weight:bold">@GogircinAdminBot</div>
-        <div class="ton-amt" id="gold-txt">0.000 TON</div>
+        <div style="font-weight:bold; color:var(--neon)">@GogircinAdminBot</div>
+        <div class="ton-pill" id="gold-display">0.000 TON</div>
     </div>
 
-    <div id="home-screen">
+    <div id="home-view">
         <div id="sky"></div>
-        <div class="stats">
-            <div style="display:flex; justify-content:space-between; margin-bottom:20px;">
-                <span>🥚 DEPO: <b id="egg-txt">0</b></span>
-                <span>⚡ ENERJİ: <b id="en-txt">100%</b></span>
+        <div class="main-panel">
+            <div style="display:flex; justify-content:space-between; margin-bottom:15px;">
+                <span>🥚 DEPO: <b id="egg-val">0</b></span>
+                <span>⚡ ENERJİ: <b id="en-val">100%</b></span>
             </div>
-            <button class="btn-main" onclick="collect()">🧺 HASADI TOPLA VE NAKDE ÇEVİR</button>
+            <button class="btn-collect" onclick="collect()">🧺 HASADI TOPLA VE SAT</button>
         </div>
     </div>
 
-    <div id="shop-screen" class="shop-container">
-        <div class="card">
-            <img src="https://i.ibb.co/C07Bf5x/Siber-Serce.png" alt="Siber Serce">
+    <div id="shop-view">
+        <div class="shop-card">
+            <img src="https://i.ibb.co/C07Bf5x/Siber-Serce.png">
             <h3>Siber Serçe</h3>
-            <p>Hız: 50/s</p>
-            <button class="btn-main" style="background:#ff00ff; color:#fff" onclick="buy('ad', 50, 'https://i.ibb.co/C07Bf5x/Siber-Serce.png')">📺 REKLAMLA AL</button>
+            <button class="btn-collect" style="background:#ff00ff; color:white; font-size:14px;" onclick="buy('ad', 50, 'https://i.ibb.co/C07Bf5x/Siber-Serce.png', false)">📺 REKLAMLA AL</button>
         </div>
 
-        <div class="card" style="border-color: var(--fire)">
-            <img src="https://i.ibb.co/Jz1Q1XQ/Z-mr-d-Anka.png" alt="Anka">
-            <h3 style="color:var(--fire)">ZÜMRÜDÜ ANKA</h3>
-            <p>Hız: 50,000/s + VIP</p>
-            <button class="btn-main" style="background:var(--fire); color:#fff" onclick="buy('ton', 50000, 'https://i.ibb.co/Jz1Q1XQ/Z-mr-d-Anka.png', true)">💎 25 TON İLE AL</button>
+        <div class="shop-card" style="border-color: var(--gold)">
+            <img src="https://i.ibb.co/Jz1Q1XQ/Z-mr-d-Anka.png">
+            <h2 style="color:var(--gold)">ZÜMRÜDÜ ANKA</h2>
+            <p>Hız: 50,000/s + VIP Statüsü</p>
+            <button class="btn-collect" style="background:var(--fire); color:white; font-size:14px; margin-bottom:10px;" onclick="buy('ton', 50000, 'https://i.ibb.co/Jz1Q1XQ/Z-mr-d-Anka.png', true)">💎 25 TON İLE AL</button>
+            <button class="btn-collect" style="background:#444; color:white; font-size:14px;" onclick="buy('ad', 50000, 'https://i.ibb.co/Jz1Q1XQ/Z-mr-d-Anka.png', true)">📺 150 REKLAMLA AL</button>
         </div>
     </div>
 
     <div class="nav">
-        <div class="nav-item active" onclick="nav('home')">🏠 KÜMES</div>
-        <div class="nav-item" onclick="nav('shop')">🛒 MARKET</div>
-        <div class="nav-item" onclick="tg.close()">❌ ÇIKIŞ</div>
+        <div onclick="nav('home')">🏠 KÜMES</div>
+        <div onclick="nav('shop')">🛒 MARKET</div>
+        <div onclick="tg.close()">❌ ÇIKIŞ</div>
     </div>
 
     <script>
@@ -78,9 +88,9 @@
         let eggs = 0, energy = 100, gold = 0;
         let birds = [{img: 'https://i.ibb.co/C07Bf5x/Siber-Serce.png', rate: 100, isVip: false}];
 
-        function nav(page) {
-            document.getElementById('home-screen').style.display = page === 'home' ? 'block' : 'none';
-            document.getElementById('shop-screen').style.display = page === 'shop' ? 'block' : 'none';
+        function nav(id) {
+            document.getElementById('home-view').style.display = id === 'home' ? 'block' : 'none';
+            document.getElementById('shop-view').style.display = id === 'shop' ? 'block' : 'none';
         }
 
         function initSky() {
@@ -89,45 +99,51 @@
             birds.forEach(b => {
                 const img = document.createElement('img');
                 img.src = b.img;
-                img.className = `bird ${b.isVip ? 'anka-bird' : ''}`;
+                img.className = `bird ${b.isVip ? 'anka-elite' : ''}`;
                 sky.appendChild(img);
                 animate(img);
             });
         }
 
         function animate(el) {
-            const m = () => {
+            const move = () => {
                 el.style.left = Math.random()*80 + "%";
                 el.style.top = Math.random()*70 + "%";
             };
-            m(); setInterval(m, 4000);
+            move(); setInterval(move, 4000);
         }
 
         setInterval(() => {
             if(energy > 0) {
-                let r = birds.reduce((a, b) => a + b.rate, 0);
-                eggs += (r / 3600);
+                let total = birds.reduce((s, b) => s + b.rate, 0);
+                eggs += (total / 3600);
                 energy -= 0.01;
             }
-            document.getElementById('egg-txt').innerText = Math.floor(eggs);
-            document.getElementById('en-txt').innerText = Math.floor(energy) + "%";
-            document.getElementById('gold-txt').innerText = gold.toFixed(3) + " TON";
+            document.getElementById('egg-val').innerText = Math.floor(eggs);
+            document.getElementById('en-val').innerText = Math.floor(energy) + "%";
+            document.getElementById('gold-display').innerText = gold.toFixed(3) + " TON";
         }, 1000);
 
-        function buy(type, rate, imgUrl, isVip = false) {
-            tg.showConfirm("İşlem onaylansın mı?", (ok) => {
-                if(ok) {
-                    birds.push({img: imgUrl, rate: rate, isVip: isVip});
-                    initSky();
-                    nav('home');
-                }
-            });
+        function buy(type, rate, img, isVip) {
+            if(isVip) {
+                // ANKA KUTLAMASI
+                document.getElementById('celebration').style.display = 'flex';
+                confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ['#ff4500', '#ffd700'] });
+                setTimeout(() => {
+                    document.getElementById('celebration').style.display = 'none';
+                    birds.push({img: img, rate: rate, isVip: true});
+                    initSky(); nav('home');
+                }, 4000);
+            } else {
+                birds.push({img: img, rate: rate, isVip: false});
+                initSky(); nav('home');
+                tg.showAlert("Kuş kümese eklendi!");
+            }
         }
 
         function collect() {
-            let gain = (eggs / 50000);
-            gold += gain; eggs = 0;
-            tg.showAlert("Tebrikler! " + gain.toFixed(4) + " TON kazandın.");
+            let gain = (eggs / 60000); gold += gain; eggs = 0;
+            tg.showAlert("Hasat satıldı! +" + gain.toFixed(4) + " TON");
         }
 
         initSky();
