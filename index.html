@@ -3,181 +3,166 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Gogircin Titan Pro</title>
+    <title>Gogircin Titan Pro - Sky Wars</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        :root { --cyan: #00f2ff; --pink: #ff00ff; --gold: #ffd700; --bg: #0a0b10; }
-        body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; margin: 0; overflow: hidden; touch-action: manipulation; }
-        .header { display: flex; justify-content: space-around; padding: 15px 5px; background: rgba(0,0,0,0.9); border-bottom: 2px solid var(--cyan); position: fixed; top: 0; width: 100%; z-index: 100; }
-        .stat-box { text-align: center; }
-        .stat-val { display: block; font-size: 15px; color: var(--gold); font-weight: bold; }
-        .screen { display: none; height: 100vh; padding: 90px 15px 90px; box-sizing: border-box; flex-direction: column; overflow-y: auto; }
-        .screen.active { display: flex; }
-        
-        /* KUŞLAR VE ÜRETİM */
-        .nest-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        .nest { background: rgba(255,255,255,0.03); border: 1px solid #333; border-radius: 20px; padding: 10px; text-align: center; position: relative; }
-        .bird-img { font-size: 45px; animation: süzül 3s ease-in-out infinite; }
-        @keyframes süzül { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
-        .bird-prod { font-size: 10px; color: var(--pink); font-family: monospace; margin-top: 5px; }
+        :root { --cyan: #00f2ff; --pink: #ff00ff; --gold: #ffd700; --bg: #05060a; }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
 
-        /* DEPO VE AKSİYON */
-        .storage-card { background: rgba(0,0,0,0.8); border: 1px solid #444; border-radius: 25px; padding: 15px; margin-top: auto; }
-        .bar-bg { width: 100%; height: 10px; background: #111; border-radius: 5px; margin: 8px 0; overflow: hidden; }
-        .bar-fill { height: 100%; background: var(--cyan); width: 0%; transition: 0.3s; }
-        
-        .btn { background: linear-gradient(45deg, var(--cyan), #0088cc); border: none; color: #000; padding: 12px; border-radius: 12px; font-weight: bold; width: 100%; margin: 4px 0; font-size: 13px; }
-        .btn-vid { background: linear-gradient(45deg, var(--pink), #9000ff); color: white; }
-        .btn-sell { background: linear-gradient(45deg, #2ecc71, #27ae60); color: white; }
+        /* CANLI GÖKYÜZÜ ARKAPLANI */
+        #sky-canvas {
+            position: fixed; top: 0; left: 0; width: 100%; height: 60%;
+            background: radial-gradient(circle at 50% 50%, #1a1b26 0%, #05060a 100%);
+            z-index: 1; border-bottom: 2px solid rgba(0,242,255,0.1);
+        }
 
-        .market-item { background: #111; padding: 12px; border-radius: 15px; margin-bottom: 10px; border: 1px solid #222; }
-        .nav { position: fixed; bottom: 0; width: 100%; height: 70px; background: #000; display: flex; justify-content: space-around; border-top: 1px solid #333; }
-        .nav-item { color: #555; font-size: 10px; text-align: center; padding-top: 15px; flex: 1; }
-        .nav-item.active { color: var(--cyan); }
+        /* KUŞLARIN UÇUŞU */
+        .bird-entity {
+            position: absolute; font-size: 40px; transition: all 3s linear;
+            z-index: 2; filter: drop-shadow(0 0 10px rgba(0,242,255,0.5));
+            user-select: none; pointer-events: none;
+        }
+        .vip-bird { filter: drop-shadow(0 0 20px var(--gold)); font-size: 60px !important; }
+
+        /* RESUL (YEMLEME) UYARISI */
+        #resul-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85); z-index: 1000;
+            display: none; flex-direction: column; align-items: center; justify-content: center;
+            text-align: center; backdrop-filter: blur(5px);
+        }
+
+        /* STATLAR ÜST PANEL */
+        .header {
+            position: fixed; top: 0; width: 100%; display: flex; justify-content: space-around;
+            padding: 15px 0; background: rgba(0,0,0,0.7); z-index: 100; border-bottom: 1px solid var(--cyan);
+        }
+        .stat-val { display: block; font-size: 18px; color: var(--gold); font-weight: bold; text-shadow: 0 0 10px var(--gold); }
+
+        /* ALT KONTROL PANELİ */
+        .control-panel {
+            position: fixed; bottom: 0; width: 100%; background: #0a0b15;
+            padding: 20px; border-radius: 30px 30px 0 0; z-index: 200;
+            box-shadow: 0 -10px 30px rgba(0,0,0,1); border-top: 2px solid var(--cyan);
+            box-sizing: border-box;
+        }
+
+        .btn {
+            background: linear-gradient(45deg, var(--cyan), #0088cc); border: none;
+            color: black; padding: 15px; border-radius: 15px; font-weight: 900;
+            width: 100%; margin: 5px 0; font-size: 14px; text-transform: uppercase;
+        }
+        .btn-resul { background: linear-gradient(45deg, #ff0055, #ff00ff); color: white; animation: pulse 1.5s infinite; }
+        
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+        
+        .bar-bg { width: 100%; height: 12px; background: #111; border-radius: 6px; margin: 10px 0; border: 1px solid #333; overflow: hidden; }
+        .bar-fill { height: 100%; background: var(--cyan); width: 100%; transition: 0.5s; }
     </style>
 </head>
 <body>
 
+    <div id="resul-overlay">
+        <h1 style="color:var(--pink); margin-bottom:10px;">🕒 RESUL ZAMANI!</h1>
+        <p style="padding: 0 40px;">Kuşların enerjisi bitti ve yere indiler. Üretime devam etmek için onları yemlemelisin!</p>
+        <button class="btn btn-resul" style="width: 80%;" onclick="watchAdToFeed()">📺 VİDEO İZLE VE YEMLE</button>
+    </div>
+
     <div class="header">
-        <div class="stat-box">🥈 GÜMÜŞ<span class="stat-val" id="h-silver">0</span></div>
-        <div class="stat-box">🥚 DEPO<span class="stat-val" id="h-depo">0</span></div>
-        <div class="stat-box">⚡ GÜÇ<span class="stat-val" id="h-power" style="color:var(--pink)">0</span></div>
+        <div style="text-align:center">🥈 GÜMÜŞ<span class="stat-val" id="h-silver">0</span></div>
+        <div style="text-align:center">🥚 DEPO<span class="stat-val" id="h-depo">0</span></div>
+        <div style="text-align:center">⚡ GÜÇ<span class="stat-val" id="h-power">0</span></div>
     </div>
 
-    <div id="s-game" class="screen active">
-        <div class="nest-grid" id="nest-container"></div>
-        <div class="storage-card">
-            <div style="font-size:12px; color:var(--cyan); display:flex; justify-content:space-between">
-                <span>Depo Kapasitesi</span><span id="depo-percent">%0</span>
-            </div>
-            <div class="bar-bg"><div class="bar-fill" id="depo-bar"></div></div>
-            <div style="text-align:center; font-size:14px; margin-bottom:10px;"><span id="cur-depo">0</span> / <span id="max-depo">2,000,000</span></div>
-            <button class="btn" onclick="collectAll()">🧺 YUMURTALARI TOPLA</button>
-            <button class="btn btn-sell" onclick="sellAll()">💰 YUMURTALARI SAT (TAKAS)</button>
+    <div id="sky-canvas"></div>
+
+    <div class="control-panel">
+        <div style="display:flex; justify-content:space-between; font-size:12px; color:var(--cyan); font-weight:bold;">
+            <span>ENERJİ DURUMU (ACIKMA)</span>
+            <span id="energy-text">100%</span>
         </div>
-    </div>
-
-    <div id="s-market" class="screen">
-        <h2 style="color:var(--cyan); text-align:center">TITAN MARKET</h2>
-        <div id="market-list"></div>
-    </div>
-
-    <div class="nav">
-        <div class="nav-item active" onclick="show('game')">🏠<br>KÜMES</div>
-        <div class="nav-item" onclick="show('market')">🛒<br>MARKET</div>
+        <div class="bar-bg"><div class="bar-fill" id="energy-bar" style="background:var(--pink)"></div></div>
+        
+        <div style="text-align:center; font-size:22px; margin: 10px 0; font-weight:900;">
+            <span id="depo-val">0</span> <small style="font-size:12px; color:#555;">/ 2.000.000</small>
+        </div>
+        
+        <button class="btn" onclick="collectEggs()">🧺 HASADI TOPLA</button>
+        <button class="btn" style="background:#2ecc71; color:white; margin-top:10px;" onclick="location.href='#market'">🛒 YENİ KUŞ AL</button>
     </div>
 
     <script>
         let tg = window.Telegram.WebApp; tg.expand();
-        let silver = 500, depo = 0, maxDepo = 2000000;
-        
-        // GÖRSELLERDEKİ NET RAKAMLAR
-        const birdData = [
-            { id: 0, name: "SARI KANAT", img: "🐥", rate: 42, cost: 1000, ads: 4, ton: 0.1 },
-            { id: 1, name: "ZÜMRÜT SAVAŞÇI", img: "🦜", rate: 221, cost: 5000, ads: 8, ton: 0.5 },
-            { id: 2, name: "ALTIN PENÇE", img: "🐤", rate: 1160, cost: 25000, ads: 15, ton: 2.5 },
-            { id: 3, name: "GÖK MİRALAYI", img: "🐦", rate: 6091, cost: 125000, ads: 25, ton: 12.5 },
-            { id: 4, name: "KIZIL HAN (VIP)", img: "🔥", rate: 31979, cost: 625000, ads: 40, ton: 62.5 }
+        let silver = 500, depo = 0, energy = 100, maxDepo = 2000000;
+        let birdsInSky = [
+            { id: 4, name: "KIZIL HAN", img: "🔥", rate: 31979, isVip: true },
+            { id: 0, name: "SARI KANAT", img: "🐥", rate: 42, isVip: false }
         ];
 
-        let myBirds = [{...birdData[0], prod: 0}];
-        let adProgress = [0,0,0,0,0];
-
-        function show(s) {
-            document.querySelectorAll('.screen').forEach(x => x.classList.remove('active'));
-            document.getElementById('s-'+s).classList.add('active');
-        }
-
-        function render() {
-            const nestCont = document.getElementById('nest-container');
-            nestCont.innerHTML = "";
-            myBirds.forEach((b, i) => {
-                nestCont.innerHTML += `<div class="nest">
-                    <div class="bird-img">${b.img}</div>
-                    <div style="font-size:11px; font-weight:bold">${b.name}</div>
-                    <div class="bird-prod" id="bprod-${i}">${Math.floor(b.prod)}</div>
-                </div>`;
-            });
-
-            const marketCont = document.getElementById('market-list');
-            marketCont.innerHTML = "";
-            birdData.forEach((b, i) => {
-                marketCont.innerHTML += `
-                <div class="market-item">
-                    <div style="display:flex; justify-content:space-between">
-                        <b>${b.img} ${b.name}</b>
-                        <span style="color:var(--gold)">${b.ton} TON</span>
-                    </div>
-                    <div style="font-size:11px; color:#888; margin:5px 0">Üretim: ${b.rate} 🥚/saat</div>
-                    <div style="display:flex; gap:5px">
-                        <button class="btn btn-vid" onclick="watchAd(${i})">📺 İzle (${adProgress[i]}/${b.ads})</button>
-                        <button class="btn" style="background:var(--gold)" onclick="buyVIP(${i})">💎 VIP AL</button>
-                    </div>
-                </div>`;
+        // KUŞLARI GÖKYÜZÜNE YERLEŞTİR
+        function initSky() {
+            const sky = document.getElementById('sky-canvas');
+            sky.innerHTML = "";
+            birdsInSky.forEach((b, i) => {
+                const el = document.createElement('div');
+                el.className = `bird-entity ${b.isVip ? 'vip-bird' : ''}`;
+                el.id = `bird-${i}`;
+                el.innerText = b.img;
+                sky.appendChild(el);
+                animateBird(el);
             });
         }
 
-        // ÜRETİM DÖNGÜSÜ
+        function animateBird(el) {
+            if (energy <= 0) return; // Acıkınca uçmayı bırak
+            const x = Math.random() * (window.innerWidth - 50);
+            const y = Math.random() * (window.innerHeight * 0.4);
+            el.style.left = x + 'px';
+            el.style.top = y + 'px';
+            el.style.transform = `rotate(${Math.random() * 20 - 10}deg)`;
+            setTimeout(() => animateBird(el), 3000);
+        }
+
+        // ANA DÖNGÜ (ÜRETİM VE ENERJİ)
         setInterval(() => {
-            myBirds.forEach((b, i) => {
-                b.prod += b.rate / 3600;
-                let el = document.getElementById(`bprod-${i}`);
-                if(el) el.innerText = Math.floor(b.prod);
-            });
+            if (energy > 0) {
+                let hourlyTotal = birdsInSky.reduce((a, b) => a + b.rate, 0);
+                depo = Math.min(maxDepo, depo + (hourlyTotal / 3600));
+                energy -= 0.05; // Enerji her saniye düşer (yaklaşık 30 dk ömür)
+                
+                if (energy <= 0) {
+                    energy = 0;
+                    document.getElementById('resul-overlay').style.display = 'flex';
+                }
+            }
             updateUI();
         }, 1000);
-
-        function collectAll() {
-            let total = 0;
-            myBirds.forEach(b => { total += b.prod; b.prod = 0; });
-            depo = Math.min(maxDepo, depo + total);
-            tg.HapticFeedback.impactOccurred('light');
-            updateUI();
-        }
-
-        function sellAll() {
-            if(depo < 100) return tg.showAlert("Min. 100 yumurta gerekli!");
-            let gain = Math.floor(depo / 100);
-            silver += gain;
-            depo = 0;
-            updateUI();
-            tg.showAlert(gain + " Gümüş hesabına geçti!");
-        }
-
-        function watchAd(id) {
-            tg.showAlert("Video İzleniyor..."); // Burası Adsgram'a bağlanacak
-            setTimeout(() => {
-                adProgress[id]++;
-                if(adProgress[id] >= birdData[id].ads) {
-                    adProgress[id] = 0;
-                    myBirds.push({...birdData[id], prod:0});
-                    tg.showAlert("Tebrikler! " + birdData[id].name + " kümesine eklendi.");
-                }
-                render();
-            }, 2000);
-        }
-
-        function buyVIP(id) {
-            tg.showConfirm(birdData[id].ton + " TON ile anında al?", (ok) => {
-                if(ok) {
-                    myBirds.push({...birdData[id], prod:0});
-                    render();
-                    tg.showAlert("VIP Alım Başarılı!");
-                }
-            });
-        }
 
         function updateUI() {
             document.getElementById('h-silver').innerText = Math.floor(silver).toLocaleString();
             document.getElementById('h-depo').innerText = Math.floor(depo).toLocaleString();
-            document.getElementById('h-power').innerText = myBirds.reduce((a,b)=>a+b.rate,0).toLocaleString();
-            document.getElementById('cur-depo').innerText = Math.floor(depo).toLocaleString();
-            let p = (depo/maxDepo*100).toFixed(1);
-            document.getElementById('depo-bar').style.width = p + "%";
-            document.getElementById('depo-percent').innerText = "%" + p;
+            document.getElementById('h-power').innerText = birdsInSky.reduce((a,b)=>a+b.rate,0).toLocaleString();
+            document.getElementById('depo-val').innerText = Math.floor(depo).toLocaleString();
+            document.getElementById('energy-bar').style.width = energy + "%";
+            document.getElementById('energy-text').innerText = Math.floor(energy) + "%";
         }
 
-        render();
+        function collectEggs() {
+            tg.HapticFeedback.notificationOccurred('success');
+            tg.showAlert(Math.floor(depo) + " Yumurta toplandı ve depoya aktarıldı!");
+        }
+
+        function watchAdToFeed() {
+            tg.showAlert("Video İzleniyor... Kuşlar doyuruluyor!");
+            setTimeout(() => {
+                energy = 100;
+                document.getElementById('resul-overlay').style.display = 'none';
+                initSky(); // Kuşları tekrar uçur
+                tg.showAlert("Kuşlar doydu! Üretim tam hız devam ediyor.");
+            }, 2000);
+        }
+
+        initSky();
     </script>
 </body>
 </html>
