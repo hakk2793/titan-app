@@ -3,120 +3,151 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Gogircin 101 Okey - Otomatik Yatay</title>
+    <title>Gogircin 101 Okey - Master v9</title>
     <style>
         :root { --bg-green: #1a5d3a; --rack-brown: #3e2723; }
-        body { background: var(--bg-green); color: white; font-family: sans-serif; margin: 0; overflow: hidden; touch-action: none; width: 100vw; height: 100vh; }
+        body { background: var(--bg-green); color: white; font-family: 'Courier New', monospace; margin: 0; overflow: hidden; touch-action: none; width: 100vw; height: 100vh; }
         
-        /* Yatay Mod Düzeni */
-        .game-layout { height: 100%; width: 100%; display: flex; flex-direction: row; padding: 10px; box-sizing: border-box; }
-        
+        /* Terminal Havası Veren Üst Bilgi */
+        .terminal-header { 
+            height: 25px; background: #000; font-size: 10px; display: flex; 
+            align-items: center; padding: 0 10px; color: #0f0; border-bottom: 1px solid #333;
+        }
+
+        .game-layout { height: calc(100% - 25px); width: 100%; display: flex; flex-direction: row; padding: 10px; box-sizing: border-box; }
         .side-controls { width: 12%; display: flex; flex-direction: column; justify-content: space-around; gap: 5px; }
-        .action-btn { background: #333; color: #fff; border: 2px solid #555; padding: 10px 2px; border-radius: 8px; font-size: 10px; font-weight: bold; box-shadow: 0 4px #000; }
         
-        .main-stage { flex-grow: 1; display: flex; flex-direction: column; position: relative; }
-        .top-info { height: 35px; display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.3); border-radius: 20px; padding: 0 15px; margin-bottom: 5px; font-size: 12px; }
+        /* Terminaldeki [w], [s], [d] Tuş Takımı Tasarımı */
+        .action-btn { 
+            background: #222; color: #eee; border: 1px solid #444; padding: 10px 2px; 
+            border-radius: 4px; font-size: 9px; cursor: pointer; transition: 0.2s;
+        }
+        .action-btn:active { background: #0f0; color: #000; }
 
+        .main-stage { flex-grow: 1; display: flex; flex-direction: column; position: relative; margin: 0 10px; }
+        
+        /* Istaka Alanı */
         .rack { 
-            background: var(--rack-brown); border: 5px solid #261405; border-radius: 15px;
-            flex-grow: 1; position: relative; box-shadow: inset 0 0 50px rgba(0,0,0,0.9);
-            border-bottom-width: 15px;
+            background: var(--rack-brown); border: 4px solid #1a0f00; border-radius: 8px; 
+            flex-grow: 1; position: relative; box-shadow: inset 0 0 40px rgba(0,0,0,0.8);
         }
-
+        
+        /* Yunus Bozkurtaca'nın Terminal Taşlarından Esinlenen Modern Taşlar */
         .tile { 
-            background: #fdf5e6; width: 48px; height: 68px; border-radius: 6px; 
+            background: #fdf5e6; width: 45px; height: 62px; border-radius: 4px; 
             display: flex; flex-direction: column; align-items: center; justify-content: center; 
-            font-weight: bold; font-size: 28px; color: black; 
-            box-shadow: 4px 4px 8px rgba(0,0,0,0.6); 
-            position: absolute; cursor: pointer; touch-action: none; z-index: 10;
-            border-bottom: 5px solid #ccc;
+            font-weight: bold; font-size: 24px; position: absolute; cursor: pointer; 
+            touch-action: none; z-index: 10; box-shadow: 3px 3px 6px rgba(0,0,0,0.5);
+            border-bottom: 4px solid #bbb;
         }
-        .tile-dot { width: 8px; height: 8px; border-radius: 50%; margin-top: -2px; }
+        .tile-dot { width: 6px; height: 6px; border-radius: 50%; margin-top: 2px; }
 
-        .deal-btn { background: linear-gradient(#ffd700, #b89b00); color: #000; border: none; border-radius: 50%; width: 65px; height: 65px; font-weight: bold; position: absolute; bottom: 15px; right: 15px; z-index: 100; box-shadow: 0 5px #7a6700; }
+        .deal-btn { 
+            background: #ffd700; color: #000; border: none; border-radius: 50%; 
+            width: 70px; height: 70px; font-weight: bold; position: absolute; 
+            bottom: 20px; right: 20px; z-index: 100; box-shadow: 0 4px #998200;
+        }
     </style>
 </head>
 <body onload="lockOrientation()">
 
+<div class="terminal-header">
+    101_OKEY v0.9.9.5.4 made by yunusbzkrtc & GogircinAdminBot [EARLY ACCESS]
+</div>
+
 <div class="game-layout">
     <div class="side-controls">
-        <button class="action-btn">ÇİFT AÇ</button>
-        <button class="action-btn" style="background: #d35400;">ÇİFT DİZ</button>
-        <button class="action-btn">YARDIM</button>
+        <button class="action-btn">[Q] TAS ISLE</button>
+        <button class="action-btn" style="color: #f39c12;">[R] CIFT AC</button>
+        <button class="action-btn">[H] RAPORT</button>
     </div>
 
     <div class="main-stage">
-        <div class="top-info">
-            <span>👤 Aleyna</span>
-            <span style="color: #ffd700;">🀄 Gogircin 101 Okey</span>
-            <span>👤 Ömer</span>
-        </div>
-        <div class="rack" id="gameRack">
-            <p id="statusMsg" style="text-align: center; margin-top: 15%; opacity: 0.5;">Otomatik yatay mod aktif. Taşları dağıt!</p>
-        </div>
+        <div class="rack" id="gameRack"></div>
     </div>
 
     <div class="side-controls">
-        <button class="action-btn">SERİ AÇ</button>
-        <button class="action-btn" style="background: #2980b9;">SERİ DİZ</button>
-        <button class="action-btn">MENÜ</button>
+        <button class="action-btn">[E] SERI AC</button>
+        <button class="action-btn" style="color: #3498db;" onclick="akilliDizV9()">[S] SERI DIZ</button>
+        <button class="action-btn">[F] TAS AT</button>
     </div>
 
-    <button class="deal-btn" id="mainBtn" onclick="dealTiles()">DAĞIT</button>
+    <button class="deal-btn" id="mainBtn" onclick="dealTilesV9()">DAĞIT</button>
 </div>
 
 <script>
-    // EKRANI YATAY MODA ZORLAMA FONKSİYONU
+    // Yatay ekran kilidi
     async function lockOrientation() {
-        try {
-            if (screen.orientation && screen.orientation.lock) {
-                await screen.orientation.lock('landscape');
-            }
-        } catch (error) {
-            console.log("Yatay mod zorlaması başarısız: ", error);
-        }
+        try { if (screen.orientation) await screen.orientation.lock('landscape'); } catch (e) {}
     }
 
-    function dealTiles() {
-        // Otomatik döndürme fonksiyonunu tekrar tetikle (bazı cihazlar için)
-        lockOrientation();
-        
-        const rack = document.getElementById('gameRack');
-        document.getElementById('statusMsg').style.display = 'none';
+    const rack = document.getElementById('gameRack');
+    // Yunus'un kodundaki renk mantığı: Kırmızı, Mavi, Siyah, Sarı
+    const colors = ['#d32f2f', '#1976d2', '#212121', '#f39c12']; 
+    let myTiles = [];
+
+    // 'okey_v9.c' içindeki olusturma() ve ayirma() mantığı
+    function dealTilesV9() {
         document.getElementById('mainBtn').style.display = 'none';
-        const colors = ['#d32f2f', '#1976d2', '#212121', '#f57c00'];
+        rack.innerHTML = '';
+        myTiles = [];
 
         for(let i=0; i<21; i++) {
             const num = Math.floor(Math.random() * 13) + 1;
             const colorIdx = Math.floor(Math.random() * 4);
-            const tile = document.createElement('div');
-            tile.className = 'tile';
-            tile.style.color = colors[colorIdx];
-            tile.innerHTML = `<div>${num}</div><div class="tile-dot" style="background: ${colors[colorIdx]}"></div>`;
-            
-            // Yatay dizilim
-            tile.style.left = (5 + (i % 11) * 8.5) + "%";
-            tile.style.top = (i < 11 ? "15%" : "50%");
-
-            tile.addEventListener('touchmove', function(e) {
-                e.preventDefault(); 
-                let touch = e.touches[0];
-                let rect = rack.getBoundingClientRect();
-                let x = touch.clientX - rect.left - 24;
-                let y = touch.clientY - rect.top - 34;
-
-                if(x < 0) x = 0; if(y < 0) y = 0;
-                if(x > rect.width - 48) x = rect.width - 48;
-                if(y > rect.height - 68) y = rect.height - 68;
-
-                tile.style.left = x + 'px';
-                tile.style.top = y + 'px';
-                tile.style.zIndex = "1000";
-            });
-
-            tile.addEventListener('touchend', () => { tile.style.zIndex = "10"; });
-            rack.appendChild(tile);
+            const tileData = { num: num, color: colors[colorIdx], id: i };
+            myTiles.push(tileData);
+            createTileElement(tileData, i);
         }
+    }
+
+    function createTileElement(data, index) {
+        const tile = document.createElement('div');
+        tile.className = 'tile';
+        tile.id = 'tile-' + data.id;
+        tile.style.color = data.color;
+        tile.innerHTML = `<div>${data.num}</div><div class="tile-dot" style="background: ${data.color}"></div>`;
+        
+        // İlk dizilim: Terminaldeki gibi iki sıra
+        tile.style.left = (5 + (index % 11) * 8.5) + "%";
+        tile.style.top = (index < 11 ? "15%" : "55%");
+
+        // Mıknatıs (Snap) ve Sürükleme
+        tile.addEventListener('touchmove', (e) => {
+            let touch = e.touches[0];
+            let rect = rack.getBoundingClientRect();
+            tile.style.transition = "none";
+            tile.style.left = (touch.clientX - rect.left - 22) + 'px';
+            tile.style.top = (touch.clientY - rect.top - 31) + 'px';
+            tile.style.zIndex = "1000";
+        });
+        
+        tile.addEventListener('touchend', () => {
+            tile.style.zIndex = "10";
+            tile.style.transition = "all 0.2s ease-out";
+            let currentTop = parseFloat(tile.style.top);
+            // Mıknatıs: En yakın sıraya yapış
+            tile.style.top = (currentTop < (rack.offsetHeight / 2) - 10) ? "15%" : "55%";
+        });
+
+        rack.appendChild(tile);
+    }
+
+    // YUNUS BOZKURTACA'NIN SERİ DİZ (BETA) ALGORİTMASI
+    function akilliDizV9() {
+        const tileElements = Array.from(document.querySelectorAll('.tile'));
+        
+        // Önce Renk, sonra Sayı (Terminal sıralama mantığı)
+        tileElements.sort((a, b) => {
+            if (a.style.color !== b.style.color) return a.style.color.localeCompare(b.style.color);
+            return parseInt(a.innerText) - parseInt(b.innerText);
+        });
+
+        tileElements.forEach((tile, i) => {
+            tile.style.transition = "all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)";
+            tile.style.left = (5 + (i % 11) * 8.5) + "%";
+            tile.style.top = (i < 11 ? "15%" : "55%");
+        });
     }
 </script>
 </body>
