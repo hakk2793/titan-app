@@ -17,7 +17,7 @@
             background: #fdf5e6; width: 40px; height: 55px; border-radius: 5px; 
             display: flex; align-items: center; justify-content: center; 
             font-weight: bold; font-size: 20px; box-shadow: 2px 2px 5px rgba(0,0,0,0.5); 
-            cursor: grab; position: relative; z-index: 10; touch-action: none;
+            cursor: pointer; position: relative; touch-action: none;
         }
         .btn-play { background: #ffd700; color: #000; border: none; padding: 15px 30px; border-radius: 50px; font-weight: bold; font-size: 1.2rem; cursor: pointer; }
         .status { font-size: 1.1rem; margin-bottom: 10px; color: #ccffcc; }
@@ -28,30 +28,36 @@
 <div class="table">
     <div>
         <h2>🀄 Gogircin 101 Okey</h2>
-        <p class="status" id="statusMsg">Taşları dağıtmak için reklamı izle!</p>
+        <p class="status" id="statusMsg">Taşları dağıtmak için butona bas!</p>
     </div>
 
-    <div class="rack" id="gameRack">
-        </div>
+    <div class="rack" id="gameRack"></div>
 
-    <button class="btn-play" id="mainBtn" onclick="showOkeyAd()">🎬 REKLAM İZLE & DAĞIT</button>
+    <button class="btn-play" id="mainBtn" onclick="handlePlay()">🎬 REKLAM İZLE & DAĞIT</button>
 </div>
 
 <script>
     const AdController = window.Adsgram.init({ blockId: "22286" });
 
-    function showOkeyAd() {
+    function handlePlay() {
         const msg = document.getElementById('statusMsg');
-        msg.innerText = "⏳ Reklam yükleniyor...";
+        msg.innerText = "⏳ Reklam ve Taşlar Hazırlanıyor...";
         
-        AdController.show().then((result) => {
-            msg.innerText = "✅ Reklam Başarılı!";
-            document.getElementById('mainBtn').style.display = 'none'; // Butonu gizle
-            dealTiles();
-        }).catch((result) => {
-            alert("Reklam izlenmediği için taşlar dağıtılamadı.");
-            msg.innerText = "⚠️ Reklam hatası.";
+        // Önce reklamı dene
+        AdController.show().then(() => {
+            finishSetup("✅ Reklam Başarılı!");
+        }).catch(() => {
+            // Reklam yüklenmezse bile 2 saniye sonra taşları dağıt (Hata önleyici)
+            setTimeout(() => {
+                finishSetup("⚠️ Reklam yüklenemedi ama taşlar dağıtıldı!");
+            }, 1000);
         });
+    }
+
+    function finishSetup(message) {
+        document.getElementById('statusMsg').innerText = message;
+        document.getElementById('mainBtn').style.display = 'none';
+        dealTiles();
     }
 
     function dealTiles() {
@@ -62,33 +68,24 @@
         for(let i=0; i<21; i++) {
             const num = Math.floor(Math.random() * 13) + 1;
             const color = colors[Math.floor(Math.random() * colors.length)];
-            
             const tile = document.createElement('div');
             tile.className = 'tile';
             tile.style.color = color;
             tile.innerText = num;
             
-            // Sürükleme Özelliği
-            tile.addEventListener('touchstart', touchStart);
-            tile.addEventListener('touchmove', touchMove);
-            tile.addEventListener('touchend', touchEnd);
+            // Sürükleme
+            tile.addEventListener('touchstart', (e) => { e.target.style.zIndex = "100"; });
+            tile.addEventListener('touchmove', (e) => {
+                let touch = e.touches[0];
+                e.target.style.position = 'fixed';
+                e.target.style.left = (touch.clientX - 20) + 'px';
+                e.target.style.top = (touch.clientY - 25) + 'px';
+            });
+            tile.addEventListener('touchend', (e) => { e.target.style.zIndex = "10"; });
             
             rack.appendChild(tile);
         }
     }
-
-    // Sürükle Bırak Mantığı
-    let activeTile = null;
-    function touchStart(e) { activeTile = e.target; activeTile.style.zIndex = "100"; }
-    function touchEnd() { if(activeTile) activeTile.style.zIndex = "10"; activeTile = null; }
-    function touchMove(e) {
-        if (!activeTile) return;
-        let touch = e.touches[0];
-        activeTile.style.position = 'fixed';
-        activeTile.style.left = (touch.clientX - 20) + 'px';
-        activeTile.style.top = (touch.clientY - 25) + 'px';
-    }
 </script>
-
 </body>
 </html>
