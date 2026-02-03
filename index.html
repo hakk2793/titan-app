@@ -6,11 +6,20 @@
     <title>Gogircin 101 Okey</title>
     <script src="https://sad.adsgram.ai/js/adsgram-ad-sdk.js"></script>
     <style>
-        body { background: #0a4d2d; color: white; font-family: Arial; margin: 0; text-align: center; }
-        .table { height: 100vh; display: flex; flex-direction: column; justify-content: space-between; padding: 20px; }
-        .rack { display: flex; flex-wrap: wrap; justify-content: center; gap: 5px; background: #4a2c16; padding: 15px; border-radius: 10px; min-height: 100px; }
-        .tile { background: #fdf5e6; color: black; width: 35px; height: 50px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 18px; box-shadow: 2px 2px 5px rgba(0,0,0,0.5); }
-        .btn-play { background: #ffd700; color: #000; border: none; padding: 15px 30px; border-radius: 50px; font-weight: bold; font-size: 1.2rem; cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+        body { background: #0a4d2d; color: white; font-family: Arial; margin: 0; text-align: center; overflow: hidden; touch-action: none; }
+        .table { height: 100vh; display: flex; flex-direction: column; justify-content: space-between; padding: 20px; box-sizing: border-box; }
+        .rack { 
+            display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; 
+            background: #4a2c16; padding: 15px; border-radius: 10px; 
+            min-height: 200px; border: 3px solid #331a0d; position: relative;
+        }
+        .tile { 
+            background: #fdf5e6; width: 40px; height: 55px; border-radius: 5px; 
+            display: flex; align-items: center; justify-content: center; 
+            font-weight: bold; font-size: 20px; box-shadow: 2px 2px 5px rgba(0,0,0,0.5); 
+            cursor: grab; position: relative; z-index: 10; touch-action: none;
+        }
+        .btn-play { background: #ffd700; color: #000; border: none; padding: 15px 30px; border-radius: 50px; font-weight: bold; font-size: 1.2rem; cursor: pointer; }
         .status { font-size: 1.1rem; margin-bottom: 10px; color: #ccffcc; }
     </style>
 </head>
@@ -25,43 +34,59 @@
     <div class="rack" id="gameRack">
         </div>
 
-    <button class="btn-play" onclick="showOkeyAd()">🎬 REKLAM İZLE & DAĞIT</button>
+    <button class="btn-play" id="mainBtn" onclick="showOkeyAd()">🎬 REKLAM İZLE & DAĞIT</button>
 </div>
 
 <script>
-    // Senin aldığın Block ID
     const AdController = window.Adsgram.init({ blockId: "22286" });
 
     function showOkeyAd() {
-        document.getElementById('statusMsg').innerText = "Reklam yükleniyor...";
+        const msg = document.getElementById('statusMsg');
+        msg.innerText = "⏳ Reklam yükleniyor...";
         
         AdController.show().then((result) => {
-            // Reklam başarıyla izlendiğinde çalışır
-            document.getElementById('statusMsg').innerText = "✅ Reklam izlendi! Taşlar dağıtılıyor...";
-            dealOkeyTiles();
+            msg.innerText = "✅ Reklam Başarılı!";
+            document.getElementById('mainBtn').style.display = 'none'; // Butonu gizle
+            dealTiles();
         }).catch((result) => {
-            // Reklam hata verirse veya kapatılırsa
-            alert("Üstadım, ödül kazanmak için reklamı sonuna kadar izlemelisin.");
-            document.getElementById('statusMsg').innerText = "⚠️ Reklam izlenmedi.";
+            alert("Reklam izlenmediği için taşlar dağıtılamadı.");
+            msg.innerText = "⚠️ Reklam hatası.";
         });
     }
 
-    function dealOkeyTiles() {
+    function dealTiles() {
         const rack = document.getElementById('gameRack');
-        rack.innerHTML = ""; // Eski taşları temizle
+        rack.innerHTML = "";
         const colors = ['red', 'blue', 'black', 'orange'];
         
-        // 21 adet rastgele taş oluştur
         for(let i=0; i<21; i++) {
             const num = Math.floor(Math.random() * 13) + 1;
             const color = colors[Math.floor(Math.random() * colors.length)];
             
-            const tileDiv = document.createElement('div');
-            tileDiv.className = 'tile';
-            tileDiv.style.color = color;
-            tileDiv.innerText = num;
-            rack.appendChild(tileDiv);
+            const tile = document.createElement('div');
+            tile.className = 'tile';
+            tile.style.color = color;
+            tile.innerText = num;
+            
+            // Sürükleme Özelliği
+            tile.addEventListener('touchstart', touchStart);
+            tile.addEventListener('touchmove', touchMove);
+            tile.addEventListener('touchend', touchEnd);
+            
+            rack.appendChild(tile);
         }
+    }
+
+    // Sürükle Bırak Mantığı
+    let activeTile = null;
+    function touchStart(e) { activeTile = e.target; activeTile.style.zIndex = "100"; }
+    function touchEnd() { if(activeTile) activeTile.style.zIndex = "10"; activeTile = null; }
+    function touchMove(e) {
+        if (!activeTile) return;
+        let touch = e.touches[0];
+        activeTile.style.position = 'fixed';
+        activeTile.style.left = (touch.clientX - 20) + 'px';
+        activeTile.style.top = (touch.clientY - 25) + 'px';
     }
 </script>
 
