@@ -4,67 +4,29 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Gogircin 101 Okey</title>
-    <script src="https://sad.adsgram.ai/js/adsgram-ad-sdk.js"></script>
     <style>
         body { background: #0a4d2d; color: white; font-family: Arial; margin: 0; text-align: center; overflow: hidden; touch-action: none; }
         .table { height: 100vh; display: flex; flex-direction: column; justify-content: space-between; padding: 20px; box-sizing: border-box; }
-        .rack { 
-            display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; 
-            background: #4a2c16; padding: 15px; border-radius: 10px; 
-            min-height: 200px; border: 3px solid #331a0d; position: relative;
-        }
-        .tile { 
-            background: #fdf5e6; width: 40px; height: 55px; border-radius: 5px; 
-            display: flex; align-items: center; justify-content: center; 
-            font-weight: bold; font-size: 20px; box-shadow: 2px 2px 5px rgba(0,0,0,0.5); 
-            cursor: pointer; position: relative; touch-action: none;
-        }
-        .btn-play { background: #ffd700; color: #000; border: none; padding: 15px 30px; border-radius: 50px; font-weight: bold; font-size: 1.2rem; cursor: pointer; }
-        .status { font-size: 1.1rem; margin-bottom: 10px; color: #ccffcc; }
+        .rack { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; background: #4a2c16; padding: 15px; border-radius: 10px; min-height: 200px; border: 3px solid #331a0d; position: relative; }
+        .tile { background: #fdf5e6; width: 40px; height: 55px; border-radius: 5px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 20px; color: black; box-shadow: 2px 2px 5px rgba(0,0,0,0.5); position: absolute; cursor: pointer; touch-action: none; }
+        .btn-play { background: #ffd700; color: #000; border: none; padding: 15px 30px; border-radius: 50px; font-weight: bold; font-size: 1.2rem; cursor: pointer; width: 100%; }
     </style>
 </head>
 <body>
-
 <div class="table">
-    <div>
-        <h2>🀄 Gogircin 101 Okey</h2>
-        <p class="status" id="statusMsg">Taşları dağıtmak için butona bas!</p>
-    </div>
-
+    <div><h2>🀄 Gogircin 101 Okey</h2><p id="statusMsg">Taşları dağıtmak için butona bas!</p></div>
     <div class="rack" id="gameRack"></div>
-
-    <button class="btn-play" id="mainBtn" onclick="handlePlay()">🎬 REKLAM İZLE & DAĞIT</button>
+    <button class="btn-play" id="mainBtn" onclick="dealTiles()">🎬 TAŞLARI DAĞIT</button>
 </div>
 
 <script>
-    const AdController = window.Adsgram.init({ blockId: "22286" });
-
-    function handlePlay() {
-        const msg = document.getElementById('statusMsg');
-        msg.innerText = "⏳ Reklam ve Taşlar Hazırlanıyor...";
-        
-        // Önce reklamı dene
-        AdController.show().then(() => {
-            finishSetup("✅ Reklam Başarılı!");
-        }).catch(() => {
-            // Reklam yüklenmezse bile 2 saniye sonra taşları dağıt (Hata önleyici)
-            setTimeout(() => {
-                finishSetup("⚠️ Reklam yüklenemedi ama taşlar dağıtıldı!");
-            }, 1000);
-        });
-    }
-
-    function finishSetup(message) {
-        document.getElementById('statusMsg').innerText = message;
-        document.getElementById('mainBtn').style.display = 'none';
-        dealTiles();
-    }
-
     function dealTiles() {
         const rack = document.getElementById('gameRack');
         rack.innerHTML = "";
-        const colors = ['red', 'blue', 'black', 'orange'];
+        document.getElementById('mainBtn').style.display = 'none';
+        document.getElementById('statusMsg').innerText = "✅ Taşlar dağıtıldı! İstediğin gibi diz.";
         
+        const colors = ['red', 'blue', 'black', 'orange'];
         for(let i=0; i<21; i++) {
             const num = Math.floor(Math.random() * 13) + 1;
             const color = colors[Math.floor(Math.random() * colors.length)];
@@ -73,16 +35,16 @@
             tile.style.color = color;
             tile.innerText = num;
             
-            // Sürükleme
-            tile.addEventListener('touchstart', (e) => { e.target.style.zIndex = "100"; });
-            tile.addEventListener('touchmove', (e) => {
+            // Başlangıç pozisyonu (rastgele)
+            tile.style.left = (Math.random() * 60 + 10) + "%";
+            tile.style.top = (Math.random() * 40 + 20) + "%";
+
+            // Sürükleme fonksiyonu
+            tile.addEventListener('touchmove', function(e) {
                 let touch = e.touches[0];
-                e.target.style.position = 'fixed';
-                e.target.style.left = (touch.clientX - 20) + 'px';
-                e.target.style.top = (touch.clientY - 25) + 'px';
+                tile.style.left = (touch.clientX - 20) + 'px';
+                tile.style.top = (touch.clientY - 25) + 'px';
             });
-            tile.addEventListener('touchend', (e) => { e.target.style.zIndex = "10"; });
-            
             rack.appendChild(tile);
         }
     }
