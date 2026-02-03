@@ -3,135 +3,67 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Kuş Oyunu</title>
+    <title>Gogircin 101 Okey</title>
+    <script src="https://sad.adsgram.ai/js/adsgram-ad-sdk.js"></script>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #87CEEB; /* Mavi gökyüzü */
-            margin: 0;
-            padding: 0;
-            overflow: hidden;
-        }
-        .header {
-            background-color: #333;
-            color: #fff;
-            padding: 10px;
-            text-align: center;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .balance-container {
-            display: flex;
-            align-items: center;
-        }
-        .balance-icon {
-            width: 20px;
-            height: 20px;
-            margin-right: 5px;
-        }
-        .game-area {
-            position: relative;
-            width: 100%;
-            height: 50vh;
-            background: url('https://i.ibb.co/6PqjXfP/sky.png') center/cover no-repeat; /* Arka plan resmi */
-        }
-        .bird-nest {
-            position: absolute;
-            width: 100px;
-            height: 100px;
-            background-size: contain;
-            background-repeat: no-repeat;
-            background-position: center;
-        }
-        .bird-icon {
-            width: 60px;
-            height: 60px;
-            position: absolute;
-            transition: 2s ease-in-out;
-            z-index: 10;
-        }
-        .panel {
-            background-color: #fff;
-            padding: 20px;
-            text-align: center;
-            border-radius: 10px;
-            margin: 10px;
-        }
-        .shop {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 10px;
-            margin: 10px;
-        }
-        .item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 10px;
-            border-bottom: 1px solid #eee;
-        }
-        .item img {
-            width: 50px;
-            height: 50px;
-            margin-right: 10px;
-        }
-        .btn {
-            padding: 10px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            border: none;
-            font-weight: bold;
-        }
-        .btn-ad {
-            background-color: #ff00ff;
-            color: white;
-        }
-        .btn-ton {
-            background-color: #00f2ff;
-            color: black;
-        }
-        .egg-basket {
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 150px;
-            height: 100px;
-            background-size: contain;
-            background-repeat: no-repeat;
-            background-position: center;
-            background-image: url('https://i.ibb.co/hFj4y0q/egg-basket.png');
-        }
+        body { background: #0a4d2d; color: white; font-family: Arial; margin: 0; text-align: center; }
+        .table { height: 100vh; display: flex; flex-direction: column; justify-content: space-between; padding: 20px; }
+        .rack { display: flex; flex-wrap: wrap; justify-content: center; gap: 5px; background: #4a2c16; padding: 15px; border-radius: 10px; min-height: 100px; }
+        .tile { background: #fdf5e6; color: black; width: 35px; height: 50px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 18px; box-shadow: 2px 2px 5px rgba(0,0,0,0.5); }
+        .btn-play { background: #ffd700; color: #000; border: none; padding: 15px 30px; border-radius: 50px; font-weight: bold; font-size: 1.2rem; cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+        .status { font-size: 1.1rem; margin-bottom: 10px; color: #ccffcc; }
     </style>
 </head>
 <body>
-    <div class="header">
-        <span>Kuş Oyunu</span>
-        <div class="balance-container">
-            <img class="balance-icon" src="https://i.ibb.co/6PqjXfP/star.png" alt="Star">
-            <span id="balance">446</span>
-        </div>
+
+<div class="table">
+    <div>
+        <h2>🀄 Gogircin 101 Okey</h2>
+        <p class="status" id="statusMsg">Taşları dağıtmak için reklamı izle!</p>
     </div>
-    <div id="game-area">
-        <div class="bird-nest" style="background-image: url('https://i.ibb.co/Wc63V0d/nest.png'); top: 10%; left: 10%;"></div>
-        <div class="bird-nest" style="background-image: url('https://i.ibb.co/Wc63V0d/nest.png'); top: 10%; right: 10%;"></div>
-        <div class="bird-nest" style="background-image: url('https://i.ibb.co/Wc63V0d/nest.png'); top: 40%; left: 25%;"></div>
-        <div class="bird-nest" style="background-image: url('https://i.ibb.co/Wc63V0d/nest.png'); top: 40%; right: 25%;"></div>
-        <div class="bird-nest" style="background-image: url('https://i.ibb.co/Wc63V0d/nest.png'); top: 70%; left: 35%;"></div>
-        <div class="egg-basket"></div>
-    </div>
-    <div class="panel">
-        <div style="display:flex; justify-content:space-between">
-            <div><span class="stat">🥚 YUMURTA</span><br><span class="val" id="egg-val">968k</span></div>
-            <div><span class="stat">⚡ KAMP</span><br><span class="val" id="en-val">1g 13s</span></div>
+
+    <div class="rack" id="gameRack">
         </div>
-        <button class="btn btn-ton" style="width:100%; margin-top:15px;" onclick="collect()">HASADI TOPLA & SAT</button>
-    </div>
-    <div class="shop">
-        </div>
-    <script>
-        // JavaScript kodları buraya gelecek
-    </script>
+
+    <button class="btn-play" onclick="showOkeyAd()">🎬 REKLAM İZLE & DAĞIT</button>
+</div>
+
+<script>
+    // Senin aldığın Block ID
+    const AdController = window.Adsgram.init({ blockId: "22286" });
+
+    function showOkeyAd() {
+        document.getElementById('statusMsg').innerText = "Reklam yükleniyor...";
+        
+        AdController.show().then((result) => {
+            // Reklam başarıyla izlendiğinde çalışır
+            document.getElementById('statusMsg').innerText = "✅ Reklam izlendi! Taşlar dağıtılıyor...";
+            dealOkeyTiles();
+        }).catch((result) => {
+            // Reklam hata verirse veya kapatılırsa
+            alert("Üstadım, ödül kazanmak için reklamı sonuna kadar izlemelisin.");
+            document.getElementById('statusMsg').innerText = "⚠️ Reklam izlenmedi.";
+        });
+    }
+
+    function dealOkeyTiles() {
+        const rack = document.getElementById('gameRack');
+        rack.innerHTML = ""; // Eski taşları temizle
+        const colors = ['red', 'blue', 'black', 'orange'];
+        
+        // 21 adet rastgele taş oluştur
+        for(let i=0; i<21; i++) {
+            const num = Math.floor(Math.random() * 13) + 1;
+            const color = colors[Math.floor(Math.random() * colors.length)];
+            
+            const tileDiv = document.createElement('div');
+            tileDiv.className = 'tile';
+            tileDiv.style.color = color;
+            tileDiv.innerText = num;
+            rack.appendChild(tileDiv);
+        }
+    }
+</script>
+
 </body>
 </html>
