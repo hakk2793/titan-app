@@ -1,154 +1,2453 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Gogircin 101 Okey - Master v9</title>
-    <style>
-        :root { --bg-green: #1a5d3a; --rack-brown: #3e2723; }
-        body { background: var(--bg-green); color: white; font-family: 'Courier New', monospace; margin: 0; overflow: hidden; touch-action: none; width: 100vw; height: 100vh; }
-        
-        /* Terminal Havası Veren Üst Bilgi */
-        .terminal-header { 
-            height: 25px; background: #000; font-size: 10px; display: flex; 
-            align-items: center; padding: 0 10px; color: #0f0; border-bottom: 1px solid #333;
-        }
+<meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 
-        .game-layout { height: calc(100% - 25px); width: 100%; display: flex; flex-direction: row; padding: 10px; box-sizing: border-box; }
-        .side-controls { width: 12%; display: flex; flex-direction: column; justify-content: space-around; gap: 5px; }
-        
-        /* Terminaldeki [w], [s], [d] Tuş Takımı Tasarımı */
-        .action-btn { 
-            background: #222; color: #eee; border: 1px solid #444; padding: 10px 2px; 
-            border-radius: 4px; font-size: 9px; cursor: pointer; transition: 0.2s;
-        }
-        .action-btn:active { background: #0f0; color: #000; }
+<title>UstaPro Saha Ağı</title>
 
-        .main-stage { flex-grow: 1; display: flex; flex-direction: column; position: relative; margin: 0 10px; }
-        
-        /* Istaka Alanı */
-        .rack { 
-            background: var(--rack-brown); border: 4px solid #1a0f00; border-radius: 8px; 
-            flex-grow: 1; position: relative; box-shadow: inset 0 0 40px rgba(0,0,0,0.8);
-        }
-        
-        /* Yunus Bozkurtaca'nın Terminal Taşlarından Esinlenen Modern Taşlar */
-        .tile { 
-            background: #fdf5e6; width: 45px; height: 62px; border-radius: 4px; 
-            display: flex; flex-direction: column; align-items: center; justify-content: center; 
-            font-weight: bold; font-size: 24px; position: absolute; cursor: pointer; 
-            touch-action: none; z-index: 10; box-shadow: 3px 3px 6px rgba(0,0,0,0.5);
-            border-bottom: 4px solid #bbb;
-        }
-        .tile-dot { width: 6px; height: 6px; border-radius: 50%; margin-top: 2px; }
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
 
-        .deal-btn { 
-            background: #ffd700; color: #000; border: none; border-radius: 50%; 
-            width: 70px; height: 70px; font-weight: bold; position: absolute; 
-            bottom: 20px; right: 20px; z-index: 100; box-shadow: 0 4px #998200;
-        }
-    </style>
+<style>
+:root{
+    --bg:#060d18;
+    --bg2:#0b1422;
+    --card:#101c2c;
+    --card2:#142238;
+    --border:#20344e;
+    --green:#19d27f;
+    --green2:#0c9e60;
+    --gold:#f6bd35;
+    --blue:#3195ff;
+    --purple:#9b7cff;
+    --red:#ef5350;
+    --text:#f5f7fb;
+    --muted:#91a2b8;
+    --shadow:0 12px 35px rgba(0,0,0,.25);
+}
+
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+    -webkit-tap-highlight-color:transparent;
+}
+
+html{
+    scroll-behavior:smooth;
+}
+
+body{
+    min-height:100vh;
+    background:
+        radial-gradient(circle at 50% -15%,#17385b 0,#08111e 38%,#060d18 75%);
+    color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,
+                 "Segoe UI",Roboto,Arial,sans-serif;
+    padding-bottom:88px;
+}
+
+button,
+input,
+select,
+textarea{
+    font:inherit;
+}
+
+button{
+    border:0;
+    cursor:pointer;
+}
+
+.container{
+    width:100%;
+    max-width:620px;
+    margin:auto;
+    padding:14px;
+}
+
+/* ================= HEADER ================= */
+
+.header{
+    text-align:center;
+    padding:10px 0 17px;
+}
+
+.logo{
+    width:76px;
+    height:76px;
+    margin:0 auto 11px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border-radius:23px;
+    font-size:39px;
+    background:linear-gradient(145deg,#20dc88,#087348);
+    border:1px solid rgba(255,255,255,.15);
+    box-shadow:
+        0 12px 35px rgba(25,210,127,.22),
+        inset 0 1px rgba(255,255,255,.2);
+}
+
+.header h1{
+    font-size:23px;
+    font-weight:900;
+    letter-spacing:-.4px;
+}
+
+.header p{
+    color:var(--muted);
+    font-size:12px;
+    margin-top:4px;
+}
+
+/* ================= PROFILE ================= */
+
+.profile{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    background:linear-gradient(145deg,var(--card),#0d1828);
+    border:1px solid var(--border);
+    border-radius:18px;
+    padding:14px;
+    box-shadow:var(--shadow);
+}
+
+.avatar{
+    width:50px;
+    height:50px;
+    flex:none;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:23px;
+    background:linear-gradient(145deg,#294566,#17283e);
+    border:1px solid #355474;
+}
+
+.profile-info{
+    flex:1;
+    min-width:0;
+}
+
+.profile-name{
+    font-size:15px;
+    font-weight:900;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+}
+
+.profile-level{
+    color:var(--muted);
+    font-size:10px;
+    margin-top:3px;
+}
+
+.points{
+    text-align:right;
+}
+
+.points strong{
+    display:block;
+    color:var(--gold);
+    font-size:20px;
+    font-weight:900;
+}
+
+.points span{
+    color:var(--muted);
+    font-size:9px;
+}
+
+/* ================= PROGRESS ================= */
+
+.progress-card{
+    margin-top:12px;
+    background:linear-gradient(145deg,#28200c,#131d2c);
+    border:1px solid #5a4717;
+    border-radius:17px;
+    padding:15px;
+}
+
+.progress-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.progress-title{
+    font-size:14px;
+    font-weight:900;
+}
+
+.progress-points{
+    color:var(--gold);
+    font-weight:900;
+    font-size:14px;
+}
+
+.progress-track{
+    height:8px;
+    margin-top:11px;
+    background:#26344a;
+    border-radius:20px;
+    overflow:hidden;
+}
+
+.progress-fill{
+    width:75%;
+    height:100%;
+    background:linear-gradient(90deg,var(--gold),#ffe07b);
+    border-radius:20px;
+}
+
+.progress-bottom{
+    display:flex;
+    justify-content:space-between;
+    color:var(--muted);
+    font-size:9px;
+    margin-top:7px;
+}
+
+/* ================= CAMPAIGN ================= */
+
+.campaign{
+    position:relative;
+    overflow:hidden;
+    margin-top:12px;
+    padding:17px;
+    border-radius:18px;
+    background:
+        linear-gradient(135deg,#063d2b,#0d2730);
+    border:1px solid #16835a;
+    box-shadow:0 10px 30px rgba(0,0,0,.2);
+}
+
+.campaign:after{
+    content:"";
+    position:absolute;
+    width:150px;
+    height:150px;
+    right:-65px;
+    top:-65px;
+    border-radius:50%;
+    background:rgba(25,210,127,.1);
+}
+
+.campaign-title{
+    position:relative;
+    z-index:1;
+    font-size:16px;
+    font-weight:900;
+}
+
+.campaign-title span{
+    color:var(--gold);
+}
+
+.campaign-text{
+    position:relative;
+    z-index:1;
+    color:#a9c8bb;
+    font-size:11px;
+    margin-top:5px;
+    line-height:1.5;
+}
+
+.campaign-btn{
+    position:relative;
+    z-index:2;
+    width:100%;
+    margin-top:13px;
+    padding:13px;
+    border-radius:11px;
+    background:var(--green);
+    color:#04170e;
+    font-weight:900;
+    box-shadow:0 7px 20px rgba(25,210,127,.2);
+}
+
+/* ================= SECTION ================= */
+
+.section{
+    margin-top:20px;
+}
+
+.section-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:10px;
+}
+
+.section-title{
+    font-size:15px;
+    font-weight:900;
+}
+
+.section-link{
+    color:var(--green);
+    background:transparent;
+    font-size:10px;
+    font-weight:800;
+}
+
+/* ================= MAIN MENU ================= */
+
+.menu{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:10px;
+}
+
+.menu-card{
+    position:relative;
+    text-align:left;
+    min-height:105px;
+    padding:14px;
+    border-radius:16px;
+    background:linear-gradient(145deg,var(--card),#0d1828);
+    border:1px solid var(--border);
+    color:var(--text);
+    transition:.15s;
+}
+
+.menu-card:active{
+    transform:scale(.97);
+    border-color:var(--green);
+}
+
+.menu-icon{
+    font-size:25px;
+    display:block;
+    margin-bottom:8px;
+}
+
+.menu-title{
+    font-size:13px;
+    font-weight:900;
+}
+
+.menu-desc{
+    color:var(--muted);
+    font-size:9px;
+    line-height:1.4;
+    margin-top:3px;
+}
+
+/* ================= JOB FILTER ================= */
+
+.filters{
+    display:flex;
+    gap:7px;
+    overflow-x:auto;
+    padding-bottom:4px;
+    scrollbar-width:none;
+}
+
+.filters::-webkit-scrollbar{
+    display:none;
+}
+
+.filter{
+    flex:none;
+    padding:8px 11px;
+    border-radius:20px;
+    background:#111f32;
+    border:1px solid var(--border);
+    color:var(--muted);
+    font-size:10px;
+    font-weight:800;
+}
+
+.filter.active{
+    background:#123b2c;
+    border-color:#1a9e67;
+    color:var(--green);
+}
+
+/* ================= JOB CARD ================= */
+
+.job{
+    margin-top:9px;
+    padding:14px;
+    border-radius:16px;
+    background:linear-gradient(145deg,var(--card),#0d1828);
+    border:1px solid var(--border);
+}
+
+.job-head{
+    display:flex;
+    justify-content:space-between;
+    gap:10px;
+}
+
+.job-title{
+    font-size:14px;
+    font-weight:900;
+}
+
+.job-distance{
+    color:#66adff;
+    font-size:9px;
+    white-space:nowrap;
+}
+
+.job-tags{
+    display:flex;
+    flex-wrap:wrap;
+    gap:5px;
+    margin-top:8px;
+}
+
+.tag{
+    padding:4px 7px;
+    border-radius:6px;
+    background:#172940;
+    color:#9fb5ce;
+    font-size:9px;
+}
+
+.job-info{
+    color:var(--muted);
+    font-size:10px;
+    line-height:1.6;
+    margin-top:8px;
+}
+
+.job-bottom{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:10px;
+    margin-top:11px;
+}
+
+.job-price{
+    color:var(--green);
+    font-size:12px;
+    font-weight:900;
+}
+
+.job-button{
+    padding:9px 13px;
+    border-radius:9px;
+    background:#1b3554;
+    color:#fff;
+    font-size:10px;
+    font-weight:900;
+}
+
+/* ================= CHAT ================= */
+
+.chat-box{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:16px;
+    padding:4px 13px;
+}
+
+.chat-row{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:12px 0;
+    border-bottom:1px solid #1b2b40;
+}
+
+.chat-row:last-child{
+    border-bottom:0;
+}
+
+.chat-avatar{
+    width:41px;
+    height:41px;
+    flex:none;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border-radius:50%;
+    background:#1b3451;
+    font-size:19px;
+}
+
+.chat-info{
+    flex:1;
+    min-width:0;
+}
+
+.chat-name{
+    font-size:12px;
+    font-weight:900;
+}
+
+.chat-message{
+    color:var(--muted);
+    font-size:10px;
+    margin-top:3px;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+}
+
+.chat-time{
+    color:#60748d;
+    font-size:8px;
+}
+
+/* ================= INVITE ================= */
+
+.invite{
+    padding:16px;
+    border-radius:17px;
+    background:linear-gradient(135deg,#142d4d,#101b2c);
+    border:1px solid #2a4d72;
+}
+
+.invite-title{
+    font-size:15px;
+    font-weight:900;
+}
+
+.invite-text{
+    color:var(--muted);
+    font-size:10px;
+    margin-top:4px;
+    line-height:1.5;
+}
+
+.invite-reward{
+    color:var(--gold);
+    font-weight:900;
+}
+
+.invite-btn{
+    width:100%;
+    margin-top:12px;
+    padding:12px;
+    border-radius:10px;
+    background:var(--blue);
+    color:white;
+    font-size:12px;
+    font-weight:900;
+}
+
+/* ================= TOOLS ================= */
+
+.tools{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:9px;
+}
+
+.tool{
+    text-align:center;
+    padding:13px 5px;
+    border-radius:14px;
+    background:var(--card);
+    border:1px solid var(--border);
+}
+
+.tool:active{
+    transform:scale(.97);
+}
+
+.tool-icon{
+    display:block;
+    font-size:23px;
+}
+
+.tool-name{
+    display:block;
+    color:#dce4ed;
+    font-size:9px;
+    font-weight:800;
+    margin-top:5px;
+}
+
+/* ================= EMPTY ================= */
+
+.empty{
+    text-align:center;
+    padding:24px 15px;
+    color:var(--muted);
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:15px;
+}
+
+.empty-icon{
+    font-size:32px;
+}
+
+.empty-title{
+    color:#fff;
+    font-weight:900;
+    font-size:13px;
+    margin-top:7px;
+}
+
+.empty-text{
+    font-size:10px;
+    margin-top:4px;
+}
+
+/* ================= MODAL ================= */
+
+.modal{
+    position:fixed;
+    inset:0;
+    display:none;
+    align-items:flex-end;
+    background:rgba(0,0,0,.68);
+    z-index:100;
+}
+
+.modal.show{
+    display:flex;
+}
+
+.modal-box{
+    width:100%;
+    max-width:620px;
+    max-height:90vh;
+    overflow-y:auto;
+    margin:0 auto;
+    padding:20px;
+    background:#101c2c;
+    border:1px solid var(--border);
+    border-radius:21px 21px 0 0;
+    box-shadow:0 -15px 50px rgba(0,0,0,.35);
+}
+
+.modal-handle{
+    width:40px;
+    height:4px;
+    margin:0 auto 16px;
+    border-radius:10px;
+    background:#3a4b60;
+}
+
+.modal-title{
+    font-size:18px;
+    font-weight:900;
+    margin-bottom:14px;
+}
+
+.form{
+    margin-bottom:11px;
+}
+
+.form label{
+    display:block;
+    color:var(--muted);
+    font-size:10px;
+    margin-bottom:5px;
+}
+
+.form input,
+.form select,
+.form textarea{
+    width:100%;
+    padding:11px;
+    border-radius:10px;
+    border:1px solid var(--border);
+    outline:none;
+    background:#091525;
+    color:#fff;
+}
+
+.form textarea{
+    min-height:90px;
+    resize:none;
+}
+
+.modal-actions{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:9px;
+    margin-top:14px;
+}
+
+.modal-actions button{
+    padding:12px;
+    border-radius:10px;
+    font-weight:900;
+}
+
+.cancel{
+    background:#26374d;
+    color:white;
+}
+
+.confirm{
+    background:var(--green);
+    color:#04170e;
+}
+
+/* ================= TOAST ================= */
+
+.toast{
+    position:fixed;
+    left:50%;
+    bottom:80px;
+    transform:translateX(-50%) translateY(20px);
+    width:calc(100% - 30px);
+    max-width:570px;
+    padding:12px 15px;
+    border-radius:12px;
+    background:#18283d;
+    border:1px solid #31506f;
+    color:white;
+    font-size:11px;
+    text-align:center;
+    opacity:0;
+    pointer-events:none;
+    transition:.25s;
+    z-index:200;
+}
+
+.toast.show{
+    opacity:1;
+    transform:translateX(-50%) translateY(0);
+}
+
+/* ================= BOTTOM NAV ================= */
+
+.bottom-nav{
+    position:fixed;
+    left:0;
+    right:0;
+    bottom:0;
+    height:70px;
+    background:rgba(7,15,26,.96);
+    border-top:1px solid var(--border);
+    backdrop-filter:blur(15px);
+    z-index:90;
+}
+
+.nav-inner{
+    width:100%;
+    max-width:620px;
+    height:100%;
+    margin:auto;
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+}
+
+.nav-btn{
+    background:transparent;
+    color:#657a93;
+    font-size:9px;
+    font-weight:800;
+}
+
+.nav-btn.active{
+    color:var(--green);
+}
+
+.nav-icon{
+    display:block;
+    font-size:20px;
+    margin-bottom:3px;
+}
+
+/* ================= FOOTER ================= */
+
+.footer{
+    text-align:center;
+    color:#566a81;
+    font-size:9px;
+    line-height:1.6;
+    margin-top:24px;
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media(max-width:360px){
+
+    .menu{
+        grid-template-columns:1fr 1fr;
+    }
+
+    .tools{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+}
+</style>
 </head>
-<body onload="lockOrientation()">
 
-<div class="terminal-header">
-    101_OKEY v0.9.9.5.4 made by yunusbzkrtc & GogircinAdminBot [EARLY ACCESS]
+<body>
+
+<div class="container">
+
+<!-- ================= HEADER ================= -->
+
+<header class="header">
+
+    <div class="logo">🏗️</div>
+
+    <h1>Hakkı Dayı UstaPro</h1>
+
+    <p>
+        Saha hesabı • İş ağı • Ustalar • Teklif
+    </p>
+
+</header>
+
+
+<!-- ================= PROFILE ================= -->
+
+<section class="profile">
+
+    <div class="avatar">👷</div>
+
+    <div class="profile-info">
+
+        <div class="profile-name" id="userName">
+            Usta
+        </div>
+
+        <div class="profile-level" id="userLevel">
+            🥉 Başlangıç Ustası
+        </div>
+
+    </div>
+
+    <div class="points">
+
+        <strong id="points">
+            750
+        </strong>
+
+        <span>
+            UstaPuan
+        </span>
+
+    </div>
+
+</section>
+
+
+<!-- ================= PROGRESS ================= -->
+
+<section class="progress-card">
+
+    <div class="progress-head">
+
+        <div class="progress-title">
+            🏆 30 Gün PRO Ödülü
+        </div>
+
+        <div class="progress-points">
+            750 / 1000
+        </div>
+
+    </div>
+
+    <div class="progress-track">
+
+        <div class="progress-fill"
+             id="progressFill">
+        </div>
+
+    </div>
+
+    <div class="progress-bottom">
+
+        <span id="remainingText">
+            250 puan kaldı
+        </span>
+
+        <span>
+            🎁 30 Gün PRO
+        </span>
+
+    </div>
+
+</section>
+
+
+<!-- ================= DOWNLOAD CAMPAIGN ================= -->
+
+<section class="campaign">
+
+    <div class="campaign-title">
+        📱 UstaPro'yu indir,
+        <span>+250 UstaPuan kazan!</span>
+    </div>
+
+    <p class="campaign-text">
+        UstaPro mobil uygulamasını indir.
+        Tek seferlik kampanya ile PRO hedefine
+        daha hızlı ulaş.
+    </p>
+
+    <button class="campaign-btn"
+            onclick="downloadUstaPro()">
+
+        🚀 UstaPro'yu Ücretsiz İndir
+
+    </button>
+
+</section>
+
+
+<!-- ================= QUICK MENU ================= -->
+
+<section class="section">
+
+    <div class="section-head">
+
+        <div class="section-title">
+            🚀 Saha Ağı
+        </div>
+
+    </div>
+
+    <div class="menu">
+
+        <button class="menu-card"
+                onclick="scrollToId('jobsSection')">
+
+            <span class="menu-icon">📢</span>
+
+            <span class="menu-title">
+                İş İlanları
+            </span>
+
+            <span class="menu-desc">
+                Yakınındaki işleri keşfet
+            </span>
+
+        </button>
+
+
+        <button class="menu-card"
+                onclick="openNewJob()">
+
+            <span class="menu-icon">➕</span>
+
+            <span class="menu-title">
+                İş İlanı Ver
+            </span>
+
+            <span class="menu-desc">
+                Ücretsiz ilan oluştur
+            </span>
+
+        </button>
+
+
+        <button class="menu-card"
+                onclick="openChats()">
+
+            <span class="menu-icon">💬</span>
+
+            <span class="menu-title">
+                Sohbetler
+            </span>
+
+            <span class="menu-desc">
+                İş sahipleriyle iletişim
+            </span>
+
+        </button>
+
+
+        <button class="menu-card"
+                onclick="openProfile()">
+
+            <span class="menu-icon">👤</span>
+
+            <span class="menu-title">
+                Profilim
+            </span>
+
+            <span class="menu-desc">
+                Usta profilini yönet
+            </span>
+
+        </button>
+
+    </div>
+
+</section>
+
+
+<!-- ================= JOBS ================= -->
+
+<section class="section"
+         id="jobsSection">
+
+    <div class="section-head">
+
+        <div class="section-title">
+            📍 Yakındaki İşler
+        </div>
+
+        <button class="section-link"
+                onclick="openNewJob()">
+            + İlan Ver
+        </button>
+
+    </div>
+
+
+    <div class="filters">
+
+        <button class="filter active"
+                onclick="filterJobs('all',this)">
+            Tümü
+        </button>
+
+        <button class="filter"
+                onclick="filterJobs('parke',this)">
+            🧱 Parke
+        </button>
+
+        <button class="filter"
+                onclick="filterJobs('bordur',this)">
+            🪨 Bordür
+        </button>
+
+        <button class="filter"
+                onclick="filterJobs('beton',this)">
+            🏗️ Beton
+        </button>
+
+        <button class="filter"
+                onclick="filterJobs('peyzaj',this)">
+            🌳 Peyzaj
+        </button>
+
+        <button class="filter"
+                onclick="filterJobs('cim',this)">
+            🌱 Çim
+        </button>
+
+    </div>
+
+
+    <div id="jobsList">
+
+        <!-- JOB 1 -->
+
+        <article class="job"
+                 data-category="parke">
+
+            <div class="job-head">
+
+                <div class="job-title">
+                    🧱 800 m² Kilit Parke
+                </div>
+
+                <div class="job-distance">
+                    8 km
+                </div>
+
+            </div>
+
+            <div class="job-tags">
+
+                <span class="tag">
+                    Kilit Parke
+                </span>
+
+                <span class="tag">
+                    Ekip
+                </span>
+
+                <span class="tag">
+                    800 m²
+                </span>
+
+            </div>
+
+            <div class="job-info">
+                📍 Mersin / Erdemli<br>
+                👷 Usta veya ekip aranıyor<br>
+                🕒 Yeni ilan
+            </div>
+
+            <div class="job-bottom">
+
+                <div class="job-price">
+                    💰 Teklif alınacak
+                </div>
+
+                <button class="job-button"
+                        onclick="openJob('800 m² Kilit Parke','parke')">
+                    İşi Gör
+                </button>
+
+            </div>
+
+        </article>
+
+
+        <!-- JOB 2 -->
+
+        <article class="job"
+                 data-category="bordur">
+
+            <div class="job-head">
+
+                <div class="job-title">
+                    🪨 120 MT Beton Bordür
+                </div>
+
+                <div class="job-distance">
+                    14 km
+                </div>
+
+            </div>
+
+            <div class="job-tags">
+
+                <span class="tag">
+                    Bordür
+                </span>
+
+                <span class="tag">
+                    120 MT
+                </span>
+
+            </div>
+
+            <div class="job-info">
+                📍 Mersin / Mezitli<br>
+                👷 Usta veya ekip aranıyor<br>
+                🕒 Bugün
+            </div>
+
+            <div class="job-bottom">
+
+                <div class="job-price">
+                    💰 Teklif alınacak
+                </div>
+
+                <button class="job-button"
+                        onclick="openJob('120 MT Beton Bordür','bordur')">
+                    İşi Gör
+                </button>
+
+            </div>
+
+        </article>
+
+
+        <!-- JOB 3 -->
+
+        <article class="job"
+                 data-category="beton">
+
+            <div class="job-head">
+
+                <div class="job-title">
+                    🏗️ 150 m² Saha Betonu
+                </div>
+
+                <div class="job-distance">
+                    17 km
+                </div>
+
+            </div>
+
+            <div class="job-tags">
+
+                <span class="tag">
+                    Beton
+                </span>
+
+                <span class="tag">
+                    10 cm
+                </span>
+
+            </div>
+
+            <div class="job-info">
+                📍 Mersin / Yenişehir<br>
+                🧱 C25 beton<br>
+                🕒 Yeni ilan
+            </div>
+
+            <div class="job-bottom">
+
+                <div class="job-price">
+                    💰 Teklif alınacak
+                </div>
+
+                <button class="job-button"
+                        onclick="openJob('150 m² Saha Betonu','beton')">
+                    İşi Gör
+                </button>
+
+            </div>
+
+        </article>
+
+
+        <!-- JOB 4 -->
+
+        <article class="job"
+                 data-category="peyzaj">
+
+            <div class="job-head">
+
+                <div class="job-title">
+                    🌳 Çevre Düzenleme
+                </div>
+
+                <div class="job-distance">
+                    21 km
+                </div>
+
+            </div>
+
+            <div class="job-tags">
+
+                <span class="tag">
+                    Peyzaj
+                </span>
+
+                <span class="tag">
+                    Çim
+                </span>
+
+                <span class="tag">
+                    Ekip
+                </span>
+
+            </div>
+
+            <div class="job-info">
+                📍 Mersin / Toroslar<br>
+                🌱 Çim saha + çevre düzenleme<br>
+                🕒 2 gün önce
+            </div>
+
+            <div class="job-bottom">
+
+                <div class="job-price">
+                    💰 Teklif alınacak
+                </div>
+
+                <button class="job-button"
+                        onclick="openJob('Çevre Düzenleme','peyzaj')">
+                    İşi Gör
+                </button>
+
+            </div>
+
+        </article>
+
+    </div>
+
+</section>
+
+
+<!-- ================= CHAT ================= -->
+
+<section class="section">
+
+    <div class="section-head">
+
+        <div class="section-title">
+            💬 Son Sohbetler
+        </div>
+
+        <button class="section-link"
+                onclick="openChats()">
+            Tümü
+        </button>
+
+    </div>
+
+
+    <div class="chat-box">
+
+        <div class="chat-row">
+
+            <div class="chat-avatar">
+                👨
+            </div>
+
+            <div class="chat-info">
+
+                <div class="chat-name">
+                    Ahmet • Kilit Parke
+                </div>
+
+                <div class="chat-message">
+                    Fiyat teklifini gönderebilir misiniz?
+                </div>
+
+            </div>
+
+            <div class="chat-time">
+                10:42
+            </div>
+
+        </div>
+
+
+        <div class="chat-row">
+
+            <div class="chat-avatar">
+                👷
+            </div>
+
+            <div class="chat-info">
+
+                <div class="chat-name">
+                    Mehmet Usta
+                </div>
+
+                <div class="chat-message">
+                    Fotoğrafları gönderdim.
+                </div>
+
+            </div>
+
+            <div class="chat-time">
+                09:18
+            </div>
+
+        </div>
+
+
+        <div class="chat-row">
+
+            <div class="chat-avatar">
+                👩
+            </div>
+
+            <div class="chat-info">
+
+                <div class="chat-name">
+                    Zeynep • Peyzaj
+                </div>
+
+                <div class="chat-message">
+                    İş için ne zaman gelebilirsiniz?
+                </div>
+
+            </div>
+
+            <div class="chat-time">
+                Dün
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ================= INVITE ================= -->
+
+<section class="section">
+
+    <div class="invite">
+
+        <div class="invite-title">
+            👥 Arkadaşını Davet Et
+        </div>
+
+        <p class="invite-text">
+            Arkadaşın UstaPro Saha Ağına katıldığında
+            <span class="invite-reward">
+                ikiniz de UstaPuan
+            </span>
+            kazanabilirsiniz.
+        </p>
+
+        <button class="invite-btn"
+                onclick="inviteFriend()">
+
+            🎁 Davet Linkimi Paylaş
+
+        </button>
+
+    </div>
+
+</section>
+
+
+<!-- ================= TOOLS ================= -->
+
+<section class="section">
+
+    <div class="section-head">
+
+        <div class="section-title">
+            🛠️ UstaPro Araçları
+        </div>
+
+        <button class="section-link"
+                onclick="downloadUstaPro()">
+            Tümünü Gör
+        </button>
+
+    </div>
+
+
+    <div class="tools">
+
+        <button class="tool"
+                onclick="downloadUstaPro()">
+
+            <span class="tool-icon">📐</span>
+            <span class="tool-name">Metraj</span>
+
+        </button>
+
+
+        <button class="tool"
+                onclick="downloadUstaPro()">
+
+            <span class="tool-icon">🏗️</span>
+            <span class="tool-name">Beton</span>
+
+        </button>
+
+
+        <button class="tool"
+                onclick="downloadUstaPro()">
+
+            <span class="tool-icon">🎨</span>
+            <span class="tool-name">Boya</span>
+
+        </button>
+
+
+        <button class="tool"
+                onclick="downloadUstaPro()">
+
+            <span class="tool-icon">📏</span>
+            <span class="tool-name">AR Metre</span>
+
+        </button>
+
+
+        <button class="tool"
+                onclick="downloadUstaPro()">
+
+            <span class="tool-icon">🗺️</span>
+            <span class="tool-name">GPS Alan</span>
+
+        </button>
+
+
+        <button class="tool"
+                onclick="downloadUstaPro()">
+
+            <span class="tool-icon">📄</span>
+            <span class="tool-name">Teklif PDF</span>
+
+        </button>
+
+
+        <button class="tool"
+                onclick="downloadUstaPro()">
+
+            <span class="tool-icon">🧱</span>
+            <span class="tool-name">Alan Döşeme</span>
+
+        </button>
+
+
+        <button class="tool"
+                onclick="downloadUstaPro()">
+
+            <span class="tool-icon">📊</span>
+            <span class="tool-name">Maliyet</span>
+
+        </button>
+
+
+        <button class="tool"
+                onclick="downloadUstaPro()">
+
+            <span class="tool-icon">📍</span>
+            <span class="tool-name">Nokta</span>
+
+        </button>
+
+    </div>
+
+</section>
+
+
+<div class="footer">
+    © 2026 Hakkı Dayı UstaPro<br>
+    UstaPro Saha Ağı
 </div>
 
-<div class="game-layout">
-    <div class="side-controls">
-        <button class="action-btn">[Q] TAS ISLE</button>
-        <button class="action-btn" style="color: #f39c12;">[R] CIFT AC</button>
-        <button class="action-btn">[H] RAPORT</button>
-    </div>
-
-    <div class="main-stage">
-        <div class="rack" id="gameRack"></div>
-    </div>
-
-    <div class="side-controls">
-        <button class="action-btn">[E] SERI AC</button>
-        <button class="action-btn" style="color: #3498db;" onclick="akilliDizV9()">[S] SERI DIZ</button>
-        <button class="action-btn">[F] TAS AT</button>
-    </div>
-
-    <button class="deal-btn" id="mainBtn" onclick="dealTilesV9()">DAĞIT</button>
 </div>
+
+
+<!-- ================= NEW JOB MODAL ================= -->
+
+<div class="modal"
+     id="jobModal">
+
+    <div class="modal-box">
+
+        <div class="modal-handle"></div>
+
+        <div class="modal-title">
+            📢 Yeni İş İlanı Oluştur
+        </div>
+
+
+        <div class="form">
+
+            <label>
+                İş türü
+            </label>
+
+            <select id="jobType">
+
+                <option value="Kilit Parke">
+                    🧱 Kilit Parke
+                </option>
+
+                <option value="Bordür">
+                    🪨 Bordür
+                </option>
+
+                <option value="Beton">
+                    🏗️ Beton
+                </option>
+
+                <option value="Çim Saha">
+                    🌱 Çim Saha
+                </option>
+
+                <option value="Peyzaj">
+                    🌳 Peyzaj
+                </option>
+
+                <option value="Hafriyat">
+                    🚜 Hafriyat
+                </option>
+
+                <option value="Taş Duvar">
+                    🧱 Taş Duvar
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <div class="form">
+
+            <label>
+                Şehir / İlçe
+            </label>
+
+            <input
+                id="jobLocation"
+                type="text"
+                placeholder="Örn: Mersin / Erdemli">
+
+        </div>
+
+
+        <div class="form">
+
+            <label>
+                İş miktarı
+            </label>
+
+            <input
+                id="jobAmount"
+                type="text"
+                placeholder="Örn: 500 m²">
+
+        </div>
+
+
+        <div class="form">
+
+            <label>
+                Açıklama
+            </label>
+
+            <textarea
+                id="jobDescription"
+                placeholder="İş hakkında bilgi yazın..."></textarea>
+
+        </div>
+
+
+        <div class="modal-actions">
+
+            <button class="cancel"
+                    onclick="closeModal()">
+                Vazgeç
+            </button>
+
+            <button class="confirm"
+                    onclick="submitJob()">
+                İlanı Yayınla
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ================= TOAST ================= -->
+
+<div class="toast"
+     id="toast">
+</div>
+
+
+<!-- ================= BOTTOM NAV ================= -->
+
+<nav class="bottom-nav">
+
+    <div class="nav-inner">
+
+        <button class="nav-btn active"
+                onclick="goHome(this)">
+
+            <span class="nav-icon">🏠</span>
+            Ana Sayfa
+
+        </button>
+
+
+        <button class="nav-btn"
+                onclick="scrollToId('jobsSection');setActive(this)">
+
+            <span class="nav-icon">📢</span>
+            İşler
+
+        </button>
+
+
+        <button class="nav-btn"
+                onclick="openChats();setActive(this)">
+
+            <span class="nav-icon">💬</span>
+            Sohbet
+
+        </button>
+
+
+        <button class="nav-btn"
+                onclick="openProfile();setActive(this)">
+
+            <span class="nav-icon">👤</span>
+            Profil
+
+        </button>
+
+    </div>
+
+</nav>
+
 
 <script>
-    // Yatay ekran kilidi
-    async function lockOrientation() {
-        try { if (screen.orientation) await screen.orientation.lock('landscape'); } catch (e) {}
-    }
 
-    const rack = document.getElementById('gameRack');
-    // Yunus'un kodundaki renk mantığı: Kırmızı, Mavi, Siyah, Sarı
-    const colors = ['#d32f2f', '#1976d2', '#212121', '#f39c12']; 
-    let myTiles = [];
+/* =====================================================
+   USTAPRO TELEGRAM V3
+   Güvenli Telegram WebApp başlangıcı
+===================================================== */
 
-    // 'okey_v9.c' içindeki olusturma() ve ayirma() mantığı
-    function dealTilesV9() {
-        document.getElementById('mainBtn').style.display = 'none';
-        rack.innerHTML = '';
-        myTiles = [];
+"use strict";
 
-        for(let i=0; i<21; i++) {
-            const num = Math.floor(Math.random() * 13) + 1;
-            const colorIdx = Math.floor(Math.random() * 4);
-            const tileData = { num: num, color: colors[colorIdx], id: i };
-            myTiles.push(tileData);
-            createTileElement(tileData, i);
+
+/* ================= TELEGRAM ================= */
+
+const TG =
+    window.Telegram &&
+    window.Telegram.WebApp
+        ? window.Telegram.WebApp
+        : null;
+
+
+if(TG){
+
+    try{
+
+        TG.ready();
+        TG.expand();
+
+        if(TG.setHeaderColor){
+            TG.setHeaderColor("#060d18");
         }
+
+        if(TG.setBackgroundColor){
+            TG.setBackgroundColor("#060d18");
+        }
+
+    }catch(error){
+
+        console.log(
+            "Telegram WebApp başlatma hatası:",
+            error
+        );
+
     }
 
-    function createTileElement(data, index) {
-        const tile = document.createElement('div');
-        tile.className = 'tile';
-        tile.id = 'tile-' + data.id;
-        tile.style.color = data.color;
-        tile.innerHTML = `<div>${data.num}</div><div class="tile-dot" style="background: ${data.color}"></div>`;
-        
-        // İlk dizilim: Terminaldeki gibi iki sıra
-        tile.style.left = (5 + (index % 11) * 8.5) + "%";
-        tile.style.top = (index < 11 ? "15%" : "55%");
+}
 
-        // Mıknatıs (Snap) ve Sürükleme
-        tile.addEventListener('touchmove', (e) => {
-            let touch = e.touches[0];
-            let rect = rack.getBoundingClientRect();
-            tile.style.transition = "none";
-            tile.style.left = (touch.clientX - rect.left - 22) + 'px';
-            tile.style.top = (touch.clientY - rect.top - 31) + 'px';
-            tile.style.zIndex = "1000";
-        });
-        
-        tile.addEventListener('touchend', () => {
-            tile.style.zIndex = "10";
-            tile.style.transition = "all 0.2s ease-out";
-            let currentTop = parseFloat(tile.style.top);
-            // Mıknatıs: En yakın sıraya yapış
-            tile.style.top = (currentTop < (rack.offsetHeight / 2) - 10) ? "15%" : "55%";
-        });
 
-        rack.appendChild(tile);
+/* ================= SABİTLER ================= */
+
+const PLAY_STORE_URL =
+"https://play.google.com/store/apps/details?id=com.hakkidayiustapro";
+
+const BOT_USERNAME =
+"USTAPRO_BOT";
+
+
+/* ================= KULLANICI ================= */
+
+function getTelegramUser(){
+
+    try{
+
+        if(
+            TG &&
+            TG.initDataUnsafe &&
+            TG.initDataUnsafe.user
+        ){
+
+            return TG.initDataUnsafe.user;
+
+        }
+
+    }catch(error){}
+
+    return null;
+
+}
+
+
+function loadUser(){
+
+    const user =
+        getTelegramUser();
+
+    const nameElement =
+        document.getElementById("userName");
+
+    if(!nameElement){
+        return;
     }
 
-    // YUNUS BOZKURTACA'NIN SERİ DİZ (BETA) ALGORİTMASI
-    function akilliDizV9() {
-        const tileElements = Array.from(document.querySelectorAll('.tile'));
-        
-        // Önce Renk, sonra Sayı (Terminal sıralama mantığı)
-        tileElements.sort((a, b) => {
-            if (a.style.color !== b.style.color) return a.style.color.localeCompare(b.style.color);
-            return parseInt(a.innerText) - parseInt(b.innerText);
-        });
+    if(user){
 
-        tileElements.forEach((tile, i) => {
-            tile.style.transition = "all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)";
-            tile.style.left = (5 + (i % 11) * 8.5) + "%";
-            tile.style.top = (i < 11 ? "15%" : "55%");
-        });
+        const name =
+            user.first_name ||
+            user.username ||
+            "Usta";
+
+        nameElement.textContent =
+            name;
+
+    }else{
+
+        nameElement.textContent =
+            "Usta";
+
     }
+
+}
+
+loadUser();
+
+
+/* ================= HAPTIC ================= */
+
+function haptic(type){
+
+    if(
+        !TG ||
+        !TG.HapticFeedback
+    ){
+
+        return;
+
+    }
+
+    try{
+
+        if(type === "success"){
+
+            TG.HapticFeedback
+                .notificationOccurred(
+                    "success"
+                );
+
+        }else{
+
+            TG.HapticFeedback
+                .impactOccurred(
+                    "medium"
+                );
+
+        }
+
+    }catch(error){}
+
+}
+
+
+/* ================= TOAST ================= */
+
+let toastTimer = null;
+
+
+function showToast(message){
+
+    const toast =
+        document.getElementById("toast");
+
+    if(!toast){
+        return;
+    }
+
+    toast.textContent =
+        message;
+
+    toast.classList.add("show");
+
+    clearTimeout(toastTimer);
+
+    toastTimer =
+        setTimeout(function(){
+
+            toast.classList.remove("show");
+
+        },3000);
+
+}
+
+
+/* ================= NAV ================= */
+
+function setActive(button){
+
+    const buttons =
+        document.querySelectorAll(
+            ".nav-btn"
+        );
+
+    buttons.forEach(function(btn){
+
+        btn.classList.remove(
+            "active"
+        );
+
+    });
+
+    if(button){
+        button.classList.add(
+            "active"
+        );
+    }
+
+}
+
+
+function goHome(button){
+
+    setActive(button);
+
+    window.scrollTo({
+        top:0,
+        behavior:"smooth"
+    });
+
+    haptic();
+
+}
+
+
+function scrollToId(id){
+
+    const element =
+        document.getElementById(id);
+
+    if(!element){
+        return;
+    }
+
+    element.scrollIntoView({
+        behavior:"smooth",
+        block:"start"
+    });
+
+    haptic();
+
+}
+
+
+/* ================= PLAY STORE ================= */
+
+function downloadUstaPro(){
+
+    haptic("success");
+
+    showToast(
+        "📱 UstaPro açılıyor..."
+    );
+
+    setTimeout(function(){
+
+        try{
+
+            if(
+                TG &&
+                typeof TG.openLink ===
+                "function"
+            ){
+
+                TG.openLink(
+                    PLAY_STORE_URL
+                );
+
+                return;
+
+            }
+
+        }catch(error){}
+
+        window.open(
+            PLAY_STORE_URL,
+            "_blank"
+        );
+
+    },250);
+
+}
+
+
+/* ================= DAVET ================= */
+
+function inviteFriend(){
+
+    haptic();
+
+    const user =
+        getTelegramUser();
+
+    const id =
+        user && user.id
+            ? String(user.id)
+            : "guest";
+
+    const inviteLink =
+        "https://t.me/" +
+        BOT_USERNAME +
+        "?start=ref_" +
+        encodeURIComponent(id);
+
+    const message =
+        "👷 UstaPro Saha Ağına katıl!\n\n" +
+        "📢 İş ilanlarını keşfet\n" +
+        "💬 Ustalarla bağlantı kur\n" +
+        "🏆 UstaPuan kazan\n\n" +
+        inviteLink;
+
+
+    if(
+        TG &&
+        typeof TG.openTelegramLink ===
+        "function"
+    ){
+
+        try{
+
+            const shareUrl =
+                "https://t.me/share/url" +
+                "?url=" +
+                encodeURIComponent(
+                    inviteLink
+                ) +
+                "&text=" +
+                encodeURIComponent(
+                    message
+                );
+
+            TG.openTelegramLink(
+                shareUrl
+            );
+
+            return;
+
+        }catch(error){}
+
+    }
+
+
+    if(
+        navigator.clipboard &&
+        typeof navigator.clipboard.writeText ===
+        "function"
+    ){
+
+        navigator.clipboard
+            .writeText(message)
+            .then(function(){
+
+                showToast(
+                    "🎁 Davet mesajı kopyalandı."
+                );
+
+            })
+            .catch(function(){
+
+                alert(message);
+
+            });
+
+        return;
+
+    }
+
+    alert(message);
+
+}
+
+
+/* ================= JOB FILTER ================= */
+
+function filterJobs(category,button){
+
+    haptic();
+
+    const filters =
+        document.querySelectorAll(
+            ".filter"
+        );
+
+    filters.forEach(function(item){
+
+        item.classList.remove(
+            "active"
+        );
+
+    });
+
+    if(button){
+        button.classList.add(
+            "active"
+        );
+    }
+
+
+    const jobs =
+        document.querySelectorAll(
+            "#jobsList .job"
+        );
+
+    jobs.forEach(function(job){
+
+        const jobCategory =
+            job.getAttribute(
+                "data-category"
+            );
+
+        if(
+            category === "all" ||
+            jobCategory === category
+        ){
+
+            job.style.display =
+                "block";
+
+        }else{
+
+            job.style.display =
+                "none";
+
+        }
+
+    });
+
+}
+
+
+/* ================= JOB DETAIL ================= */
+
+function openJob(title,category){
+
+    haptic();
+
+    const categoryName =
+        category === "parke"
+            ? "🧱 Kilit Parke"
+            : category === "bordur"
+                ? "🪨 Bordür"
+                : category === "beton"
+                    ? "🏗️ Beton"
+                    : "🌳 Peyzaj";
+
+    showToast(
+        "📢 " +
+        categoryName +
+        " ilanı açılıyor..."
+    );
+
+    /*
+       Firebase bağlandığında:
+       burada jobId ile gerçek
+       ilan detay ekranı açılacak.
+    */
+
+    setTimeout(function(){
+
+        alert(
+            "📢 " + title + "\n\n" +
+            "📍 Konum bilgisi\n" +
+            "📏 İş miktarı\n" +
+            "💰 Teklif bilgisi\n" +
+            "👤 İş sahibi\n\n" +
+            "💬 Sohbet başlat\n\n" +
+            "Bu ekran Firebase bağlantısı " +
+            "yapıldığında gerçek ilan " +
+            "verileriyle çalışacak."
+        );
+
+    },200);
+
+}
+
+
+/* ================= NEW JOB ================= */
+
+function openNewJob(){
+
+    haptic();
+
+    const modal =
+        document.getElementById(
+            "jobModal"
+        );
+
+    if(modal){
+
+        modal.classList.add(
+            "show"
+        );
+
+    }
+
+}
+
+
+function closeModal(){
+
+    const modal =
+        document.getElementById(
+            "jobModal"
+        );
+
+    if(modal){
+
+        modal.classList.remove(
+            "show"
+        );
+
+    }
+
+}
+
+
+/* ================= SUBMIT JOB ================= */
+
+function submitJob(){
+
+    const type =
+        document.getElementById(
+            "jobType"
+        ).value;
+
+    const location =
+        document.getElementById(
+            "jobLocation"
+        ).value.trim();
+
+    const amount =
+        document.getElementById(
+            "jobAmount"
+        ).value.trim();
+
+    const description =
+        document.getElementById(
+            "jobDescription"
+        ).value.trim();
+
+
+    if(!location){
+
+        showToast(
+            "⚠️ Şehir / ilçe girin."
+        );
+
+        return;
+
+    }
+
+
+    if(!amount){
+
+        showToast(
+            "⚠️ İş miktarını girin."
+        );
+
+        return;
+
+    }
+
+
+    if(!description){
+
+        showToast(
+            "⚠️ İş açıklaması girin."
+        );
+
+        return;
+
+    }
+
+
+    const user =
+        getTelegramUser();
+
+
+    const jobData = {
+
+        action:"new_job",
+
+        jobType:type,
+
+        location:location,
+
+        amount:amount,
+
+        description:description,
+
+        telegramUser:user
+
+    };
+
+
+    haptic("success");
+
+
+    /*
+       Telegram botuna veri gönderimi.
+       WebApp bot üzerinden açılmışsa
+       bot tarafına JSON gider.
+    */
+
+    if(
+        TG &&
+        typeof TG.sendData ===
+        "function"
+    ){
+
+        try{
+
+            TG.sendData(
+                JSON.stringify(
+                    jobData
+                )
+            );
+
+            showToast(
+                "✅ İlan gönderildi."
+            );
+
+            closeModal();
+
+            return;
+
+        }catch(error){
+
+            console.log(
+                "Telegram sendData:",
+                error
+            );
+
+        }
+
+    }
+
+
+    /*
+       Telegram dışında test edildiğinde
+       uygulama çökmek yerine test mesajı.
+    */
+
+    showToast(
+        "✅ Test: İlan verisi hazır."
+    );
+
+    console.log(
+        "USTAPRO JOB:",
+        jobData
+    );
+
+    closeModal();
+
+}
+
+
+/* ================= SOHBET ================= */
+
+function openChats(){
+
+    haptic();
+
+    alert(
+        "💬 UstaPro Sohbetleri\n\n" +
+        "Burada gerçek kullanıcılarla " +
+        "iş bazlı mesajlaşma olacak.\n\n" +
+        "Firebase bağlantısı yapıldığında:\n" +
+        "• Mesajlaşma\n" +
+        "• Fotoğraf gönderme\n" +
+        "• Teklif gönderme\n" +
+        "• İş konumu\n" +
+        "• İş tamamlandı\n\n" +
+        "özellikleri aktif olacak."
+    );
+
+}
+
+
+/* ================= PROFILE ================= */
+
+function openProfile(){
+
+    haptic();
+
+    const user =
+        getTelegramUser();
+
+    const name =
+        user &&
+        (user.first_name ||
+         user.username)
+            ? (
+                user.first_name ||
+                user.username
+              )
+            : "Usta";
+
+
+    alert(
+        "👤 Usta Profilim\n\n" +
+        "👷 " + name + "\n" +
+        "🏆 750 UstaPuan\n" +
+        "🥉 Başlangıç Ustası\n" +
+        "⭐ Değerlendirme sistemi\n" +
+        "📢 Aktif işler\n" +
+        "✅ Tamamlanan işler\n\n" +
+        "Profil düzenleme Firebase " +
+        "bağlantısından sonra aktif olacak."
+    );
+
+}
+
+
+/* ================= MODAL DIŞI ================= */
+
+const jobModal =
+    document.getElementById(
+        "jobModal"
+    );
+
+
+if(jobModal){
+
+    jobModal.addEventListener(
+        "click",
+        function(event){
+
+            if(
+                event.target ===
+                jobModal
+            ){
+
+                closeModal();
+
+            }
+
+        }
+    );
+
+}
+
+
+/* ================= TELEGRAM BACK ================= */
+
+if(
+    TG &&
+    TG.BackButton
+){
+
+    try{
+
+        TG.BackButton.show();
+
+        TG.BackButton.onClick(
+            function(){
+
+                const modal =
+                    document.getElementById(
+                        "jobModal"
+                    );
+
+                if(
+                    modal &&
+                    modal.classList.contains(
+                        "show"
+                    )
+                ){
+
+                    closeModal();
+
+                    return;
+
+                }
+
+                TG.close();
+
+            }
+        );
+
+    }catch(error){}
+
+}
+
+
+/* ================= CONSOLE ================= */
+
+console.log(
+    "UstaPro Telegram V3 hazır."
+);
+
 </script>
+
 </body>
 </html>
